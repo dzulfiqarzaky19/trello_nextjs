@@ -1,0 +1,11 @@
+
+# Next.js
+/.next/
+/out/
+/build/
+/dist/
+/node_modules/
+
+# Other
+.vercel
+/coverage
