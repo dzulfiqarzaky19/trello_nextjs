@@ -1,6 +1,6 @@
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar"
 
-export const CardAvatar = ({ assignees }: { assignees: { id: string; name: string; image: string }[] }) => {
+export const CardAvatar = ({ assignees, isEditable }: { assignees: { id: string; name: string; image: string }[]; isEditable?: boolean }) => {
     if (!assignees || assignees.length === 0) return null
 
     const maxVisible = 2
@@ -10,7 +10,7 @@ export const CardAvatar = ({ assignees }: { assignees: { id: string; name: strin
     return (
         <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
             {visible.map((user, index) => {
-                if (index === maxVisible - 1 && remaining > 0) {
+                if (index === maxVisible - 1 && remaining > 0 && !isEditable) {
                     return (
                         <Avatar key="extra">
                             <AvatarFallback>+{remaining + 1}</AvatarFallback>
@@ -25,6 +25,12 @@ export const CardAvatar = ({ assignees }: { assignees: { id: string; name: strin
                     </Avatar>
                 )
             })}
+
+            {isEditable && (
+                <Avatar key="extra" >
+                    <AvatarFallback className="cursor-pointer bg-gray-200 shadow-sm hover:shadow">+</AvatarFallback>
+                </Avatar>
+            )}
         </div>
     )
 }

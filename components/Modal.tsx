@@ -1,23 +1,24 @@
 "use client"
 
-import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog"
+import { useState, cloneElement, isValidElement } from "react"
+import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog"
 
 
-export const Modal = ({ children, trigger, title }: { children: React.ReactNode, trigger: React.ReactNode, title: string }) => {
+export const Modal = ({ children, trigger }: { children: React.ReactNode, trigger: React.ReactNode }) => {
     const [open, setOpen] = useState(false)
 
+    const childrenWithProps = isValidElement(children)
+        ? cloneElement(children as React.ReactElement<any>, { closeModal: () => setOpen(false) })
+        : children
+
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={setOpen} modal>
             <DialogTrigger asChild>
                 {trigger}
             </DialogTrigger>
             <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>{title}</DialogTitle>
-                </DialogHeader>
-                {children}
+                {childrenWithProps}
             </DialogContent>
         </Dialog>
     )
-}
+}           
