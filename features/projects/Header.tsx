@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Bell, Filter, List, PlusIcon, Search, SquareKanban, User } from "lucide-react"
+import { ModalColumnForm } from "./components/ModalColumnForm"
 
 interface IHeaderProps {
     label: string,
@@ -48,15 +49,9 @@ export const Header = ({
                         <Button variant="default" className="cursor-pointer">
                             <PlusIcon /> New Column
                         </Button>
-                    }>
+                    } modalClass="sm:max-w-xl">
                         <FormWrapper action={addColumn}>
-                            <div className="space-y-4">
-                                <div>
-                                    <Label htmlFor="columnTitle">Column Title</Label>
-                                    <Input id="columnTitle" name="columnTitle" required />
-                                </div>
-                                <Button type="submit" className="cursor-pointer">Add Column</Button>
-                            </div>
+                            <ModalColumnForm />
                         </FormWrapper>
                     </Modal>
                 </div>

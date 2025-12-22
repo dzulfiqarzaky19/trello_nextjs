@@ -2,7 +2,9 @@
 
 export async function addColumn(formData: FormData) {
     const columnTitle = formData.get("columnTitle")
-    console.log("Adding new column", { columnTitle })
+    const headerColor = formData.get("headerColor")
+    const description = formData.get("description")
+    console.log("Adding new column", { columnTitle, headerColor, description })
 }
 
 export async function addTask(formData: FormData) {
