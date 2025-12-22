@@ -1,5 +1,4 @@
 import { addTask, updateTask } from '@/app/actions';
-import { IProjectsPageContentDummy } from '@/app/projects/page';
 import { CardDemo } from '@/components/Card';
 import { FormWrapper } from '@/components/FormWrapper';
 import { Modal } from '@/components/Modal';
@@ -16,8 +15,9 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { Ellipsis, Plus } from 'lucide-react';
 import { ModalForm } from './components/ModalForm';
+import { IProjectsPageContentDummy } from '@/lib/const/projectPage';
 
-export const Main = ({
+export const ProjectsMain = ({
   cardContent,
 }: {
   cardContent: IProjectsPageContentDummy;

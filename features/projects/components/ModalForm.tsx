@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
+import { ProjectCard } from '@/lib/const/projectPage';
 import {
   AlignLeft,
   Archive,
@@ -25,8 +26,6 @@ import {
   Trash2,
   User,
 } from 'lucide-react';
-
-import { ProjectCard } from '@/app/projects/page';
 
 interface ModalFormProps {
   card?: ProjectCard;
