@@ -151,6 +151,8 @@ const PROJECTS_PAGE_CONTENT_DUMMY = [
 ]
 
 export type IProjectsPageContentDummy = typeof PROJECTS_PAGE_CONTENT_DUMMY
+export type ProjectCard = typeof PROJECTS_PAGE_CONTENT_DUMMY[0]['cards'][0]
+
 
 export default function ProjectsPage() {
     return (

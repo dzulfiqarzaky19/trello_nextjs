@@ -1,4 +1,4 @@
-import { addTask } from "@/app/actions"
+import { addTask, updateTask } from "@/app/actions"
 import { IProjectsPageContentDummy } from "@/app/projects/page"
 import { CardDemo } from "@/components/Card"
 import { FormWrapper } from "@/components/FormWrapper"
@@ -34,10 +34,14 @@ export const Main = ({
 
                     <CardContent className="space-y-4">
                         {list.cards.map((card) => (
-                            <Modal key={card.id} trigger={<CardDemo {...card} />}>
-                                <div className="space-y-4" aria-describedby="details">
-                                    <p id="details">{card.description}</p>
-                                </div>
+                            <Modal
+                                key={card.id}
+                                trigger={<CardDemo {...card} />}
+                                modalClass="sm:max-w-5xl max-h-[90vh] overflow-hidden flex flex-col"
+                            >
+                                <FormWrapper action={updateTask} className="flex flex-col h-full min-h-0">
+                                    <ModalForm card={card} />
+                                </FormWrapper>
                             </Modal>
                         ))}
                     </CardContent>

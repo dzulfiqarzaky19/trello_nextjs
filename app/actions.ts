@@ -10,3 +10,10 @@ export async function addTask(formData: FormData) {
     const description = formData.get("description")
     console.log("Adding new task", { title, description })
 }
+
+export async function updateTask(formData: FormData) {
+    const id = formData.get("id")
+    const title = formData.get("title")
+    const description = formData.get("description")
+    console.log("Updating task", { id, title, description })
+}

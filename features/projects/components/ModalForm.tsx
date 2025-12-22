@@ -27,7 +27,15 @@ import {
     User
 } from "lucide-react"
 
-export const ModalForm = () => {
+import { ProjectCard } from "@/app/projects/page"
+
+interface ModalFormProps {
+    card?: ProjectCard
+}
+
+export const ModalForm = ({
+    card
+}: ModalFormProps) => {
     return (
         <div className="grid grid-cols-[1fr_auto] gap-6 h-full min-h-0">
             {/* Main Content */}
@@ -37,8 +45,14 @@ export const ModalForm = () => {
                     <DialogHeader>
                         <DialogTitle className="text-xl font-semibold flex items-center gap-2">
                             <Laptop className="size-5" />
-                            Redesign Landing Page for Q3 Campaign
+                            <Input
+                                name="title"
+                                defaultValue={card?.title}
+                                placeholder="Task Title"
+                                className="font-semibold text-xl border-none shadow-none focus-visible:ring-0 px-0 h-auto p-0"
+                            />
                         </DialogTitle>
+                        {card?.id && <input type="hidden" name="id" value={card.id} />}
                     </DialogHeader>
 
                     <div className="text-sm text-muted-foreground mt-1">
@@ -106,18 +120,12 @@ export const ModalForm = () => {
                         </Button>
                     </div>
                     <div className="text-sm text-muted-foreground pl-7">
-                        <p className="mb-2">
-                            We need to update the hero section with the new branding assets provided by the
-                            marketing team. Key deliverables include:
-                        </p>
-                        <ul className="list-disc list-inside space-y-1">
-                            <li>New typography implementation</li>
-                            <li>Updating the main CTA button color and hover state</li>
-                            <li>Replacing the background image with the Q3 abstract pattern</li>
-                        </ul>
-                        <p className="mt-2">
-                            Please refer to the attached Figma file for exact specs.
-                        </p>
+                        <Textarea
+                            name="description"
+                            defaultValue={card?.description}
+                            placeholder="Add a more detailed description..."
+                            className="min-h-[100px] bg-transparent"
+                        />
                     </div>
                 </div>
 
