@@ -28,7 +28,7 @@ const PROJECTS_PAGE_CONTENT_DUMMY = [
                 comments: 2,
                 attachments: 4,
                 status: "todo",
-                progress: { completed: 0, total: 3, percent: 0 }, // not yet touched
+                progress: { completed: 0, total: 3, percent: 0 },
                 dueDate: "2025-12-18",
                 createdAt: "2025-12-01",
                 updatedAt: "2025-12-10",
@@ -43,7 +43,7 @@ const PROJECTS_PAGE_CONTENT_DUMMY = [
                 comments: 1,
                 attachments: 0,
                 status: "todo",
-                progress: { completed: 0, total: 8, percent: 0 }, // not yet touched
+                progress: { completed: 0, total: 8, percent: 0 },
                 dueDate: "2025-12-20",
                 createdAt: "2025-12-05",
                 updatedAt: "2025-12-12",
@@ -59,7 +59,7 @@ const PROJECTS_PAGE_CONTENT_DUMMY = [
                 comments: 0,
                 attachments: 1,
                 status: "todo",
-                progress: { completed: 1, total: 8, percent: 12 }, // finished
+                progress: { completed: 1, total: 8, percent: 12 },
                 dueDate: "2025-12-15",
                 createdAt: "2025-12-07",
                 updatedAt: "2025-12-14",
@@ -87,7 +87,7 @@ const PROJECTS_PAGE_CONTENT_DUMMY = [
                 comments: 3,
                 attachments: 2,
                 status: "in-progress",
-                progress: { completed: 3, total: 5, percent: 60 }, // in progress
+                progress: { completed: 3, total: 5, percent: 60 },
                 dueDate: "2025-12-19",
                 createdAt: "2025-12-02",
                 updatedAt: "2025-12-13",
@@ -102,7 +102,7 @@ const PROJECTS_PAGE_CONTENT_DUMMY = [
                 comments: 0,
                 attachments: 0,
                 status: "in-progress",
-                progress: { completed: 0, total: 10, percent: 60 }, // in progress
+                progress: { completed: 0, total: 10, percent: 60 },
                 dueDate: "2025-12-24",
                 createdAt: "2025-12-04",
                 updatedAt: "2025-12-14",
@@ -125,7 +125,7 @@ const PROJECTS_PAGE_CONTENT_DUMMY = [
                 ],
                 comments: 0,
                 attachments: 0,
-                progress: { completed: 1, total: 1, percent: 100 }, // finished
+                progress: { completed: 1, total: 1, percent: 100 },
                 dueDate: "2025-11-20",
                 status: "done",
                 createdAt: "2025-11-20",
@@ -140,7 +140,7 @@ const PROJECTS_PAGE_CONTENT_DUMMY = [
                 ],
                 comments: 12,
                 attachments: 3,
-                progress: { completed: 4, total: 4, percent: 100 }, // finished
+                progress: { completed: 4, total: 4, percent: 100 },
                 dueDate: "2025-11-25",
                 status: "done",
                 createdAt: "2025-11-22",
