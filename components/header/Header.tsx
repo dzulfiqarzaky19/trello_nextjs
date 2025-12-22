@@ -22,6 +22,7 @@ interface IHeaderProps {
   description: string;
   isProjectsPage?: boolean;
   isTeamPage?: boolean;
+  isCalendarPage?: boolean;
 }
 
 export const Header = ({
@@ -29,12 +30,17 @@ export const Header = ({
   description,
   isProjectsPage,
   isTeamPage,
+  isCalendarPage,
 }: IHeaderProps) => {
   return (
     <header>
       <TopHeader label={label} description={description} />
 
-      <BottomHeader isProjectsPage={isProjectsPage} isTeamPage={isTeamPage} />
+      <BottomHeader
+        isProjectsPage={isProjectsPage}
+        isTeamPage={isTeamPage}
+        isCalendarPage={isCalendarPage}
+      />
     </header>
   );
 };

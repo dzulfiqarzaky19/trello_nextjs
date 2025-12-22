@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from './ui/button';
+import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
   Folder,
@@ -36,16 +37,13 @@ export const SidebarLink = ({
     >
       <Button
         variant="ghost"
-        className="cursor-pointer justify-baseline w-full text-xl"
-        style={{
-          backgroundColor: isActive ? 'rgba(255, 165, 0, 0.1)' : 'transparent',
-          color: isActive ? '#FFA500' : '#000',
-        }}
+        className={cn(
+          'w-full justify-start gap-3 px-4 py-2 font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors',
+          isActive &&
+            'bg-red-50 text-red-600 hover:bg-red-50 hover:text-red-700'
+        )}
       >
-        <Icon
-          fill={isActive ? '#FFA500' : '#000'}
-          stroke={isActive ? '#FFA500' : '#000'}
-        />
+        <Icon className={cn('w-5 h-5', isActive && 'text-red-600')} />
         {label}
       </Button>
     </Link>

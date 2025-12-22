@@ -4,9 +4,10 @@ import { Modal } from '@/components/Modal';
 import { Button } from '@/components/ui/button';
 import { ModalColumnForm } from '@/features/projects/components/ModalColumnForm';
 import {
+  ChevronLeft,
+  ChevronRight,
   Code,
   Filter,
-  Layout,
   List,
   Mail,
   PenTool,
@@ -20,9 +21,11 @@ import {
 export const BottomHeader = ({
   isProjectsPage,
   isTeamPage,
+  isCalendarPage,
 }: {
   isProjectsPage?: boolean;
   isTeamPage?: boolean;
+  isCalendarPage?: boolean;
 }) => {
   if (isProjectsPage) {
     return (
@@ -104,6 +107,55 @@ export const BottomHeader = ({
             className="cursor-pointer bg-red-500 hover:bg-red-600 text-white border-none shadow-sm"
           >
             <PlusIcon className="w-4 h-4 mr-2" /> Add Member
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (isCalendarPage) {
+    return (
+      <div className="flex items-center justify-between px-6">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="icon" className="h-8 w-8">
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="font-bold text-lg">November 2023</span>
+          <Button variant="outline" size="icon" className="h-8 w-8">
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <div className="flex items-center bg-muted/50 p-1 rounded-lg border">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-3 bg-white text-foreground shadow-sm rounded-md"
+            >
+              Month
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-3 hover:bg-white/50 text-muted-foreground"
+            >
+              Week
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-3 hover:bg-white/50 text-muted-foreground"
+            >
+              Day
+            </Button>
+          </div>
+
+          <Button
+            variant="default"
+            className="bg-red-500 hover:bg-red-600 text-white border-none shadow-sm gap-2"
+          >
+            <PlusIcon className="w-4 h-4" /> New Event
           </Button>
         </div>
       </div>

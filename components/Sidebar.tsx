@@ -40,15 +40,17 @@ const SIDEBAR_CONTENT = [
 
 export const Sidebar = () => {
   return (
-    <div className="grid grid-rows-[auto_1fr_auto] h-screen sticky top-0 z-10 shadow-xl">
-      <header>
-        <Button variant="ghost" className="w-full justify-baseline text-2xl">
-          <LucideTrello />
-          Trello clone
-        </Button>
+    <div className="grid grid-rows-[auto_1fr_auto] h-screen sticky top-0 z-10 border-r bg-white w-64">
+      <header className="p-6">
+        <div className="flex items-center gap-3 px-2">
+          <div className="bg-red-50 p-2 rounded-lg">
+            <LayoutDashboard className="w-6 h-6 text-red-600" />
+          </div>
+          <h1 className="font-bold text-xl tracking-tight">TaskMaster</h1>
+        </div>
       </header>
 
-      <aside className="flex flex-col gap-2 p-8 ">
+      <aside className="flex flex-col gap-1 px-4 py-2">
         {SIDEBAR_CONTENT.map((item) => (
           <SidebarLink
             key={item.label}
@@ -59,14 +61,19 @@ export const Sidebar = () => {
         ))}
       </aside>
 
-      <footer>
-        <Button variant="ghost" className="w-full justify-baseline">
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>CN</AvatarFallback>
+      <footer className="p-4">
+        <div className="bg-red-50/50 p-3 rounded-xl flex items-center gap-3 border border-red-100/50 cursor-pointer hover:bg-red-50 transition-colors">
+          <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
+            <AvatarImage src="https://randomuser.me/api/portraits/women/1.jpg" />
+            <AvatarFallback>SJ</AvatarFallback>
           </Avatar>
-          Trello clone
-        </Button>
+          <div className="flex flex-col overflow-hidden">
+            <span className="text-sm font-bold truncate">Sarah Jenkins</span>
+            <span className="text-xs text-muted-foreground truncate">
+              Product Manager
+            </span>
+          </div>
+        </div>
       </footer>
     </div>
   );
