@@ -46,8 +46,10 @@ export const Main = ({
                         <Modal trigger={<Button variant="ghost" className="w-full cursor-pointer">
                             <Plus />
                             Add Task
-                        </Button>}>
-                            <FormWrapper action={addTask}>
+                        </Button>}
+                            modalClass="sm:max-w-5xl max-h-[90vh] overflow-hidden flex flex-col"
+                        >
+                            <FormWrapper action={addTask} className="flex flex-col h-full min-h-0">
                                 <ModalForm />
                             </FormWrapper>
                         </Modal>
