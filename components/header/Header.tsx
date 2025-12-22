@@ -21,18 +21,20 @@ interface IHeaderProps {
   label: string;
   description: string;
   isProjectsPage?: boolean;
+  isTeamPage?: boolean;
 }
 
 export const Header = ({
   label,
   description,
   isProjectsPage,
+  isTeamPage,
 }: IHeaderProps) => {
   return (
     <header>
       <TopHeader label={label} description={description} />
 
-      <BottomHeader isProjectsPage={isProjectsPage} />
+      <BottomHeader isProjectsPage={isProjectsPage} isTeamPage={isTeamPage} />
     </header>
   );
 };
