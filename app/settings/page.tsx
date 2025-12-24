@@ -8,7 +8,6 @@ export default function SettingsPage() {
       <Header
         label={SETTINGS_PAGE_HEADER.label}
         description={SETTINGS_PAGE_HEADER.description}
-        // No specific props passed, so BottomHeader is hidden
       />
 
       <SettingsMain />

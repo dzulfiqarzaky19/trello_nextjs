@@ -40,6 +40,8 @@ export const DASHBOARD_STATS = [
   },
 ];
 
+export type DashboardStatsType = (typeof DASHBOARD_STATS)[number];
+
 export const CHART_DATA = [
   { name: 'Design', value: 35, fill: '#3B82F6' },
   { name: 'Done', value: 20, fill: '#22C55E' },
