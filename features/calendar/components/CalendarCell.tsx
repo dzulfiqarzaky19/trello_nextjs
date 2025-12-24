@@ -18,9 +18,9 @@ export const CalendarCell = ({
     : [];
 
   return (
-    <div
+    <td
       className={cn(
-        'min-h-[120px] p-2 border-b border-r border-secondary-foreground/20 bg-background transition-colors hover:bg-muted/30',
+        'h-[120px] align-top p-2 border-b border-r border-secondary-foreground/20 bg-background transition-colors hover:bg-muted/30 last:border-r-0 w-[120px]',
         !isCurrentMonth && 'bg-muted/20 text-muted-foreground'
       )}
     >
@@ -44,6 +44,6 @@ export const CalendarCell = ({
           <CalendarEvent key={event.id} {...event} />
         ))}
       </div>
-    </div>
+    </td>
   );
 };
