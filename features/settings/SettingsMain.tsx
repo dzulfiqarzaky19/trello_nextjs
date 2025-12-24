@@ -3,7 +3,7 @@ import { SecurityForm } from './components/SecurityForm';
 
 export const SettingsMain = () => {
   return (
-    <main className="p-8 max-w-4xl">
+    <main className="p-8 max-w-4xl mx-auto">
       <div className="space-y-12">
         <ProfileForm />
         <SecurityForm />
