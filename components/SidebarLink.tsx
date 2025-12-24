@@ -40,7 +40,7 @@ export const SidebarLink = ({
         className={cn(
           'w-full justify-start gap-3 px-4 py-2 font-medium text-muted-foreground hover:bg-red-50 hover:text-red-700 transition-colors cursor-pointer',
           isActive &&
-          'bg-red-50 text-red-600 hover:bg-red-50 hover:text-red-700'
+            'bg-red-50 text-red-600 hover:bg-red-50 hover:text-red-700'
         )}
       >
         <Icon className={cn('w-5 h-5', isActive && 'text-red-600')} />

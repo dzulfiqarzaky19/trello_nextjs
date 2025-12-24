@@ -1,7 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DASHBOARD_STATS } from '@/lib/const/DashboardPage';
-import { cn } from '@/lib/utils';
-import { MoreHorizontal } from 'lucide-react';
 import { TaskDistributionChart } from './components/TaskDistributionChart';
 import { RecentActivity } from './components/RecentActivity';
 import { TeamWorkload } from './components/TeamWorkload';

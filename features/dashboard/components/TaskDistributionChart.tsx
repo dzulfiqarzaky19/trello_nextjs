@@ -49,6 +49,7 @@ export const TaskDistributionChart = () => {
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
+
             <Pie
               data={CHART_DATA}
               dataKey="value"

@@ -31,10 +31,8 @@ export default function DropdownMenuDemo() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent sideOffset={8} className="bg-red-500">
-        {/* Label */}
         <DropdownMenuLabel>Board Actions</DropdownMenuLabel>
 
-        {/* Group of items */}
         <DropdownMenuGroup>
           <DropdownMenuItem>
             New Card
@@ -48,7 +46,6 @@ export default function DropdownMenuDemo() {
 
         <DropdownMenuSeparator />
 
-        {/* Checkbox item */}
         <DropdownMenuCheckboxItem
           checked={showCompleted}
           onCheckedChange={setShowCompleted}
@@ -58,7 +55,6 @@ export default function DropdownMenuDemo() {
 
         <DropdownMenuSeparator />
 
-        {/* Radio group */}
         <DropdownMenuLabel inset>Priority</DropdownMenuLabel>
         <DropdownMenuRadioGroup value={priority} onValueChange={setPriority}>
           <DropdownMenuRadioItem value="low">Low</DropdownMenuRadioItem>
@@ -68,7 +64,6 @@ export default function DropdownMenuDemo() {
 
         <DropdownMenuSeparator />
 
-        {/* Submenu */}
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>More Options</DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
