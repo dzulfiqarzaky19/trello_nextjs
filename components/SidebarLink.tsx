@@ -32,7 +32,7 @@ export const SidebarLink = ({
   return (
     <Link
       href={href}
-      className="w-full "
+      className="w-full"
       aria-current={isActive ? 'page' : undefined}
     >
       <Button

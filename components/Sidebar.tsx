@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Calendar,
   Folder,
@@ -5,10 +7,23 @@ import {
   LucideTrello,
   Settings,
   Users,
+  LogOut,
+  User,
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { SidebarLink } from './SidebarLink';
+import { useAuth } from '@/context/AuthContext';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Skeleton } from './ui/skeleton';
+import Link from 'next/link';
 
 const SIDEBAR_CONTENT = [
   {
@@ -39,8 +54,14 @@ const SIDEBAR_CONTENT = [
 ] as const;
 
 export const Sidebar = () => {
+  const { user, profile, loading, signOut } = useAuth();
+
+  if (!user) {
+    return null;
+  }
+
   return (
-    <div className="grid grid-rows-[auto_1fr_auto] h-screen sticky top-0 z-10 border-r bg-white w-64">
+    <div className="grid grid-rows-[auto_1fr_auto] h-screen sticky top-0 z-10 shadow bg-white">
       <header className="p-6">
         <div className="flex items-center gap-3 px-2">
           <div className="bg-red-50 p-2 rounded-lg">
@@ -62,18 +83,67 @@ export const Sidebar = () => {
       </aside>
 
       <footer className="p-4">
-        <div className="bg-red-50/50 p-3 rounded-xl flex items-center gap-3 border border-red-100/50 cursor-pointer hover:bg-red-50 transition-colors">
-          <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
-            <AvatarImage src="https://randomuser.me/api/portraits/women/1.jpg" />
-            <AvatarFallback>SJ</AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col overflow-hidden">
-            <span className="text-sm font-bold truncate">Sarah Jenkins</span>
-            <span className="text-xs text-muted-foreground truncate">
-              Product Manager
-            </span>
+        {loading ? (
+          <div className="flex items-center gap-3 p-3">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-3 w-[100px]" />
+              <Skeleton className="h-2 w-[80px]" />
+            </div>
           </div>
-        </div>
+        ) : (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div className="w-full flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-red-50 transition-colors border border-transparent hover:border-red-100">
+                <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
+                  <AvatarImage
+                    src={
+                      profile?.avatar_url ||
+                      user.user_metadata?.avatar_url ||
+                      'https://github.com/shadcn.png'
+                    }
+                  />
+                  <AvatarFallback>
+                    {
+                      (profile?.full_name ||
+                        user.user_metadata?.full_name ||
+                        'User')[0]
+                    }
+                  </AvatarFallback>
+                </Avatar>
+
+                <div className="flex flex-col overflow-hidden text-left">
+                  <span className="text-sm font-bold truncate">
+                    {profile?.full_name ||
+                      user.user_metadata?.full_name ||
+                      'User'}
+                  </span>
+                  <span className="text-xs text-muted-foreground truncate">
+                    {profile?.role || user.email || 'Member'}
+                  </span>
+                </div>
+              </div>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end" className="w-56 border-none">
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <Link href="/settings">
+                <DropdownMenuItem className="hover:bg-red-50">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+              </Link>
+              <DropdownMenuItem
+                onClick={signOut}
+                className="text-red-600 focus:text-red-600 hover:bg-red-50"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Log out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </footer>
     </div>
   );
