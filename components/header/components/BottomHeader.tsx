@@ -1,4 +1,4 @@
-import { addColumn } from '@/app/actions';
+import { createList } from '@/features/projects/lists/actions';
 import { FormWrapper } from '@/components/FormWrapper';
 import { Modal } from '@/components/Modal';
 import { Button } from '@/components/ui/button';
@@ -22,10 +22,12 @@ export const BottomHeader = ({
   isProjectsPage,
   isTeamPage,
   isCalendarPage,
+  boardId,
 }: {
   isProjectsPage?: boolean;
   isTeamPage?: boolean;
   isCalendarPage?: boolean;
+  boardId?: string;
 }) => {
   if (isProjectsPage) {
     return (
@@ -54,9 +56,11 @@ export const BottomHeader = ({
             }
             modalClass="sm:max-w-xl"
           >
-            <FormWrapper action={addColumn}>
-              <ModalColumnForm />
-            </FormWrapper>
+            {boardId && (
+              <FormWrapper action={createList.bind(null, boardId)}>
+                <ModalColumnForm />
+              </FormWrapper>
+            )}
           </Modal>
         </div>
       </div>

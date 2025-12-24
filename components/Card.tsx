@@ -18,7 +18,7 @@ interface ICardProps {
   title: string;
   labels: { id: string; name: string; color: string }[];
   progress?: { completed: number; total: number; percent: number };
-  dueDate: string;
+  dueDate?: string;
   assignees: { id: string; name: string; image: string }[];
   comments: number;
   attachments: number;

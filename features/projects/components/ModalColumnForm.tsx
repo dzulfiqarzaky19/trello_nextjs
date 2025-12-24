@@ -30,12 +30,12 @@ export const ModalColumnForm = () => {
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="columnTitle" className="font-semibold">
+          <Label htmlFor="title" className="font-semibold">
             Column Name
           </Label>
           <Input
-            id="columnTitle"
-            name="columnTitle"
+            id="title"
+            name="title"
             placeholder="e.g. QA Review, Backlog"
             required
           />

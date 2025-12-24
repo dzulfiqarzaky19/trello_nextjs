@@ -1,20 +1,27 @@
 import { Header } from '@/components/header/Header';
-import { ProjectsMain } from '@/features/projects/ProjectsMain';
-import {
-  PROJECTS_PAGE_CONTENT_DUMMY,
-  PROJECTS_PAGE_HEADER,
-} from '@/lib/const/projectPage';
+import { BoardList } from '@/features/projects/components/BoardList';
+import { getBoards } from '@/features/projects/actions';
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/login');
+  }
+
+  const { boards } = await getBoards();
+
   return (
     <div className="min-h-screen font-sans bg-zinc-100 dark:bg-primary grid grid-rows-[auto_1fr]">
       <Header
-        label={PROJECTS_PAGE_HEADER.label}
-        description={PROJECTS_PAGE_HEADER.description}
-        isProjectsPage
+        label="My Projects"
+        description="Manage your boards and collaborate with your team"
       />
 
-      <ProjectsMain cardContent={PROJECTS_PAGE_CONTENT_DUMMY} />
+      <BoardList boards={boards} />
     </div>
   );
 }

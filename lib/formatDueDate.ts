@@ -1,4 +1,6 @@
-export const formatDueDate = (dateStr: string): string => {
+export const formatDueDate = (dateStr?: string): string => {
+  if (!dateStr) return '';
+  
   const date = new Date(dateStr);
   const today = new Date();
 

@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
-import { ProjectCard } from '@/lib/const/projectPage';
+import { Card as CardType } from '../types';
 import {
   AlignLeft,
   Archive,
@@ -28,10 +28,11 @@ import {
 } from 'lucide-react';
 
 interface ModalFormProps {
-  card?: ProjectCard;
+  card?: CardType;
+  listTitle: string;
 }
 
-export const ModalForm = ({ card }: ModalFormProps) => {
+export const ModalForm = ({ card, listTitle }: ModalFormProps) => {
   return (
     <div className="grid grid-cols-[1fr_auto] gap-6 h-full min-h-0">
       <div className="overflow-y-auto scroll-m-0 px-4 space-y-4">
@@ -53,7 +54,7 @@ export const ModalForm = ({ card }: ModalFormProps) => {
 
             <div className="text-sm text-muted-foreground mt-1">
               in list{' '}
-              <span className="underline cursor-pointer">Design Backlog</span>
+              <span className="underline cursor-pointer">{listTitle}</span>
             </div>
           </div>
         </div>
@@ -135,7 +136,7 @@ export const ModalForm = ({ card }: ModalFormProps) => {
             <div className="text-sm text-muted-foreground ">
               <Textarea
                 name="description"
-                defaultValue={card?.description}
+                defaultValue={card?.description ?? ''}
                 placeholder="Add a more detailed description..."
                 className="min-h-[100px] bg-transparent"
               />

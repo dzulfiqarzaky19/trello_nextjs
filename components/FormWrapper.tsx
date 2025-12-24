@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 
 type FormWrapperProps = {
   children: ReactNode;
-  action: (formData: FormData) => Promise<void>;
+  action: (formData: FormData) => Promise<any>;
   closeModal?: () => void;
   className?: string;
 };

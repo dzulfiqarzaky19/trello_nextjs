@@ -17,7 +17,7 @@ interface ICardFooterRightProps {
     total: number;
     percent: number;
   };
-  dueDate: string;
+  dueDate?: string;
 }
 export const CardFooterRight = ({
   status,
@@ -57,7 +57,7 @@ export const CardFooterRight = ({
     );
   }
 
-  if (isOverdue) {
+  if (isOverdue && dueDate) {
     return (
       <div className="flex items-center gap-2">
         <Timer />
@@ -102,10 +102,14 @@ export const CardFooterRight = ({
     );
   }
 
-  return (
-    <div className="flex items-center gap-2">
-      <Flag />
-      <span>{formatDueDate(dueDate)}</span>
-    </div>
-  );
+  if (dueDate) {
+    return (
+      <div className="flex items-center gap-2">
+        <Flag />
+        <span>{formatDueDate(dueDate)}</span>
+      </div>
+    );
+  }
+
+  return null;
 };
