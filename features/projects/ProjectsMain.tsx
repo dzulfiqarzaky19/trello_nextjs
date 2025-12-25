@@ -76,7 +76,7 @@ export const ProjectsMain = ({ board }: ProjectsMainProps) => {
                     action={updateCard.bind(null, card.id)}
                     className="flex flex-col h-full min-h-0"
                   >
-                    <ModalForm card={card} listTitle={list.title} />
+                    <ModalForm card={card} listTitle={list.title} boardId={board.id} />
                   </FormWrapper>
                 </Modal>
               ))}
@@ -96,7 +96,7 @@ export const ProjectsMain = ({ board }: ProjectsMainProps) => {
                   action={createCard.bind(null, list.id)}
                   className="flex flex-col h-full min-h-0"
                 >
-                  <ModalForm listTitle={list.title} />
+                  <ModalForm listTitle={list.title} boardId={board.id} />
                 </FormWrapper>
               </Modal>
             </CardFooter>

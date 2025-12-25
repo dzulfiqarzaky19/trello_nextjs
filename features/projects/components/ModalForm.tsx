@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { CardAvatar } from '@/components/CardAvatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,17 +26,43 @@ import {
   Tag,
   Trash2,
   User,
+  Calendar,
+  Flag,
 } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface ModalFormProps {
   card?: CardType;
   listTitle: string;
+  boardId?: string;
 }
 
-export const ModalForm = ({ card, listTitle }: ModalFormProps) => {
+export const ModalForm = ({ card, listTitle, boardId }: ModalFormProps) => {
+  const [selectedPriority, setSelectedPriority] = useState<string>(
+    card?.priority || 'none'
+  );
+
+  // Calculate checklist progress
+  const calculateProgress = () => {
+    if (!card?.checklists || card.checklists.length === 0) return 0;
+
+    const allItems = card.checklists.flatMap(cl => cl.checklist_items);
+    if (allItems.length === 0) return 0;
+
+    const completed = allItems.filter(item => item.completed).length;
+    return Math.round((completed / allItems.length) * 100);
+  };
+
   return (
     <div className="grid grid-cols-[1fr_auto] gap-6 h-full min-h-0">
       <div className="overflow-y-auto scroll-m-0 px-4 space-y-4">
+        {/* Title Section */}
         <div className="grid grid-cols-[32px_auto] gap-2 sticky top-0 bg-background z-10">
           <Laptop className="size-5" />
 
@@ -46,10 +73,10 @@ export const ModalForm = ({ card, listTitle }: ModalFormProps) => {
                   name="title"
                   defaultValue={card?.title}
                   placeholder="Task Title"
+                  required
                   className="font-semibold text-xl border-none shadow-none focus-visible:ring-0 px-0 h-auto p-0"
                 />
               </DialogTitle>
-              {card?.id && <input type="hidden" name="id" value={card.id} />}
             </DialogHeader>
 
             <div className="text-sm text-muted-foreground mt-1">
@@ -59,287 +86,228 @@ export const ModalForm = ({ card, listTitle }: ModalFormProps) => {
           </div>
         </div>
 
+        {/* Metadata Section - Members, Labels, Due Date, Priority */}
         <div className="grid grid-cols-[32px_auto] gap-2">
           <div />
 
-          <div className="flex items-start gap-6">
+          <div className="flex items-start gap-6 flex-wrap">
+            {/* Members */}
             <div className="shrink-0">
               <div className="text-xs font-semibold text-muted-foreground uppercase mb-2">
                 Members
               </div>
               <CardAvatar
-                assignees={[
-                  {
-                    id: 'user-1',
-                    name: 'Alice',
-                    image: 'https://randomuser.me/api/portraits/women/1.jpg',
-                  },
-                  {
-                    id: 'user-2',
-                    name: 'Bob',
-                    image: 'https://randomuser.me/api/portraits/men/2.jpg',
-                  },
-                ]}
+                assignees={card?.card_members?.map((cm) => ({
+                  id: cm.user_id,
+                  name: cm.profiles.full_name || 'Unknown',
+                  image: cm.profiles.avatar_url || '',
+                })) || []}
                 isEditable
               />
             </div>
 
+            {/* Labels */}
             <div className="shrink-0">
               <div className="text-xs font-semibold text-muted-foreground uppercase mb-2">
                 Labels
               </div>
               <div className="flex flex-wrap gap-1">
-                <Badge className="bg-red-500 text-white hover:bg-red-600 cursor-pointer">
-                  High Priority
-                </Badge>
-                <Badge className="bg-blue-500 text-white hover:bg-blue-600 cursor-pointer">
-                  Design
-                </Badge>
+                {card?.card_labels?.map((cl) => (
+                  <Badge
+                    key={cl.label_id}
+                    style={{ backgroundColor: cl.labels.color }}
+                    className="text-white"
+                  >
+                    {cl.labels.name}
+                  </Badge>
+                ))}
+                {(!card?.card_labels || card.card_labels.length === 0) && (
+                  <span className="text-sm text-muted-foreground">No labels</span>
+                )}
               </div>
             </div>
 
+            {/* Due Date */}
             <div className="shrink-0">
               <div className="text-xs font-semibold text-muted-foreground uppercase mb-2">
                 Due Date
               </div>
-              <div className="flex items-center gap-2">
-                <Checkbox id="due-complete" />
-                <Label
-                  htmlFor="due-complete"
-                  className="flex items-center gap-2 cursor-pointer"
-                >
-                  <span>Oct 24 at 5:00 PM</span>
-                  <Badge
-                    variant="secondary"
-                    className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                  >
-                    SOON
-                  </Badge>
-                </Label>
+              <Input
+                type="datetime-local"
+                name="dueDate"
+                defaultValue={card?.due_date ? new Date(card.due_date).toISOString().slice(0, 16) : ''}
+                className="w-[200px]"
+              />
+            </div>
+
+            {/* Priority */}
+            <div className="shrink-0">
+              <div className="text-xs font-semibold text-muted-foreground uppercase mb-2">
+                Priority
               </div>
+              <Select
+                name="priority"
+                value={selectedPriority}
+                onValueChange={setSelectedPriority}
+              >
+                <SelectTrigger className="w-[120px]">
+                  <SelectValue placeholder="None" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
 
+        {/* Description Section */}
         <div className="grid grid-cols-[32px_auto] space-y-4">
           <AlignLeft className="size-5" />
 
           <div className="space-y-2">
             <div className="flex justify-between">
-              <div className="flex gap-2">
-                <h3 className="font-semibold">Description</h3>
-              </div>
-              <Button variant="ghost" size="sm" className="text-sm">
-                Edit
-              </Button>
+              <h3 className="font-semibold">Description</h3>
             </div>
-            <div className="text-sm text-muted-foreground ">
-              <Textarea
-                name="description"
-                defaultValue={card?.description ?? ''}
-                placeholder="Add a more detailed description..."
-                className="min-h-[100px] bg-transparent"
-              />
-            </div>
+            <Textarea
+              name="description"
+              defaultValue={card?.description ?? ''}
+              placeholder="Add a more detailed description..."
+              className="min-h-[100px] bg-transparent"
+            />
           </div>
 
-          <Paperclip className="size-5" />
+          {/* Checklists Section */}
+          {card?.checklists && card.checklists.length > 0 && (
+            <>
+              <CheckSquare className="size-5" />
 
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold">Attachments</h3>
-            </div>
-            <div className=" space-y-2">
-              <div className="flex items-center gap-3 p-2 border rounded-lg hover:bg-accent cursor-pointer">
-                <div className="bg-gray-100 rounded p-2 shrink-0">
-                  <FileText className="size-6 text-gray-600" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-sm truncate">
-                    Hero_Section_V2.png
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    Added just now •{' '}
-                    <span className="underline cursor-pointer">Comment</span> •{' '}
-                    <span className="underline cursor-pointer">Delete</span>
-                  </div>
-                </div>
-                <div className="shrink-0 flex items-center gap-2">
-                  <Badge variant="outline" className="text-xs">
-                    FIG
-                  </Badge>
-                  <Badge variant="outline" className="text-xs">
-                    COVER
-                  </Badge>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 p-2 border rounded-lg hover:bg-accent cursor-pointer">
-                <div className="bg-gray-100 rounded p-2 shrink-0">
-                  <FileText className="size-6 text-gray-600" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-sm truncate">
-                    Q3_Campaign_Assets.fig
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    Added Oct 20 •{' '}
-                    <span className="underline cursor-pointer">Comment</span> •{' '}
-                    <span className="underline cursor-pointer">Delete</span>
-                  </div>
-                </div>
-                <div className="shrink-0">
-                  <Badge variant="outline" className="text-xs">
-                    FIG
-                  </Badge>
-                </div>
-              </div>
-
-              <Button variant="ghost" size="sm" className="text-sm">
-                Add
-              </Button>
-            </div>
-          </div>
-
-          <CheckSquare className="size-5" />
-
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <div className="flex  gap-2">
-                <h3 className="font-semibold">Implementation Steps</h3>
-              </div>
-
-              <div className="flex gap-3">
-                <Button variant="ghost" size="sm" className="text-xs">
-                  Hide checked items
-                </Button>
-                <Button variant="ghost" size="sm" className="text-xs">
-                  Delete
-                </Button>
-              </div>
-            </div>
-
-            <div className=" space-y-3">
-              <Progress value={66} className="h-2" />
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Checkbox id="step-1" defaultChecked />
-                  <Label htmlFor="step-1" className="cursor-pointer">
-                    Review brand guidelines
-                  </Label>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <h3 className="font-semibold">Checklists</h3>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <Checkbox id="step-2" defaultChecked />
-                  <Label htmlFor="step-2" className="cursor-pointer">
-                    Export assets from Figma
-                  </Label>
-                </div>
+                <div className="space-y-4">
+                  {card.checklists.map((checklist) => {
+                    const items = checklist.checklist_items || [];
+                    const completed = items.filter(item => item.completed).length;
+                    const progress = items.length > 0 ? Math.round((completed / items.length) * 100) : 0;
 
-                <div className="flex items-center gap-2">
-                  <Checkbox id="step-3" />
-                  <Label htmlFor="step-3" className="cursor-pointer">
-                    Implement new hero HTML structure
-                  </Label>
+                    return (
+                      <div key={checklist.id} className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium">{checklist.title}</h4>
+                          <span className="text-sm text-muted-foreground">
+                            {completed}/{items.length}
+                          </span>
+                        </div>
+
+                        {items.length > 0 && (
+                          <Progress value={progress} className="h-2" />
+                        )}
+
+                        <div className="space-y-2 ml-2">
+                          {items.map((item) => (
+                            <div key={item.id} className="flex items-center gap-2">
+                              <Checkbox
+                                id={`item-${item.id}`}
+                                defaultChecked={item.completed}
+                                disabled
+                              />
+                              <Label
+                                htmlFor={`item-${item.id}`}
+                                className={`cursor-pointer ${item.completed ? 'line-through text-muted-foreground' : ''}`}
+                              >
+                                {item.title}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
+            </>
+          )}
 
-              <Button variant="ghost" size="sm" className="text-sm">
-                Add an item
-              </Button>
-            </div>
-          </div>
+          {/* Attachments Section */}
+          {card?.attachments && card.attachments.length > 0 && (
+            <>
+              <Paperclip className="size-5" />
 
-          <FileText className="size-5" />
-
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <h3 className="font-semibold">Activity</h3>
-              </div>
-              <Button variant="ghost" size="sm" className="text-sm">
-                Show details
-              </Button>
-            </div>
-
-            <div className=" space-y-4">
-              <div className="flex items-start gap-2">
-                <CardAvatar
-                  assignees={[
-                    {
-                      id: 'user-current',
-                      name: 'You',
-                      image: 'https://randomuser.me/api/portraits/women/5.jpg',
-                    },
-                  ]}
-                />
-                <div className="flex-1">
-                  <Textarea
-                    placeholder="Write a comment..."
-                    className="min-h-[80px]"
-                  />
-                  <div className="flex items-center justify-between mt-2">
-                    <div className="flex items-center gap-1">
-                      <Button variant="ghost" size="icon" className="size-8">
-                        <Paperclip className="size-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="size-8">
-                        <User className="size-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="size-8">
-                        <FileText className="size-4" />
-                      </Button>
+              <div className="space-y-3">
+                <h3 className="font-semibold">Attachments</h3>
+                <div className="space-y-2">
+                  {card.attachments.map((attachment) => (
+                    <div
+                      key={attachment.id}
+                      className="flex items-center gap-3 p-2 border rounded-lg hover:bg-accent cursor-pointer"
+                    >
+                      <div className="bg-gray-100 rounded p-2 shrink-0">
+                        <FileText className="size-6 text-gray-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm truncate">
+                          {attachment.file_name}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {new Date(attachment.created_at).toLocaleDateString()}
+                        </div>
+                      </div>
                     </div>
-                    <Button size="sm">Save</Button>
-                  </div>
+                  ))}
                 </div>
               </div>
+            </>
+          )}
 
-              <div className="flex items-start gap-2">
-                <CardAvatar
-                  assignees={[
-                    {
-                      id: 'user-1',
-                      name: 'John Doe',
-                      image: 'https://randomuser.me/api/portraits/men/1.jpg',
-                    },
-                  ]}
-                />
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-semibold text-sm">John Doe</span>
-                    <span className="text-xs text-muted-foreground">
-                      Yesterday at 2:30 PM
-                    </span>
-                  </div>
-                  <div className="bg-accent rounded-lg p-3 text-sm">
-                    Here are the initial sketches for the new layout. I think
-                    option B works best for the responsive view.
-                  </div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-xs h-6 px-2"
-                    >
-                      Reply
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-xs h-6 px-2"
-                    >
-                      Edit
-                    </Button>
-                  </div>
+          {/* Comments Section */}
+          {card?.comments && card.comments.length > 0 && (
+            <>
+              <FileText className="size-5" />
+
+              <div className="space-y-3">
+                <h3 className="font-semibold">Activity</h3>
+
+                <div className="space-y-4">
+                  {card.comments.map((comment) => (
+                    <div key={comment.id} className="flex items-start gap-2">
+                      <CardAvatar
+                        assignees={[
+                          {
+                            id: comment.user_id,
+                            name: comment.profiles.full_name || 'Unknown',
+                            image: comment.profiles.avatar_url || '',
+                          },
+                        ]}
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold text-sm">
+                            {comment.profiles.full_name || 'Unknown'}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(comment.created_at).toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="bg-accent rounded-lg p-3 text-sm">
+                          {comment.content}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
       </div>
 
+      {/* Sidebar Actions */}
       <div className="w-[180px] space-y-2">
         <div className="text-xs font-semibold text-muted-foreground uppercase mb-3">
           Add to card
@@ -349,6 +317,7 @@ export const ModalForm = ({ card, listTitle }: ModalFormProps) => {
           variant="secondary"
           size="sm"
           className="w-full justify-start gap-2"
+          type="button"
         >
           <User className="size-4" />
           Members
@@ -358,6 +327,7 @@ export const ModalForm = ({ card, listTitle }: ModalFormProps) => {
           variant="secondary"
           size="sm"
           className="w-full justify-start gap-2"
+          type="button"
         >
           <Tag className="size-4" />
           Labels
@@ -367,6 +337,7 @@ export const ModalForm = ({ card, listTitle }: ModalFormProps) => {
           variant="secondary"
           size="sm"
           className="w-full justify-start gap-2"
+          type="button"
         >
           <CheckSquare className="size-4" />
           Checklist
@@ -376,27 +347,10 @@ export const ModalForm = ({ card, listTitle }: ModalFormProps) => {
           variant="secondary"
           size="sm"
           className="w-full justify-start gap-2"
-        >
-          <Clock className="size-4" />
-          Dates
-        </Button>
-
-        <Button
-          variant="secondary"
-          size="sm"
-          className="w-full justify-start gap-2"
+          type="button"
         >
           <Paperclip className="size-4" />
           Attachment
-        </Button>
-
-        <Button
-          variant="secondary"
-          size="sm"
-          className="w-full justify-start gap-2"
-        >
-          <CreditCard className="size-4" />
-          Cover
         </Button>
 
         <div className="text-xs font-semibold text-muted-foreground uppercase mt-6 mb-3">
@@ -407,6 +361,7 @@ export const ModalForm = ({ card, listTitle }: ModalFormProps) => {
           variant="secondary"
           size="sm"
           className="w-full justify-start gap-2"
+          type="button"
         >
           <Move className="size-4" />
           Move
@@ -416,6 +371,7 @@ export const ModalForm = ({ card, listTitle }: ModalFormProps) => {
           variant="secondary"
           size="sm"
           className="w-full justify-start gap-2"
+          type="button"
         >
           <Copy className="size-4" />
           Copy
@@ -425,24 +381,7 @@ export const ModalForm = ({ card, listTitle }: ModalFormProps) => {
           variant="secondary"
           size="sm"
           className="w-full justify-start gap-2"
-        >
-          <FileText className="size-4" />
-          Make template
-        </Button>
-
-        <Button
-          variant="secondary"
-          size="sm"
-          className="w-full justify-start gap-2"
-        >
-          <Eye className="size-4" />
-          Watch
-        </Button>
-
-        <Button
-          variant="secondary"
-          size="sm"
-          className="w-full justify-start gap-2"
+          type="button"
         >
           <Archive className="size-4" />
           Archive
@@ -452,6 +391,7 @@ export const ModalForm = ({ card, listTitle }: ModalFormProps) => {
           variant="secondary"
           size="sm"
           className="w-full justify-start gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+          type="button"
         >
           <Trash2 className="size-4" />
           Delete

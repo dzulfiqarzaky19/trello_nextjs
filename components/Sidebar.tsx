@@ -1,16 +1,9 @@
 'use client';
 
 import {
-  Calendar,
-  Folder,
-  LayoutDashboard,
-  LucideTrello,
-  Settings,
-  Users,
   LogOut,
   User,
 } from 'lucide-react';
-import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { SidebarLink } from './SidebarLink';
 import { useAuth } from '@/context/AuthContext';
@@ -24,6 +17,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Skeleton } from './ui/skeleton';
 import Link from 'next/link';
+import { Logo } from './ui/Logo';
 
 const SIDEBAR_CONTENT = [
   {
@@ -63,12 +57,7 @@ export const Sidebar = () => {
   return (
     <div className="grid grid-rows-[auto_1fr_auto] h-screen sticky top-0 z-10 shadow bg-white">
       <header className="p-6">
-        <div className="flex items-center gap-3 px-2">
-          <div className="bg-red-50 p-2 rounded-lg">
-            <LayoutDashboard className="w-6 h-6 text-red-600" />
-          </div>
-          <h1 className="font-bold text-xl tracking-tight">TaskMaster</h1>
-        </div>
+        <Logo />
       </header>
 
       <aside className="flex flex-col gap-1 px-4 py-2">

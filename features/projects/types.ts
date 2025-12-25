@@ -10,6 +10,57 @@ export interface CardMember {
   profiles: Profile;
 }
 
+export interface Label {
+  id: string;
+  board_id: string;
+  name: string;
+  color: string;
+  created_at: string;
+}
+
+export interface CardLabel {
+  label_id: string;
+  labels: Label;
+}
+
+export interface ChecklistItem {
+  id: string;
+  checklist_id: string;
+  title: string;
+  completed: boolean;
+  order: number;
+  created_at: string;
+}
+
+export interface Checklist {
+  id: string;
+  card_id: string;
+  title: string;
+  order: number;
+  created_at: string;
+  checklist_items: ChecklistItem[];
+}
+
+export interface Comment {
+  id: string;
+  card_id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+  profiles: Profile;
+}
+
+export interface Attachment {
+  id: string;
+  card_id: string;
+  file_name: string;
+  file_url: string;
+  file_size: number | null;
+  file_type: string | null;
+  uploaded_by: string | null;
+  created_at: string;
+}
+
 export interface Card {
   id: string;
   title: string;
@@ -20,6 +71,10 @@ export interface Card {
   priority: 'low' | 'medium' | 'high' | null;
   created_at: string;
   card_members: CardMember[];
+  card_labels?: CardLabel[];
+  checklists?: Checklist[];
+  comments?: Comment[];
+  attachments?: Attachment[];
 }
 
 export interface List {

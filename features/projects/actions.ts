@@ -80,7 +80,20 @@ export async function getBoardDetails(boardId: string) {
           card_members (
             user_id,
             profiles (id, full_name, avatar_url)
-          )
+          ),
+          card_labels (
+            label_id,
+            labels (id, name, color, board_id)
+          ),
+          checklists (
+            *,
+            checklist_items (*)
+          ),
+          comments (
+            *,
+            profiles (id, full_name, avatar_url)
+          ),
+          attachments (*)
         )
       ),
       board_members (

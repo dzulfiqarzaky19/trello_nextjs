@@ -9,7 +9,7 @@ export default async function ProjectsPage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login');
+    redirect('/sign-in');
   }
 
   const { boards } = await getBoards();

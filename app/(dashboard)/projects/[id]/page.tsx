@@ -15,7 +15,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-        redirect('/login');
+        redirect('/sign-in');
     }
 
     // Await params for Next.js 14+

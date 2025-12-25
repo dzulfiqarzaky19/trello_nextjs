@@ -18,52 +18,32 @@ import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import { Loader2 } from 'lucide-react';
 
-export function SignupForm({
+export const SigninForm = ({
   className,
   ...props
-}: React.ComponentProps<'form'>) {
+}: React.ComponentProps<'form'>) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
-  const handleSignup = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    if (password !== confirmPassword) {
-      toast.error('Passwords do not match');
-      setLoading(false);
-      return;
-    }
-
     try {
-      const { error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
-        options: {
-          data: {
-            full_name: fullName,
-            avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=random`,
-          },
-        },
       });
 
       if (error) {
+        console.log(error.message);
         toast.error(error.message);
       } else {
-        toast.success('Account created! Logging in...');
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        if (session) {
-          router.push('/');
-        } else {
-          router.push('/login?message=Account created. Please log in.');
-        }
+        toast.success('Successfully logged in!');
+        router.push('/');
         router.refresh();
       }
     } catch (error) {
@@ -75,29 +55,17 @@ export function SignupForm({
 
   return (
     <form
-      onSubmit={handleSignup}
+      onSubmit={handleLogin}
       className={cn('flex flex-col gap-6', className)}
       {...props}
     >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Create your account</h1>
+          <h1 className="text-2xl font-bold">Login to your account</h1>
           <p className="text-muted-foreground text-sm text-balance">
-            Fill in the form below to create your account
+            Enter your email below to login to your account
           </p>
         </div>
-        <Field>
-          <FieldLabel htmlFor="name">Full Name</FieldLabel>
-          <Input
-            id="name"
-            type="text"
-            placeholder="John Doe"
-            required
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            disabled={loading}
-          />
-        </Field>
         <Field>
           <FieldLabel htmlFor="email">Email</FieldLabel>
           <Input
@@ -109,13 +77,17 @@ export function SignupForm({
             onChange={(e) => setEmail(e.target.value)}
             disabled={loading}
           />
-          <FieldDescription>
-            We&apos;ll use this to contact you. We will not share your email
-            with anyone else.
-          </FieldDescription>
         </Field>
         <Field>
-          <FieldLabel htmlFor="password">Password</FieldLabel>
+          <div className="flex items-center">
+            <FieldLabel htmlFor="password">Password</FieldLabel>
+            <a
+              href="#"
+              className="ml-auto text-sm underline-offset-4 hover:underline"
+            >
+              Forgot your password?
+            </a>
+          </div>
           <Input
             id="password"
             type="password"
@@ -123,28 +95,12 @@ export function SignupForm({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={loading}
-            minLength={6}
           />
-          <FieldDescription>
-            Must be at least 8 characters long.
-          </FieldDescription>
-        </Field>
-        <Field>
-          <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
-          <Input
-            id="confirm-password"
-            type="password"
-            required
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            disabled={loading}
-          />
-          <FieldDescription>Please confirm your password.</FieldDescription>
         </Field>
         <Field>
           <Button type="submit" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Create Account
+            Login
           </Button>
         </Field>
         <FieldSeparator>Or continue with</FieldSeparator>
@@ -156,10 +112,13 @@ export function SignupForm({
                 fill="currentColor"
               />
             </svg>
-            Sign up with GitHub
+            Login with GitHub
           </Button>
-          <FieldDescription className="px-6 text-center">
-            Already have an account? <Link href="/login">Sign in</Link>
+          <FieldDescription className="text-center">
+            Don&apos;t have an account?{' '}
+            <Link href="/sign-up" className="underline underline-offset-4">
+              Sign up
+            </Link>
           </FieldDescription>
         </Field>
       </FieldGroup>

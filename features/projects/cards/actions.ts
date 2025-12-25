@@ -67,7 +67,7 @@ export async function updateCard(cardId: string, formData: FormData) {
 
   const title = formData.get('title') as string;
   const description = formData.get('description') as string;
-  const priority = formData.get('priority') as 'low' | 'medium' | 'high' | null;
+  const priority = formData.get('priority') as 'low' | 'medium' | 'high' | 'none';
   const dueDate = formData.get('dueDate') as string;
 
   const updates: {
@@ -79,7 +79,11 @@ export async function updateCard(cardId: string, formData: FormData) {
 
   if (title) updates.title = title;
   if (description !== undefined) updates.description = description || null;
-  if (priority !== undefined) updates.priority = priority;
+  if (priority && priority !== 'none') {
+    updates.priority = priority;
+  } else if (priority === 'none') {
+    updates.priority = null;
+  }
   if (dueDate !== undefined) updates.due_date = dueDate || null;
 
   const { data, error } = await supabase
