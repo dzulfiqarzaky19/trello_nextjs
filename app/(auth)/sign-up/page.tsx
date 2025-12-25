@@ -5,7 +5,7 @@ import {
   FieldGroup,
   FieldSeparator,
 } from '@/components/ui/field';
-import { SignupForm } from '@/features/signUp/SignupForm';
+import { SignupForm } from '@/features/auth/SignupForm';
 import { Github } from 'lucide-react';
 import Link from 'next/link';
 
@@ -18,13 +18,17 @@ export default function SignupPage() {
           Fill in the form below to create your account
         </p>
       </div>
+
       <SignupForm />
+
       <FieldSeparator>Or continue with</FieldSeparator>
+
       <Field>
         <Button variant="outline" type="button">
           <Github className="mr-2 h-4 w-4" />
           Sign up with GitHub
         </Button>
+
         <FieldDescription className="px-6 text-center">
           Already have an account? <Link href="/sign-in">Sign in</Link>
         </FieldDescription>
