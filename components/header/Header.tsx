@@ -1,19 +1,3 @@
-import { addColumn } from '@/app/actions';
-import { FormWrapper } from '@/components/FormWrapper';
-import { Modal } from '@/components/Modal';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { ModalColumnForm } from '@/features/projects/components/ModalColumnForm';
-import {
-    Bell,
-    Filter,
-    List,
-    PlusIcon,
-    Search,
-    SquareKanban,
-    User,
-} from 'lucide-react';
 import { BottomHeader } from './components/BottomHeader';
 import { TopHeader } from './components/TopHeader';
 
