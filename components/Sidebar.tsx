@@ -1,9 +1,6 @@
 'use client';
 
-import {
-  LogOut,
-  User,
-} from 'lucide-react';
+import { LogOut, User } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { SidebarLink } from './SidebarLink';
 import { useAuth } from '@/context/AuthContext';

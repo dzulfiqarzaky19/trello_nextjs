@@ -32,10 +32,10 @@ export const ProfileForm = ({ profile, userEmail }: ProfileFormProps) => {
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Profile updated successfully");
+        toast.success('Profile updated successfully');
       }
     } catch (e) {
-      toast.error("Failed to update profile");
+      toast.error('Failed to update profile');
     } finally {
       setLoading(false);
     }
@@ -73,7 +73,9 @@ export const ProfileForm = ({ profile, userEmail }: ProfileFormProps) => {
 
               <div className="flex flex-col">
                 <p className="font-medium">Avatar</p>
-                <p className="text-xs text-muted-foreground">Managed via Supabase / UI Avatars for now</p>
+                <p className="text-xs text-muted-foreground">
+                  Managed via Supabase / UI Avatars for now
+                </p>
               </div>
             </div>
 
@@ -85,12 +87,17 @@ export const ProfileForm = ({ profile, userEmail }: ProfileFormProps) => {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="role">Role</Label>
-                <Input id="role" name="role" defaultValue={profile?.role || ''} placeholder="e.g. Product Manager" />
+                <Input
+                  id="role"
+                  name="role"
+                  defaultValue={profile?.role || ''}
+                  placeholder="e.g. Product Manager"
+                />
               </div>
               {/* Tags - basic text input for now, could be improved to tag input */}
               <div className="space-y-2">
                 <Label htmlFor="tags">Tags (comma separated)</Label>
-                <Input id="tags" name="tags" defaultValue={""} disabled />
+                <Input id="tags" name="tags" defaultValue={''} disabled />
               </div>
             </div>
 
@@ -127,11 +134,17 @@ export const ProfileForm = ({ profile, userEmail }: ProfileFormProps) => {
                 defaultValue={profile?.bio || ''}
                 className="min-h-[100px] resize-none"
               />
-              <p className="text-xs text-right text-muted-foreground">Markdown supported</p>
+              <p className="text-xs text-right text-muted-foreground">
+                Markdown supported
+              </p>
             </div>
 
             <div className="flex justify-end">
-              <Button type="submit" disabled={loading} className="bg-red-500 hover:bg-red-600 text-white">
+              <Button
+                type="submit"
+                disabled={loading}
+                className="bg-red-500 hover:bg-red-600 text-white"
+              >
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Save Changes
               </Button>

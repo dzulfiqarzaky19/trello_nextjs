@@ -6,10 +6,16 @@ import { revalidatePath } from 'next/cache';
 // Note: This is a placeholder. Full file upload requires Supabase Storage setup
 // For now, we'll support adding attachments via URL
 
-export async function addAttachment(cardId: string, fileName: string, fileUrl: string) {
+export async function addAttachment(
+  cardId: string,
+  fileName: string,
+  fileUrl: string
+) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }
@@ -45,8 +51,10 @@ export async function addAttachment(cardId: string, fileName: string, fileUrl: s
 
 export async function deleteAttachment(attachmentId: string) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }

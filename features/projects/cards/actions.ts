@@ -5,8 +5,10 @@ import { revalidatePath } from 'next/cache';
 
 export async function createCard(listId: string, formData: FormData) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }
@@ -59,15 +61,21 @@ export async function createCard(listId: string, formData: FormData) {
 
 export async function updateCard(cardId: string, formData: FormData) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }
 
   const title = formData.get('title') as string;
   const description = formData.get('description') as string;
-  const priority = formData.get('priority') as 'low' | 'medium' | 'high' | 'none';
+  const priority = formData.get('priority') as
+    | 'low'
+    | 'medium'
+    | 'high'
+    | 'none';
   const dueDate = formData.get('dueDate') as string;
 
   const updates: {
@@ -113,8 +121,10 @@ export async function updateCard(cardId: string, formData: FormData) {
 
 export async function deleteCard(cardId: string) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }
@@ -126,10 +136,7 @@ export async function deleteCard(cardId: string) {
     .eq('id', cardId)
     .single();
 
-  const { error } = await supabase
-    .from('cards')
-    .delete()
-    .eq('id', cardId);
+  const { error } = await supabase.from('cards').delete().eq('id', cardId);
 
   if (error) {
     return { error: error.message };

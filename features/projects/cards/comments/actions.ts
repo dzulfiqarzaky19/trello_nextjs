@@ -5,8 +5,10 @@ import { revalidatePath } from 'next/cache';
 
 export async function addComment(cardId: string, content: string) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }
@@ -41,8 +43,10 @@ export async function addComment(cardId: string, content: string) {
 
 export async function updateComment(commentId: string, content: string) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }
@@ -78,8 +82,10 @@ export async function updateComment(commentId: string, content: string) {
 
 export async function deleteComment(commentId: string) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }
@@ -113,8 +119,10 @@ export async function deleteComment(commentId: string) {
 
 export async function getCardComments(cardId: string) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated', comments: [] };
   }

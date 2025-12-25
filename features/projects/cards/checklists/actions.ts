@@ -5,8 +5,10 @@ import { revalidatePath } from 'next/cache';
 
 export async function createChecklist(cardId: string, title: string) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }
@@ -19,7 +21,8 @@ export async function createChecklist(cardId: string, title: string) {
     .order('order', { ascending: false })
     .limit(1);
 
-  const nextOrder = checklists && checklists.length > 0 ? checklists[0].order + 1 : 0;
+  const nextOrder =
+    checklists && checklists.length > 0 ? checklists[0].order + 1 : 0;
 
   const { data, error } = await supabase
     .from('checklists')
@@ -51,8 +54,10 @@ export async function createChecklist(cardId: string, title: string) {
 
 export async function addChecklistItem(checklistId: string, title: string) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }
@@ -100,8 +105,10 @@ export async function addChecklistItem(checklistId: string, title: string) {
 
 export async function toggleChecklistItem(itemId: string, completed: boolean) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }
@@ -120,7 +127,9 @@ export async function toggleChecklistItem(itemId: string, completed: boolean) {
   // Get board_id to revalidate
   const { data: item } = await supabase
     .from('checklist_items')
-    .select('checklist_id, checklists(card_id, cards(list_id, lists(board_id)))')
+    .select(
+      'checklist_id, checklists(card_id, cards(list_id, lists(board_id)))'
+    )
     .eq('id', itemId)
     .single();
 
@@ -136,8 +145,10 @@ export async function toggleChecklistItem(itemId: string, completed: boolean) {
 
 export async function deleteChecklistItem(itemId: string) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }
@@ -145,7 +156,9 @@ export async function deleteChecklistItem(itemId: string) {
   // Get board_id before deleting
   const { data: item } = await supabase
     .from('checklist_items')
-    .select('checklist_id, checklists(card_id, cards(list_id, lists(board_id)))')
+    .select(
+      'checklist_id, checklists(card_id, cards(list_id, lists(board_id)))'
+    )
     .eq('id', itemId)
     .single();
 

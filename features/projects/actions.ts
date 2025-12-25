@@ -5,8 +5,10 @@ import { revalidatePath } from 'next/cache';
 
 export async function createBoard(formData: FormData) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }
@@ -38,18 +40,22 @@ export async function createBoard(formData: FormData) {
 
 export async function getBoards() {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated', boards: [] };
   }
 
   const { data: boards, error } = await supabase
     .from('boards')
-    .select(`
+    .select(
+      `
       *,
       board_members!inner(user_id, role)
-    `)
+    `
+    )
     .eq('board_members.user_id', user.id)
     .order('created_at', { ascending: false });
 
@@ -62,8 +68,10 @@ export async function getBoards() {
 
 export async function getBoardDetails(boardId: string) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }
@@ -71,7 +79,8 @@ export async function getBoardDetails(boardId: string) {
   // Fetch board with lists and cards
   const { data: board, error: boardError } = await supabase
     .from('boards')
-    .select(`
+    .select(
+      `
       *,
       lists (
         *,
@@ -101,16 +110,17 @@ export async function getBoardDetails(boardId: string) {
         role,
         profiles (id, full_name, avatar_url, role)
       )
-    `)
+    `
+    )
     .eq('id', boardId)
     .single();
 
-  console.log('getBoardDetails result:', { 
-    boardId, 
+  console.log('getBoardDetails result:', {
+    boardId,
     userId: user.id,
-    hasBoard: !!board, 
+    hasBoard: !!board,
     error: boardError?.message,
-    errorDetails: boardError 
+    errorDetails: boardError,
   });
 
   if (boardError) {

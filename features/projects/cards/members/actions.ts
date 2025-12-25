@@ -5,18 +5,18 @@ import { revalidatePath } from 'next/cache';
 
 export async function assignMemberToCard(cardId: string, userId: string) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }
 
-  const { error } = await supabase
-    .from('card_members')
-    .insert({
-      card_id: cardId,
-      user_id: userId,
-    });
+  const { error } = await supabase.from('card_members').insert({
+    card_id: cardId,
+    user_id: userId,
+  });
 
   if (error) {
     return { error: error.message };
@@ -38,8 +38,10 @@ export async function assignMemberToCard(cardId: string, userId: string) {
 
 export async function removeMemberFromCard(cardId: string, userId: string) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }
@@ -70,8 +72,10 @@ export async function removeMemberFromCard(cardId: string, userId: string) {
 
 export async function getAvailableMembers(boardId: string) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated', members: [] };
   }

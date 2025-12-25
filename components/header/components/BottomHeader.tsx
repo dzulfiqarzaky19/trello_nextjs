@@ -1,5 +1,5 @@
 import { createList } from '@/features/projects/lists/actions';
-import { FormWrapper } from '@/components/FormWrapper';
+import { FormWrapper } from '@/components/form/FormWrapper';
 import { Modal } from '@/components/Modal';
 import { Button } from '@/components/ui/button';
 import { ModalColumnForm } from '@/features/projects/components/ModalColumnForm';

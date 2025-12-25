@@ -5,8 +5,10 @@ import { revalidatePath } from 'next/cache';
 
 export async function createList(boardId: string, formData: FormData) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }
@@ -47,8 +49,10 @@ export async function createList(boardId: string, formData: FormData) {
 
 export async function updateList(listId: string, formData: FormData) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }
@@ -87,8 +91,10 @@ export async function updateList(listId: string, formData: FormData) {
 
 export async function deleteList(listId: string) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }
@@ -100,10 +106,7 @@ export async function deleteList(listId: string) {
     .eq('id', listId)
     .single();
 
-  const { error } = await supabase
-    .from('lists')
-    .delete()
-    .eq('id', listId);
+  const { error } = await supabase.from('lists').delete().eq('id', listId);
 
   if (error) {
     return { error: error.message };

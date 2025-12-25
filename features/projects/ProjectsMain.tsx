@@ -1,6 +1,6 @@
 import { createCard, updateCard } from '@/features/projects/cards/actions';
 import { CardDemo } from '@/components/Card';
-import { FormWrapper } from '@/components/FormWrapper';
+import { FormWrapper } from '@/components/form/FormWrapper';
 import { Modal } from '@/components/Modal';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,7 +23,7 @@ export const ProjectsMain = ({ board }: ProjectsMainProps) => {
   // Sort lists by order
   const sortedLists = [...board.lists].sort((a, b) => a.order - b.order);
 
-  console.log(board)
+  console.log(board);
   return (
     <main className="flex justify-between gap-4 p-8 overflow-x-auto">
       {sortedLists.map((list) => {
@@ -76,7 +76,11 @@ export const ProjectsMain = ({ board }: ProjectsMainProps) => {
                     action={updateCard.bind(null, card.id)}
                     className="flex flex-col h-full min-h-0"
                   >
-                    <ModalForm card={card} listTitle={list.title} boardId={board.id} />
+                    <ModalForm
+                      card={card}
+                      listTitle={list.title}
+                      boardId={board.id}
+                    />
                   </FormWrapper>
                 </Modal>
               ))}

@@ -52,10 +52,10 @@ export const ModalForm = ({ card, listTitle, boardId }: ModalFormProps) => {
   const calculateProgress = () => {
     if (!card?.checklists || card.checklists.length === 0) return 0;
 
-    const allItems = card.checklists.flatMap(cl => cl.checklist_items);
+    const allItems = card.checklists.flatMap((cl) => cl.checklist_items);
     if (allItems.length === 0) return 0;
 
-    const completed = allItems.filter(item => item.completed).length;
+    const completed = allItems.filter((item) => item.completed).length;
     return Math.round((completed / allItems.length) * 100);
   };
 
@@ -97,11 +97,13 @@ export const ModalForm = ({ card, listTitle, boardId }: ModalFormProps) => {
                 Members
               </div>
               <CardAvatar
-                assignees={card?.card_members?.map((cm) => ({
-                  id: cm.user_id,
-                  name: cm.profiles.full_name || 'Unknown',
-                  image: cm.profiles.avatar_url || '',
-                })) || []}
+                assignees={
+                  card?.card_members?.map((cm) => ({
+                    id: cm.user_id,
+                    name: cm.profiles.full_name || 'Unknown',
+                    image: cm.profiles.avatar_url || '',
+                  })) || []
+                }
                 isEditable
               />
             </div>
@@ -122,7 +124,9 @@ export const ModalForm = ({ card, listTitle, boardId }: ModalFormProps) => {
                   </Badge>
                 ))}
                 {(!card?.card_labels || card.card_labels.length === 0) && (
-                  <span className="text-sm text-muted-foreground">No labels</span>
+                  <span className="text-sm text-muted-foreground">
+                    No labels
+                  </span>
                 )}
               </div>
             </div>
@@ -135,7 +139,11 @@ export const ModalForm = ({ card, listTitle, boardId }: ModalFormProps) => {
               <Input
                 type="datetime-local"
                 name="dueDate"
-                defaultValue={card?.due_date ? new Date(card.due_date).toISOString().slice(0, 16) : ''}
+                defaultValue={
+                  card?.due_date
+                    ? new Date(card.due_date).toISOString().slice(0, 16)
+                    : ''
+                }
                 className="w-[200px]"
               />
             </div>
@@ -193,8 +201,13 @@ export const ModalForm = ({ card, listTitle, boardId }: ModalFormProps) => {
                 <div className="space-y-4">
                   {card.checklists.map((checklist) => {
                     const items = checklist.checklist_items || [];
-                    const completed = items.filter(item => item.completed).length;
-                    const progress = items.length > 0 ? Math.round((completed / items.length) * 100) : 0;
+                    const completed = items.filter(
+                      (item) => item.completed
+                    ).length;
+                    const progress =
+                      items.length > 0
+                        ? Math.round((completed / items.length) * 100)
+                        : 0;
 
                     return (
                       <div key={checklist.id} className="space-y-2">
@@ -211,7 +224,10 @@ export const ModalForm = ({ card, listTitle, boardId }: ModalFormProps) => {
 
                         <div className="space-y-2 ml-2">
                           {items.map((item) => (
-                            <div key={item.id} className="flex items-center gap-2">
+                            <div
+                              key={item.id}
+                              className="flex items-center gap-2"
+                            >
                               <Checkbox
                                 id={`item-${item.id}`}
                                 defaultChecked={item.completed}

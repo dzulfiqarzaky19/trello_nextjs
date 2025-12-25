@@ -3,10 +3,16 @@
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 
-export async function createLabel(boardId: string, name: string, color: string) {
+export async function createLabel(
+  boardId: string,
+  name: string,
+  color: string
+) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }
@@ -31,8 +37,10 @@ export async function createLabel(boardId: string, name: string, color: string) 
 
 export async function getBoardLabels(boardId: string) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated', labels: [] };
   }
@@ -52,18 +60,18 @@ export async function getBoardLabels(boardId: string) {
 
 export async function assignLabelToCard(cardId: string, labelId: string) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }
 
-  const { error } = await supabase
-    .from('card_labels')
-    .insert({
-      card_id: cardId,
-      label_id: labelId,
-    });
+  const { error } = await supabase.from('card_labels').insert({
+    card_id: cardId,
+    label_id: labelId,
+  });
 
   if (error) {
     return { error: error.message };
@@ -85,8 +93,10 @@ export async function assignLabelToCard(cardId: string, labelId: string) {
 
 export async function removeLabelFromCard(cardId: string, labelId: string) {
   const supabase = await createClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return { error: 'Not authenticated' };
   }
