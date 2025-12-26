@@ -5,7 +5,7 @@ import {
   FieldGroup,
   FieldSeparator,
 } from '@/components/ui/field';
-import { SigninForm } from '@/features/signin/SigninForm';
+import { SigninForm } from '@/features/auth/SigninForm';
 import { Github } from 'lucide-react';
 import Link from 'next/link';
 
