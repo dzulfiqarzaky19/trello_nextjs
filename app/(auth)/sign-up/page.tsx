@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/field';
 import { AuthFooter } from '@/features/auth/components/AuthFooter';
 import { AuthHeader } from '@/features/auth/components/AuthHeader';
-import { SignupForm } from '@/features/auth/SignupForm';
+import { SignupForm } from '@/features/auth/components/SignupForm';
 
 export default function SignupPage() {
   return (

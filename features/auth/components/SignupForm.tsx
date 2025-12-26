@@ -6,18 +6,20 @@ import { Field } from '@/components/ui/field';
 
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { createClient } from '@/lib/supabase/client';
+import { createSupabaseClient } from '@/lib/supabase/client';
 import { FormInput } from '@/components/form/FormInput';
 import { FormSubmit } from '@/components/form/FormSubmit';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { signUpSchema } from './schemas';
+import { signUpSchema } from '../schemas';
+import { useRegister } from '../api/useRegister';
 
 type ISignUpForm = z.infer<typeof signUpSchema>;
 
 export const SignupForm = ({ className }: React.ComponentProps<'form'>) => {
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = createSupabaseClient();
+  const { mutate } = useRegister();
 
   const {
     register,
@@ -28,38 +30,42 @@ export const SignupForm = ({ className }: React.ComponentProps<'form'>) => {
   });
 
   const onSubmit = async (data: ISignUpForm) => {
-    try {
-      const { error } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          data: {
-            full_name: data.fullName,
-            avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.fullName)}&background=random`,
-          },
-        },
-      });
+    mutate({
+      json: data,
+    });
 
-      if (error) {
-        toast.error(error.message);
+    // try {
+    //   const { error } = await supabase.auth.signUp({
+    //     email: data.email,
+    //     password: data.password,
+    //     options: {
+    //       data: {
+    //         full_name: data.fullName,
+    //         avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.fullName)}&background=random`,
+    //       },
+    //     },
+    //   });
 
-        return;
-      }
-      toast.success('Account created! Logging in...');
+    //   if (error) {
+    //     toast.error(error.message);
 
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+    //     return;
+    //   }
+    //   toast.success('Account created! Logging in...');
 
-      if (session) {
-        router.push('/');
-        return;
-      }
+    //   const {
+    //     data: { session },
+    //   } = await supabase.auth.getSession();
 
-      router.push('/sign-in?message=Account created. Please log in.');
-    } catch (error) {
-      toast.error('Something went wrong');
-    }
+    //   if (session) {
+    //     router.push('/');
+    //     return;
+    //   }
+
+    //   router.push('/sign-in?message=Account created. Please log in.');
+    // } catch (error) {
+    //   toast.error('Something went wrong');
+    // }
   };
 
   return (

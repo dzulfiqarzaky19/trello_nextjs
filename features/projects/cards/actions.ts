@@ -1,10 +1,10 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createSupabaseServer } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 
 export async function createCard(listId: string, formData: FormData) {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServer();
 
   const {
     data: { user },
@@ -60,7 +60,7 @@ export async function createCard(listId: string, formData: FormData) {
 }
 
 export async function updateCard(cardId: string, formData: FormData) {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServer();
 
   const {
     data: { user },
@@ -120,7 +120,7 @@ export async function updateCard(cardId: string, formData: FormData) {
 }
 
 export async function deleteCard(cardId: string) {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServer();
 
   const {
     data: { user },

@@ -1,10 +1,10 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createSupabaseServer } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 
 export async function createList(boardId: string, formData: FormData) {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServer();
 
   const {
     data: { user },
@@ -48,7 +48,7 @@ export async function createList(boardId: string, formData: FormData) {
 }
 
 export async function updateList(listId: string, formData: FormData) {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServer();
 
   const {
     data: { user },
@@ -90,7 +90,7 @@ export async function updateList(listId: string, formData: FormData) {
 }
 
 export async function deleteList(listId: string) {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServer();
 
   const {
     data: { user },

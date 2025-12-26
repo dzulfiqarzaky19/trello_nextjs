@@ -2,7 +2,7 @@ import { Header } from '@/components/header/Header';
 import { ProjectsMain } from '@/features/projects/ProjectsMain';
 import { getBoardDetails } from '@/features/projects/actions';
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { createSupabaseServer } from '@/lib/supabase/server';
 
 interface ProjectDetailPageProps {
   params: Promise<{
@@ -13,7 +13,7 @@ interface ProjectDetailPageProps {
 export default async function ProjectDetailPage({
   params,
 }: ProjectDetailPageProps) {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServer();
   const {
     data: { user },
   } = await supabase.auth.getUser();

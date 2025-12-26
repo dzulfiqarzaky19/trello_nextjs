@@ -8,15 +8,17 @@ import { FormSubmit } from '@/components/form/FormSubmit';
 import { FormInput } from '@/components/form/FormInput';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { createSupabaseClient } from '@/lib/supabase/client';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { signInSchema } from './schemas';
+import { signInSchema } from '../schemas';
+import { useLogin } from '../api/useLogin';
 
 type ISignInForm = z.infer<typeof signInSchema>;
 
 export const SigninForm = ({ className }: React.ComponentProps<'form'>) => {
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = createSupabaseClient();
+  const { mutate } = useLogin();
 
   const {
     register,
@@ -27,18 +29,21 @@ export const SigninForm = ({ className }: React.ComponentProps<'form'>) => {
   });
 
   const onSubmit = async (data: ISignInForm) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
+    mutate({
+      json: data,
     });
+    // const { error } = await supabase.auth.signInWithPassword({
+    //   email: data.email,
+    //   password: data.password,
+    // });
 
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
+    // if (error) {
+    //   toast.error(error.message);
+    //   return;
+    // }
 
-    toast.success('Signed in successfully');
-    router.push('/');
+    // toast.success('Signed in successfully');
+    // router.push('/');
   };
 
   return (

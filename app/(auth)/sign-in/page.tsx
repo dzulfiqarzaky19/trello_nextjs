@@ -1,7 +1,7 @@
 import { FieldGroup, FieldSeparator } from '@/components/ui/field';
 import { AuthFooter } from '@/features/auth/components/AuthFooter';
 import { AuthHeader } from '@/features/auth/components/AuthHeader';
-import { SigninForm } from '@/features/auth/SigninForm';
+import { SigninForm } from '@/features/auth/components/SigninForm';
 
 export default function LoginPage() {
   return (

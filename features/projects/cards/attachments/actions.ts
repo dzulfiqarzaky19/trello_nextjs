@@ -1,6 +1,6 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createSupabaseServer } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 
 // Note: This is a placeholder. Full file upload requires Supabase Storage setup
@@ -11,7 +11,7 @@ export async function addAttachment(
   fileName: string,
   fileUrl: string
 ) {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServer();
 
   const {
     data: { user },
@@ -50,7 +50,7 @@ export async function addAttachment(
 }
 
 export async function deleteAttachment(attachmentId: string) {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServer();
 
   const {
     data: { user },

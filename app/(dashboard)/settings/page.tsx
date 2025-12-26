@@ -1,11 +1,11 @@
 import { Header } from '@/components/header/Header';
 import { SettingsMain } from '@/features/settings/SettingsMain';
 import { SETTINGS_PAGE_HEADER } from '@/lib/const/settingsPage';
-import { createClient } from '@/lib/supabase/server';
+import { createSupabaseServer } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 
 export default async function SettingsPage() {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServer();
   const {
     data: { user },
   } = await supabase.auth.getUser();

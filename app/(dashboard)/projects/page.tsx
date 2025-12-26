@@ -2,10 +2,10 @@ import { Header } from '@/components/header/Header';
 import { BoardList } from '@/features/projects/components/BoardList';
 import { getBoards } from '@/features/projects/actions';
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { createSupabaseServer } from '@/lib/supabase/server';
 
 export default async function ProjectsPage() {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServer();
   const {
     data: { user },
   } = await supabase.auth.getUser();
