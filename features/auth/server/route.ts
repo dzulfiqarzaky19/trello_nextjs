@@ -1,24 +1,64 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { signInSchema, signUpSchema } from '../schemas';
-import { createSupabaseClient } from '@/lib/supabase/client';
+import { createSupabaseServer } from '@/lib/supabase/server';
 
 const app = new Hono()
   .post('/login', zValidator('json', signInSchema), async (c) => {
-    const supabase = createSupabaseClient();
+    const supabase = await createSupabaseServer();
     const { email, password } = c.req.valid('json');
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    return c.json({ email, password });
+      if (error) {
+        return c.json({ error: error.message });
+      }
+
+      return c.json({ response: data });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'My Internal Server Error';
+      return c.json({ error: errorMessage });
+    }
   })
   .post('/register', zValidator('json', signUpSchema), async (c) => {
+    const supabase = await createSupabaseServer();
     const { email, password, fullName, confirmPassword } = c.req.valid('json');
 
-    return c.json({ email, password, fullName, confirmPassword });
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=random`,
+          },
+        },
+      });
+
+      if (error) {
+        return c.json({ error: error.message });
+      }
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (session) {
+        return c.json({ response: session });
+      }
+
+      return c.json({ response: 'Account created. Please log in.' });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'My Internal Server Error';
+      return c.json({ error: errorMessage });
+    }
   });
 
 export default app;

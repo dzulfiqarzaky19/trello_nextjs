@@ -18,7 +18,7 @@ type ISignInForm = z.infer<typeof signInSchema>;
 export const SigninForm = ({ className }: React.ComponentProps<'form'>) => {
   const router = useRouter();
   const supabase = createSupabaseClient();
-  const { mutate } = useLogin();
+  const { mutateAsync } = useLogin();
 
   const {
     register,
@@ -29,21 +29,22 @@ export const SigninForm = ({ className }: React.ComponentProps<'form'>) => {
   });
 
   const onSubmit = async (data: ISignInForm) => {
-    mutate({
-      json: data,
-    });
-    // const { error } = await supabase.auth.signInWithPassword({
-    //   email: data.email,
-    //   password: data.password,
-    // });
+    try {
+      const result = await mutateAsync({
+        json: data,
+      });
 
-    // if (error) {
-    //   toast.error(error.message);
-    //   return;
-    // }
+      if ('error' in result) {
+        toast.error(result.error);
+        return;
+      }
 
-    // toast.success('Signed in successfully');
-    // router.push('/');
+      toast.success('Signed in successfully');
+      router.refresh();
+      router.push('/');
+    } catch {
+      toast.error('Something went wrong');
+    }
   };
 
   return (

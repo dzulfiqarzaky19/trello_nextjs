@@ -19,7 +19,7 @@ type ISignUpForm = z.infer<typeof signUpSchema>;
 export const SignupForm = ({ className }: React.ComponentProps<'form'>) => {
   const router = useRouter();
   const supabase = createSupabaseClient();
-  const { mutate } = useRegister();
+  const { mutateAsync } = useRegister();
 
   const {
     register,
@@ -30,42 +30,28 @@ export const SignupForm = ({ className }: React.ComponentProps<'form'>) => {
   });
 
   const onSubmit = async (data: ISignUpForm) => {
-    mutate({
-      json: data,
-    });
+    try {
+      const result = await mutateAsync({
+        json: data,
+      });
 
-    // try {
-    //   const { error } = await supabase.auth.signUp({
-    //     email: data.email,
-    //     password: data.password,
-    //     options: {
-    //       data: {
-    //         full_name: data.fullName,
-    //         avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.fullName)}&background=random`,
-    //       },
-    //     },
-    //   });
+      if ('error' in result) {
+        toast.error(result.error);
+        return;
+      }
 
-    //   if (error) {
-    //     toast.error(error.message);
+      if (typeof result.response === 'string') {
+        toast.success(result.response);
+        router.push(`/sign-in?message=${encodeURIComponent(result.response)}`);
+        return;
+      }
 
-    //     return;
-    //   }
-    //   toast.success('Account created! Logging in...');
-
-    //   const {
-    //     data: { session },
-    //   } = await supabase.auth.getSession();
-
-    //   if (session) {
-    //     router.push('/');
-    //     return;
-    //   }
-
-    //   router.push('/sign-in?message=Account created. Please log in.');
-    // } catch (error) {
-    //   toast.error('Something went wrong');
-    // }
+      toast.success('Account created! Logging in...');
+      router.refresh();
+      router.push('/');
+    } catch {
+      toast.error('Something went wrong');
+    }
   };
 
   return (
