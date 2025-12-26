@@ -20,8 +20,6 @@ export const FormWrapper = ({
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
 
-    console.log(Object.fromEntries(formData));
-
     try {
       const result = await action(formData);
 

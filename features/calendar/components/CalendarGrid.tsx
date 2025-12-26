@@ -2,7 +2,6 @@ import { CALENDAR_DAYS, WEEKDAYS } from '@/lib/const/calendarPage';
 import { CalendarCell } from './CalendarCell';
 
 export const CalendarGrid = () => {
-  // Chunk the days into weeks (arrays of 7)
   const weeks = [];
   for (let i = 0; i < CALENDAR_DAYS.length; i += 7) {
     weeks.push(CALENDAR_DAYS.slice(i, i + 7));

@@ -76,7 +76,6 @@ export async function getBoardDetails(boardId: string) {
     return { error: 'Not authenticated' };
   }
 
-  // Fetch board with lists and cards
   const { data: board, error: boardError } = await supabase
     .from('boards')
     .select(

@@ -43,14 +43,14 @@ export const CALENDAR_EVENTS = [
   },
   {
     id: 6,
-    date: 15, // Today
+    date: 15,
     title: 'Dark Mode Impl.',
     time: 'In Progress',
     color: 'bg-blue-100 text-blue-700 border-l-4 border-blue-500',
   },
   {
     id: 7,
-    date: 15, // Today
+    date: 15,
     title: 'Weekly Sync',
     time: '3:00 PM',
     color: 'bg-gray-100 text-gray-700 border-l-4 border-gray-500',
@@ -85,22 +85,15 @@ export const CALENDAR_EVENTS = [
   },
 ];
 
-// Generating grid for November 2023
-// Starts on Wednesday (Nov 1st)
-// Previous month (Oct) ends on 31st.
-// 29, 30, 31 exist in previous month row.
 export const CALENDAR_DAYS = [
-  // Previous month (Oct)
   { day: 29, isCurrentMonth: false },
   { day: 30, isCurrentMonth: false },
   { day: 31, isCurrentMonth: false },
-  // Current month (Nov)
   ...Array.from({ length: 30 }, (_, i) => ({
     day: i + 1,
     isCurrentMonth: true,
     isToday: i + 1 === 15,
   })),
-  // Next month (Dec)
   { day: 1, isCurrentMonth: false },
   { day: 2, isCurrentMonth: false },
 ];
