@@ -1,10 +1,10 @@
-import { Sidebar } from '@/components/Sidebar';
+import { Sidebar } from '@/components/sidebar/Sidebar';
 
-export default function DashboardLayout({
-  children,
-}: {
+interface IDashboardLayoutProps {
   children: React.ReactNode;
-}) {
+}
+
+export default function DashboardLayout({ children }: IDashboardLayoutProps) {
   return (
     <div className="grid grid-cols-[280px_1fr]">
       <Sidebar />
