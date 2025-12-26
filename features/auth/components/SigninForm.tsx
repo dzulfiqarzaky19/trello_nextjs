@@ -8,7 +8,6 @@ import { FormSubmit } from '@/components/form/FormSubmit';
 import { FormInput } from '@/components/form/FormInput';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-import { createSupabaseClient } from '@/lib/supabase/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signInSchema } from '../schemas';
 import { useLogin } from '../api/useLogin';
@@ -17,7 +16,6 @@ type ISignInForm = z.infer<typeof signInSchema>;
 
 export const SigninForm = ({ className }: React.ComponentProps<'form'>) => {
   const router = useRouter();
-  const supabase = createSupabaseClient();
   const { mutateAsync } = useLogin();
 
   const {
@@ -40,8 +38,8 @@ export const SigninForm = ({ className }: React.ComponentProps<'form'>) => {
       }
 
       toast.success('Signed in successfully');
-      router.refresh();
       router.push('/');
+      router.refresh();
     } catch {
       toast.error('Something went wrong');
     }

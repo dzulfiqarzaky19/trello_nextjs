@@ -27,7 +27,7 @@ const app = new Hono()
   })
   .post('/register', zValidator('json', signUpSchema), async (c) => {
     const supabase = await createSupabaseServer();
-    const { email, password, fullName, confirmPassword } = c.req.valid('json');
+    const { email, password, fullName } = c.req.valid('json');
 
     try {
       const { error } = await supabase.auth.signUp({
@@ -59,6 +59,11 @@ const app = new Hono()
         error instanceof Error ? error.message : 'My Internal Server Error';
       return c.json({ error: errorMessage });
     }
+  })
+  .post('/logout', async (c) => {
+    const supabase = await createSupabaseServer();
+    await supabase.auth.signOut();
+    return c.json({ success: true });
   });
 
 export default app;

@@ -6,7 +6,6 @@ import { Field } from '@/components/ui/field';
 
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { createSupabaseClient } from '@/lib/supabase/client';
 import { FormInput } from '@/components/form/FormInput';
 import { FormSubmit } from '@/components/form/FormSubmit';
 import { useForm } from 'react-hook-form';
@@ -18,7 +17,6 @@ type ISignUpForm = z.infer<typeof signUpSchema>;
 
 export const SignupForm = ({ className }: React.ComponentProps<'form'>) => {
   const router = useRouter();
-  const supabase = createSupabaseClient();
   const { mutateAsync } = useRegister();
 
   const {
@@ -47,8 +45,8 @@ export const SignupForm = ({ className }: React.ComponentProps<'form'>) => {
       }
 
       toast.success('Account created! Logging in...');
-      router.refresh();
       router.push('/');
+      router.refresh();
     } catch {
       toast.error('Something went wrong');
     }
