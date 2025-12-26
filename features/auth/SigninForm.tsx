@@ -1,9 +1,11 @@
-'use client';
+'use client'
 
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
-import { Field } from '@/components/ui/field';
-import { useForm } from 'react-hook-form';
+import {
+  Field,
+} from '@/components/ui/field';
+import { useForm } from "react-hook-form";
 import { FormSubmit } from '@/components/form/FormSubmit';
 import { FormInput } from '@/components/form/FormInput';
 import { toast } from 'sonner';
@@ -34,12 +36,12 @@ export const SigninForm = ({ className }: React.ComponentProps<'form'>) => {
 
     if (error) {
       toast.error(error.message);
-      return;
+      return
     }
 
     toast.success('Signed in successfully');
     router.push('/');
-  };
+  }
 
   return (
     <form
@@ -51,7 +53,7 @@ export const SigninForm = ({ className }: React.ComponentProps<'form'>) => {
         type="email"
         placeholder="m@example.com"
         required
-        {...register('email')}
+        {...register("email")}
         error={errors.email?.message}
       />
 
@@ -59,7 +61,7 @@ export const SigninForm = ({ className }: React.ComponentProps<'form'>) => {
         label="Password"
         type="password"
         required
-        {...register('password')}
+        {...register("password")}
         error={errors.password?.message}
       />
 
