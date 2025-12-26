@@ -1,10 +1,4 @@
-import { Button } from '@/components/ui/button';
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldSeparator,
-} from '@/components/ui/field';
+import { FieldGroup, FieldSeparator } from '@/components/ui/field';
 import { AuthFooter } from '@/features/auth/components/AuthFooter';
 import { AuthHeader } from '@/features/auth/components/AuthHeader';
 import { SignupForm } from '@/features/auth/components/SignupForm';
