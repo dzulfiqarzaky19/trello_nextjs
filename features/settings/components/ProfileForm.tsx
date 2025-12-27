@@ -16,14 +16,21 @@ import { updateProfile } from '../actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import { useMe } from '@/features/auth/api/useMe';
 
-interface ProfileFormProps {
-  profile: any;
-  userEmail?: string;
-}
-
-export const ProfileForm = ({ profile, userEmail }: ProfileFormProps) => {
+export const ProfileForm = () => {
+  const { data, isLoading: isLoadingUser } = useMe();
   const [loading, setLoading] = useState(false);
+
+  console.log({ data });
+
+  // We can use local state or just derive from data
+  // But since it's a form, we might want uncontrolled inputs with defaultValues (which only set on mount/key change)
+  // or controlled inputs. The original code used defaultValues.
+
+  const profile = data && 'profile' in data ? data.profile : null;
+  const userEmail = data && 'user' in data ? data.user.email : null;
+  const fullName = profile?.full_name || '';
 
   const handleSubmit = async (formData: FormData) => {
     setLoading(true);
@@ -41,7 +48,13 @@ export const ProfileForm = ({ profile, userEmail }: ProfileFormProps) => {
     }
   };
 
-  const fullName = profile?.full_name || '';
+  if (isLoadingUser) {
+    return (
+      <div className="flex justify-center p-8">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   console.log(profile);
 

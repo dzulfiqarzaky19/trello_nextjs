@@ -64,6 +64,39 @@ const app = new Hono()
     const supabase = await createSupabaseServer();
     await supabase.auth.signOut();
     return c.json({ success: true });
+  })
+  .get('/me', async (c) => {
+    const supabase = await createSupabaseServer();
+
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      console.log({ user });
+
+      if (!user) {
+        return c.json({ error: 'User not found' });
+      }
+
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      console.log({ profile, profileError });
+
+      if (!profile) {
+        return c.json({ error: 'Profile not found' });
+      }
+
+      return c.json({ user, profile });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Internal Server Error';
+      return c.json({ error: errorMessage });
+    }
   });
 
 export default app;
