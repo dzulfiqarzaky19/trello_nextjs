@@ -12,7 +12,5 @@ export function ProgressDemo() {
     return () => clearTimeout(timer);
   }, []);
 
-  console.log(progress);
-
   return <Progress value={progress} className="w-[60%] bg-red-500" />;
 }

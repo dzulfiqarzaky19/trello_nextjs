@@ -22,12 +22,9 @@ export default async function ProjectDetailPage({
     redirect('/sign-in');
   }
 
-  // Await params for Next.js 14+
   const { id } = await params;
 
   const { board, error } = await getBoardDetails(id);
-
-  console.log('Board fetch result:', { board, error, boardId: id });
 
   if (error || !board) {
     console.error(

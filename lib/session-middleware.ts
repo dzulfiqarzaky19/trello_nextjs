@@ -2,7 +2,6 @@ import 'server-only';
 
 import { createMiddleware } from 'hono/factory';
 import { createSupabaseServer } from './supabase/server';
-import { getCookie } from 'hono/cookie';
 import { User } from '@supabase/supabase-js';
 
 type AdditionalContext = {

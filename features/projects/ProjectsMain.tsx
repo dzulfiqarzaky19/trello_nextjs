@@ -23,7 +23,6 @@ export const ProjectsMain = ({ board }: ProjectsMainProps) => {
   // Sort lists by order
   const sortedLists = [...board.lists].sort((a, b) => a.order - b.order);
 
-  console.log(board);
   return (
     <main className="flex justify-between gap-4 p-8 overflow-x-auto">
       {sortedLists.map((list) => {
