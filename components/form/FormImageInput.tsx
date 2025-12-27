@@ -57,7 +57,7 @@ export const FormImageInput = <T extends FieldValues>({
         };
 
         const handleRemove = () => {
-          onChange(undefined);
+          onChange(null);
           if (inputRef.current) inputRef.current.value = '';
         };
 

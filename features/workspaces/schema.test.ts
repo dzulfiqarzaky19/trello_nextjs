@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { createWorkspaceSchema, workspacesListSchema } from './schema';
+import {
+  createWorkspaceSchema,
+  workspacesListSchema,
+  updateWorkspaceSchema,
+} from './schema';
 
 describe('Workspace Schemas', () => {
   describe('createWorkspaceSchema', () => {
@@ -7,7 +11,7 @@ describe('Workspace Schemas', () => {
       const validData = {
         name: 'Engineering Team',
         slug: 'eng-team-123',
-        imageUrl: 'https://example.com/logo.png',
+        image: 'https://example.com/logo.png',
       };
       const result = createWorkspaceSchema.safeParse(validData);
       expect(result.success).toBe(true);
@@ -26,7 +30,7 @@ describe('Workspace Schemas', () => {
       }
     });
 
-    it('should allow empty or optional imageUrl', () => {
+    it('should allow empty or optional image', () => {
       expect(
         createWorkspaceSchema.safeParse({ name: 'Test', slug: 'test' }).success
       ).toBe(true);
@@ -34,9 +38,40 @@ describe('Workspace Schemas', () => {
         createWorkspaceSchema.safeParse({
           name: 'Test',
           slug: 'test',
-          imageUrl: '',
+          image: null,
         }).success
       ).toBe(true);
+    });
+
+    it('should fail if slug is invalid', () => {
+      const result = createWorkspaceSchema.safeParse({
+        name: 'Valid Name',
+        slug: 'Invalid Slug!',
+      });
+      expect(result.success).toBe(false);
+    });
+  });
+
+  describe('updateWorkspaceSchema', () => {
+    it('should validate partial updates', () => {
+      const result = updateWorkspaceSchema.safeParse({
+        name: 'Updated Name',
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should allow removing image with null', () => {
+      const result = updateWorkspaceSchema.safeParse({
+        image: null,
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should fail if partial name is too short', () => {
+      const result = updateWorkspaceSchema.safeParse({
+        name: 'ab',
+      });
+      expect(result.success).toBe(false);
     });
   });
 

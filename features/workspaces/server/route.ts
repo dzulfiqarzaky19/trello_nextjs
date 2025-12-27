@@ -1,6 +1,10 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
-import { createWorkspaceSchema, workspacesListSchema } from '../schema';
+import {
+  createWorkspaceSchema,
+  updateWorkspaceSchema,
+  workspacesListSchema,
+} from '../schema';
 import { sessionMiddleware } from '@/lib/session-middleware';
 import { createSupabaseServer } from '@/lib/supabase/server';
 
@@ -68,6 +72,129 @@ const app = new Hono()
       return c.json({ data: workspace });
     }
   )
+  .patch(
+    '/:workspaceId',
+    sessionMiddleware,
+    zValidator('form', updateWorkspaceSchema),
+    async (c) => {
+      const supabase = await createSupabaseServer();
+      const user = c.get('user');
+      const { workspaceId } = c.req.param();
+      const { name, slug, image } = c.req.valid('form');
+
+      const { data: member, error: memberError } = await supabase
+        .from('members')
+        .select('role, workspaces(image_url)')
+        .eq('workspace_id', workspaceId)
+        .eq('user_id', user.id)
+        .single();
+
+      if (memberError || member?.role !== 'ADMIN') {
+        return c.json({ error: 'Unauthorized' }, 401);
+      }
+
+      const existingImageUrl = (member.workspaces as any)?.image_url;
+      let imageUrl: string | undefined | null = undefined;
+
+      if (image instanceof File) {
+        const fileName = `${user.id}/${Date.now()}-${image.name}`;
+        const { data, error } = await supabase.storage
+          .from('workspace_image')
+          .upload(fileName, image, {
+            cacheControl: '3600',
+            upsert: false,
+          });
+
+        if (error) return c.json({ error: error.message }, 500);
+
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from('workspace_image').getPublicUrl(data.path);
+
+        imageUrl = publicUrl;
+      } else if (typeof image === 'string') {
+        imageUrl = image;
+      } else if (image === null) {
+        imageUrl = null;
+      }
+
+      const updateData: any = {};
+      if (name !== undefined) updateData.name = name;
+      if (slug !== undefined) updateData.slug = slug;
+
+      if (imageUrl !== undefined) {
+        updateData.image_url = imageUrl;
+      }
+
+      const { data, error } = await supabase
+        .from('workspaces')
+        .update(updateData)
+        .eq('id', workspaceId)
+        .select()
+        .single();
+
+      if (error) {
+        if (error.code === '23505') {
+          return c.json(
+            { error: 'Workspace with this slug already exists' },
+            400
+          );
+        }
+        return c.json({ error: 'Something went wrong' }, 500);
+      }
+
+      if (
+        imageUrl !== undefined &&
+        existingImageUrl &&
+        existingImageUrl !== imageUrl
+      ) {
+        const parts = existingImageUrl.split('workspace_image/');
+        if (parts.length > 1) {
+          const path = parts[parts.length - 1];
+          await supabase.storage.from('workspace_image').remove([path]);
+        }
+      }
+
+      return c.json({ data });
+    }
+  )
+  .delete('/:workspaceId', sessionMiddleware, async (c) => {
+    const supabase = await createSupabaseServer();
+    const user = c.get('user');
+    const { workspaceId } = c.req.param();
+
+    const { data: member, error: memberError } = await supabase
+      .from('members')
+      .select('role, workspaces(image_url)')
+      .eq('workspace_id', workspaceId)
+      .eq('user_id', user.id)
+      .single();
+
+    if (memberError || member?.role !== 'ADMIN') {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    const imageUrl = (member.workspaces as any)?.image_url;
+
+    if (imageUrl) {
+      const parts = imageUrl.split('workspace_image/');
+      if (parts.length > 1) {
+        const path = parts[parts.length - 1];
+        await supabase.storage.from('workspace_image').remove([path]);
+      }
+    }
+
+    const { error } = await supabase
+      .from('workspaces')
+      .delete()
+      .eq('id', workspaceId);
+
+    if (error) {
+      return c.json({ error: 'Something went wrong' }, 500);
+    }
+
+    return c.json({ data: { id: workspaceId } });
+  })
   .get('/', sessionMiddleware, async (c) => {
     const supabase = await createSupabaseServer();
     const user = c.get('user');
@@ -78,16 +205,12 @@ const app = new Hono()
       .eq('members.user_id', user.id);
 
     if (error) {
-      console.error('Supabase Error:', error);
       return c.json({ error: 'Something went wrong' }, 500);
     }
-
-    console.log({ data });
 
     const result = workspacesListSchema.safeParse(data);
 
     if (!result.success) {
-      console.error('Zod Validation Error:', result.error);
       return c.json({ error: 'Data validation failed' }, 500);
     }
 

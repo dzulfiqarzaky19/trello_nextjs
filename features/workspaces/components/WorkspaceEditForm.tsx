@@ -8,54 +8,63 @@ import {
 } from '@/components/ui/dialog';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { createWorkspaceSchema, ICreateWorkspace } from '../schema';
-import { useCreateWorkspace } from '../api/useCreateWorkspace';
+import {
+  updateWorkspaceSchema,
+  IUpdateWorkspace,
+  workspaceSchema,
+} from '../schema';
+import { useUpdateWorkspace } from '../api/useUpdateWorkspace';
 import { FormImageInput } from '@/components/form/FormImageInput';
+import { z } from 'zod';
 import { slugify } from '../utils';
 
-export const WorkspaceCreateForm = ({
-  closeModal,
-}: {
+interface IWorkspaceEditFormProps {
+  workspace: z.infer<typeof workspaceSchema>;
+  onSuccess?: () => void;
   closeModal?: () => void;
-}) => {
-  const { mutateAsync } = useCreateWorkspace();
+}
+
+export const WorkspaceEditForm = ({
+  workspace,
+  onSuccess,
+  closeModal,
+}: IWorkspaceEditFormProps) => {
+  const { mutateAsync } = useUpdateWorkspace();
 
   const {
     register,
     handleSubmit,
-    reset,
     setValue,
     formState: { errors, isSubmitting, isDirty },
     control,
-  } = useForm<ICreateWorkspace>({
-    resolver: zodResolver(createWorkspaceSchema),
+  } = useForm<IUpdateWorkspace>({
+    resolver: zodResolver(updateWorkspaceSchema),
     mode: 'onChange',
     defaultValues: {
-      name: '',
-      slug: '',
-      image: undefined,
+      name: workspace.name,
+      slug: workspace.slug,
+      image: workspace.image_url || undefined,
     },
   });
 
   const onNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-
     setValue('name', value, { shouldValidate: true, shouldDirty: true });
-
     setValue('slug', slugify(value), {
       shouldValidate: true,
       shouldDirty: true,
     });
   };
 
-  const onSubmit = async (data: ICreateWorkspace) => {
+  const onSubmit = async (data: IUpdateWorkspace) => {
     if (!isDirty) return;
 
     try {
       await mutateAsync({
+        param: { workspaceId: workspace.id },
         form: data,
       });
-      reset();
+      onSuccess?.();
       closeModal?.();
     } catch {
       // Error handled by useMutation.onError
@@ -66,10 +75,10 @@ export const WorkspaceCreateForm = ({
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <DialogHeader>
         <DialogTitle className="text-2xl font-bold mb-2">
-          Create New Board
+          Edit Workspace
         </DialogTitle>
         <DialogDescription className="text-sm text-muted-foreground">
-          Start organizing your tasks in a new project board.
+          Update your workspace details.
         </DialogDescription>
       </DialogHeader>
 

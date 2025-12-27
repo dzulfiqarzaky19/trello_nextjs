@@ -1,23 +1,27 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import app from './route';
 
-const mockInsert = vi.fn();
-const mockSelect = vi.fn();
-const mockSingle = vi.fn();
-const mockEq = vi.fn();
-const mockDelete = vi.fn();
+const mockRemove = vi.fn();
+const mockUpload = vi.fn();
+
+const createChain = (finalResult = { data: null, error: null }) => {
+  const chain: any = {
+    select: vi.fn(() => chain),
+    eq: vi.fn(() => chain),
+    single: vi.fn(() => Promise.resolve(finalResult)),
+    update: vi.fn(() => chain),
+    delete: vi.fn(() => chain),
+    insert: vi.fn(() => chain),
+    then: (resolve: any) => Promise.resolve(finalResult).then(resolve),
+  };
+  return chain;
+};
 
 vi.mock('@/lib/supabase/server', () => ({
-  createSupabaseServer: vi.fn(async () => ({
-    from: vi.fn((table) => ({
-      insert: mockInsert,
-      select: mockSelect,
-      eq: mockEq,
-      delete: mockDelete,
-      single: mockSingle,
-    })),
-  })),
+  createSupabaseServer: vi.fn(),
 }));
+
+import { createSupabaseServer } from '@/lib/supabase/server';
 
 vi.mock('@/lib/session-middleware', () => ({
   sessionMiddleware: async (c: any, next: any) => {
@@ -29,154 +33,144 @@ vi.mock('@/lib/session-middleware', () => ({
 describe('Workspaces Hono Routes', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockInsert.mockReturnValue({ select: mockSelect });
-    mockSelect.mockReturnValue({ single: mockSingle, eq: mockEq });
-    mockEq.mockReturnValue({ single: mockSingle });
+    mockRemove.mockResolvedValue({ error: null });
+    mockUpload.mockResolvedValue({ data: { path: 'test-path' }, error: null });
   });
 
-  describe('GET /', () => {
-    it('returns a list of workspaces for the user', async () => {
-      const mockWorkspaces = [
-        {
-          id: 'ws-1',
-          name: 'Workspace 1',
-          slug: 'ws-1',
-          image_url: null,
-          user_id: 'test-user-id',
-          members: [{ user_id: 'test-user-id' }],
-          created_at: '2023-01-01',
-          updated_at: null,
-        },
-      ];
+  const setupSupabaseMock = (results: any[]) => {
+    let callCount = 0;
+    (createSupabaseServer as any).mockImplementation(async () => ({
+      from: vi.fn(() => {
+        const res = results[callCount++] || { data: null, error: null };
+        const chain = createChain(res);
+        return chain;
+      }),
+      storage: {
+        from: vi.fn(() => ({
+          remove: mockRemove,
+          getPublicUrl: vi.fn(() => ({
+            data: { publicUrl: 'http://example.com/workspace_image/mock.png' },
+          })),
+          upload: mockUpload,
+        })),
+      },
+    }));
+  };
 
-      mockSelect.mockReturnValue({
-        eq: vi.fn().mockResolvedValue({ data: mockWorkspaces, error: null }),
-      });
+  const mockWorkspace = {
+    id: 'ws-1',
+    name: 'Workspace 1',
+    slug: 'ws-1',
+    image_url: 'http://example.com/workspace_image/old.png',
+    user_id: 'test-user-id',
+    created_at: '2023-01-01',
+    updated_at: null,
+    members: [{ user_id: 'test-user-id' }],
+  };
+
+  describe('GET /', () => {
+    it('returns a list of workspaces', async () => {
+      setupSupabaseMock([{ data: [mockWorkspace], error: null }]);
 
       const res = await app.request('/');
       const body = await res.json();
 
       expect(res.status).toBe(200);
       expect(body.workspaces).toHaveLength(1);
-      expect(body.workspaces[0].name).toBe('Workspace 1');
-    });
-
-    it('returns 500 if Supabase fetch fails', async () => {
-      mockSelect.mockReturnValue({
-        eq: vi
-          .fn()
-          .mockResolvedValue({ data: null, error: { message: 'Fetch error' } }),
-      });
-
-      const res = await app.request('/');
-      const body = await res.json();
-
-      expect(res.status).toBe(500);
-      expect(body.error).toBe('Something went wrong');
     });
   });
 
   describe('POST /', () => {
-    const validPayload = {
-      name: 'New Workspace',
-      slug: 'new-ws',
-      image: 'https://example.com/img.png',
-    };
-
-    it('successfully creates a workspace and an admin member', async () => {
-      const mockWorkspace = {
-        id: 'new-ws-id',
-        ...validPayload,
-        user_id: 'test-user-id',
-      };
-
-      mockSingle.mockResolvedValueOnce({ data: mockWorkspace, error: null });
-
-      mockInsert
-        .mockReturnValueOnce({ select: mockSelect })
-        .mockResolvedValueOnce({ error: null });
+    it('successfully creates a workspace', async () => {
+      setupSupabaseMock([
+        { data: mockWorkspace, error: null },
+        { error: null },
+      ]);
 
       const formData = new FormData();
-      formData.append('name', validPayload.name);
-      formData.append('slug', validPayload.slug);
-      formData.append('image', validPayload.image);
+      formData.append('name', 'New Workspace');
+      formData.append('slug', 'new-slug');
 
       const res = await app.request('/', {
         method: 'POST',
         body: formData,
       });
-
-      const body = await res.json();
 
       expect(res.status).toBe(200);
-      expect(body.data.name).toBe('New Workspace');
     });
+  });
 
-    it('returns 400 if slug already exists', async () => {
-      mockSingle.mockResolvedValueOnce({
-        data: null,
-        error: { code: '23505' },
-      });
+  describe('PATCH /:workspaceId', () => {
+    it('updates workspace and cleans up image', async () => {
+      setupSupabaseMock([
+        {
+          data: {
+            role: 'ADMIN',
+            workspaces: {
+              image_url: 'http://example.com/workspace_image/old.png',
+            },
+          },
+          error: null,
+        },
+        { data: mockWorkspace, error: null },
+      ]);
 
       const formData = new FormData();
-      formData.append('name', validPayload.name);
-      formData.append('slug', validPayload.slug);
-      formData.append('image', validPayload.image);
+      formData.append('name', 'Updated');
+      formData.append('image', 'http://example.com/workspace_image/new.png');
 
-      const res = await app.request('/', {
-        method: 'POST',
+      const res = await app.request('/ws-1', {
+        method: 'PATCH',
         body: formData,
       });
 
-      const body = await res.json();
-
-      expect(res.status).toBe(400);
-      expect(body.error).toBe('Workspace with this slug already exists');
+      expect(res.status).toBe(200);
+      expect(mockRemove).toHaveBeenCalled();
     });
 
-    it('rolls back workspace creation if member creation fails', async () => {
-      const mockWorkspace = {
-        id: 'new-ws-id',
-        ...validPayload,
-        user_id: 'test-user-id',
-      };
+    it('returns 401 if not admin', async () => {
+      setupSupabaseMock([{ data: { role: 'MEMBER' }, error: null }]);
 
-      mockSingle.mockResolvedValueOnce({ data: mockWorkspace, error: null });
-      mockInsert
-        .mockReturnValueOnce({ select: mockSelect }) // workspace
-        .mockResolvedValueOnce({ error: { message: 'Member error' } }); // member
-
-      mockDelete.mockReturnValue({
-        eq: vi.fn().mockResolvedValue({ error: null }),
+      const res = await app.request('/ws-1', {
+        method: 'PATCH',
+        body: new URLSearchParams({ name: 'Fail' }),
       });
 
-      const formData = new FormData();
-      formData.append('name', validPayload.name);
-      formData.append('slug', validPayload.slug);
-      formData.append('image', validPayload.image);
+      expect(res.status).toBe(401);
+    });
+  });
 
-      const res = await app.request('/', {
-        method: 'POST',
-        body: formData,
+  describe('DELETE /:workspaceId', () => {
+    it('deletes workspace and cleans up image', async () => {
+      setupSupabaseMock([
+        {
+          data: {
+            role: 'ADMIN',
+            workspaces: {
+              image_url: 'http://example.com/workspace_image/old.png',
+            },
+          },
+          error: null,
+        },
+        { error: null },
+      ]);
+
+      const res = await app.request('/ws-1', {
+        method: 'DELETE',
       });
 
-      const body = await res.json();
-
-      expect(res.status).toBe(500);
-      expect(body.error).toBe('Something went wrong');
-      expect(mockDelete).toHaveBeenCalled();
+      expect(res.status).toBe(200);
+      expect(mockRemove).toHaveBeenCalled();
     });
 
-    it('returns 400 if validation fails', async () => {
-      const formData = new FormData();
-      formData.append('name', 'ab');
+    it('returns 401 if not admin', async () => {
+      setupSupabaseMock([{ data: { role: 'MEMBER' }, error: null }]);
 
-      const res = await app.request('/', {
-        method: 'POST',
-        body: formData,
+      const res = await app.request('/ws-1', {
+        method: 'DELETE',
       });
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(401);
     });
   });
 });

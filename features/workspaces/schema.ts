@@ -15,7 +15,10 @@ export const createWorkspaceSchema = z.object({
       /^[a-z0-9-]+$/,
       'Slug can only contain letters, numbers, and hyphens'
     ),
-  image: z.union([z.instanceof(File), z.string()]).optional(),
+  image: z
+    .union([z.instanceof(File), z.string()])
+    .optional()
+    .nullable(),
 });
 
 export const workspaceSchema = z.object({
@@ -35,5 +38,8 @@ export const workspaceSchema = z.object({
 
 export const workspacesListSchema = z.array(workspaceSchema);
 
+export const updateWorkspaceSchema = createWorkspaceSchema.partial();
+
 export type ICreateWorkspace = z.infer<typeof createWorkspaceSchema>;
+export type IUpdateWorkspace = z.infer<typeof updateWorkspaceSchema>;
 export type IGetWorkspace = z.infer<typeof workspacesListSchema>;

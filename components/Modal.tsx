@@ -7,12 +7,20 @@ export const Modal = ({
   children,
   trigger,
   modalClass,
+  open: externalOpen,
+  onOpenChange: externalOnOpenChange,
 }: {
   children: React.ReactNode;
   trigger: React.ReactNode;
   modalClass?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) => {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+
+  const open = externalOpen !== undefined ? externalOpen : internalOpen;
+  const setOpen =
+    externalOnOpenChange !== undefined ? externalOnOpenChange : setInternalOpen;
 
   const childrenWithProps = isValidElement(children)
     ? cloneElement(children as React.ReactElement<any>, {
@@ -22,7 +30,7 @@ export const Modal = ({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className={modalClass}>{childrenWithProps}</DialogContent>
     </Dialog>
   );
