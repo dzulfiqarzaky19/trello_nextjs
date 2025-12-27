@@ -12,6 +12,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signUpSchema } from '../schemas';
 import { useRegister } from '../api/useRegister';
+import { FormPasswordInput } from '@/components/form/FormPasswordInput';
 
 type ISignUpForm = z.infer<typeof signUpSchema>;
 
@@ -75,17 +76,15 @@ export const SignupForm = ({ className }: React.ComponentProps<'form'>) => {
         error={errors.email?.message}
       />
 
-      <FormInput
+      <FormPasswordInput
         label="Password"
-        type="password"
         required
         {...register('password')}
         error={errors.password?.message}
       />
 
-      <FormInput
+      <FormPasswordInput
         label="Confirm Password"
-        type="password"
         required
         {...register('confirmPassword')}
         error={errors.confirmPassword?.message}

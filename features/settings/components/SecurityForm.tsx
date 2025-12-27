@@ -1,56 +1,79 @@
+'use client';
+
+import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from '@/components/ui/card';
+import { CardContent, CardFooter } from '@/components/ui/card';
+import { useSecurity } from '../api/useSecurity';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { securitySchema } from '../schema';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { FormSubmit } from '@/components/form/FormSubmit';
+import { FormPasswordInput } from '@/components/form/FormPasswordInput';
+
+type ISecurityForm = z.infer<typeof securitySchema>;
 
 export const SecurityForm = () => {
+  const { mutateAsync } = useSecurity();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<ISecurityForm>({
+    resolver: zodResolver(securitySchema),
+  });
+
+  const onSubmit = async (data: ISecurityForm) => {
+    try {
+      const result = await mutateAsync({
+        json: data,
+      });
+
+      if ('error' in result) {
+        toast.error(result.error);
+        return;
+      }
+
+      toast.success('Password updated successfully');
+      reset();
+    } catch {
+      toast.error('Something went wrong');
+    }
+  };
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-bold">Security</h3>
-        <p className="text-sm text-muted-foreground">
-          Update your password and secure your account.
-        </p>
-      </div>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <CardContent className="space-y-6">
+        <FormPasswordInput
+          label="Current Password"
+          placeholder="Confirmation required"
+          required
+          {...register('currentPassword')}
+          error={errors.currentPassword?.message}
+        />
 
-      <Card className="border-none">
-        <CardHeader>
-          <CardTitle className="sr-only">Security Settings</CardTitle>
-          <CardDescription className="sr-only">
-            Manage your password and account security
-          </CardDescription>
-        </CardHeader>
+        <FormPasswordInput
+          label="New Password"
+          placeholder="Minimum 8 characters"
+          required
+          {...register('newPassword')}
+          error={errors.newPassword?.message}
+        />
+      </CardContent>
 
-        <CardContent>
-          <div className="space-y-2 mb-6">
-            <Label htmlFor="currentPassword">Current Password</Label>
-            <Input
-              id="currentPassword"
-              type="password"
-              placeholder="Minimum 8 characters"
-            />
-          </div>
-        </CardContent>
+      <CardFooter className="flex justify-end gap-2 pt-6">
+        <Button
+          variant="ghost"
+          className="hover:bg-muted"
+          onClick={() => reset()}
+        >
+          Cancel
+        </Button>
 
-        <CardFooter className="flex justify-end gap-2 pt-6">
-          <Button variant="ghost" className="hover:bg-muted">
-            Cancel
-          </Button>
-          <Button
-            variant="default"
-            className="bg-red-500 hover:bg-red-600 text-white border-none shadow-sm"
-          >
-            Save Changes
-          </Button>
-        </CardFooter>
-      </Card>
-    </div>
+        <FormSubmit label="Save Changes" isSubmitting={isSubmitting} />
+      </CardFooter>
+    </form>
   );
 };

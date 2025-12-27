@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signInSchema } from '../schemas';
 import { useLogin } from '../api/useLogin';
+import { FormPasswordInput } from '@/components/form/FormPasswordInput';
 
 type ISignInForm = z.infer<typeof signInSchema>;
 
@@ -59,9 +60,8 @@ export const SigninForm = ({ className }: React.ComponentProps<'form'>) => {
         error={errors.email?.message}
       />
 
-      <FormInput
+      <FormPasswordInput
         label="Password"
-        type="password"
         required
         {...register('password')}
         error={errors.password?.message}
