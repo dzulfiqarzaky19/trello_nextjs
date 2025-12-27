@@ -14,6 +14,73 @@ export type Database = {
   };
   public: {
     Tables: {
+      columns: {
+        Row: {
+          created_at: string | null;
+          id: string;
+          name: string;
+          position: number;
+          project_id: string;
+          updated_at: string | null;
+        };
+        Insert: {
+          created_at?: string | null;
+          id?: string;
+          name: string;
+          position?: number;
+          project_id: string;
+          updated_at?: string | null;
+        };
+        Update: {
+          created_at?: string | null;
+          id?: string;
+          name?: string;
+          position?: number;
+          project_id?: string;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'columns_project_id_fkey';
+            columns: ['project_id'];
+            isOneToOne: false;
+            referencedRelation: 'projects';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      members: {
+        Row: {
+          created_at: string | null;
+          id: string;
+          role: Database['public']['Enums']['member_role'];
+          user_id: string;
+          workspace_id: string;
+        };
+        Insert: {
+          created_at?: string | null;
+          id?: string;
+          role?: Database['public']['Enums']['member_role'];
+          user_id: string;
+          workspace_id: string;
+        };
+        Update: {
+          created_at?: string | null;
+          id?: string;
+          role?: Database['public']['Enums']['member_role'];
+          user_id?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'members_workspace_id_fkey';
+            columns: ['workspace_id'];
+            isOneToOne: false;
+            referencedRelation: 'workspaces';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       profiles: {
         Row: {
           avatar_url: string | null;
@@ -44,6 +111,119 @@ export type Database = {
         };
         Relationships: [];
       };
+      projects: {
+        Row: {
+          created_at: string | null;
+          id: string;
+          image_url: string | null;
+          name: string;
+          updated_at: string | null;
+          workspace_id: string;
+        };
+        Insert: {
+          created_at?: string | null;
+          id?: string;
+          image_url?: string | null;
+          name: string;
+          updated_at?: string | null;
+          workspace_id: string;
+        };
+        Update: {
+          created_at?: string | null;
+          id?: string;
+          image_url?: string | null;
+          name?: string;
+          updated_at?: string | null;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'projects_workspace_id_fkey';
+            columns: ['workspace_id'];
+            isOneToOne: false;
+            referencedRelation: 'workspaces';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      tasks: {
+        Row: {
+          column_id: string;
+          created_at: string | null;
+          description: string | null;
+          id: string;
+          position: number;
+          project_id: string;
+          title: string;
+          updated_at: string | null;
+        };
+        Insert: {
+          column_id: string;
+          created_at?: string | null;
+          description?: string | null;
+          id?: string;
+          position?: number;
+          project_id: string;
+          title: string;
+          updated_at?: string | null;
+        };
+        Update: {
+          column_id?: string;
+          created_at?: string | null;
+          description?: string | null;
+          id?: string;
+          position?: number;
+          project_id?: string;
+          title?: string;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'tasks_column_id_fkey';
+            columns: ['column_id'];
+            isOneToOne: false;
+            referencedRelation: 'columns';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'tasks_project_id_fkey';
+            columns: ['project_id'];
+            isOneToOne: false;
+            referencedRelation: 'projects';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      workspaces: {
+        Row: {
+          created_at: string | null;
+          id: string;
+          image_url: string | null;
+          name: string;
+          slug: string;
+          updated_at: string | null;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string | null;
+          id?: string;
+          image_url?: string | null;
+          name: string;
+          slug: string;
+          updated_at?: string | null;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string | null;
+          id?: string;
+          image_url?: string | null;
+          name?: string;
+          slug?: string;
+          updated_at?: string | null;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -52,7 +232,7 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
-      [_ in never]: never;
+      member_role: 'ADMIN' | 'MEMBER';
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -182,6 +362,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      member_role: ['ADMIN', 'MEMBER'],
+    },
   },
 } as const;

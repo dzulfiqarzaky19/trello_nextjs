@@ -23,6 +23,11 @@ const data = {
       icon: LayoutDashboard,
     },
     {
+      title: 'Workspaces',
+      url: '/workspaces',
+      icon: Folder,
+    },
+    {
       title: 'Projects',
       url: '/projects',
       icon: Folder,
