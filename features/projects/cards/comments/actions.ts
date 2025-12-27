@@ -1,10 +1,10 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createSupabaseServer } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 
 export async function addComment(cardId: string, content: string) {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServer();
 
   const {
     data: { user },
@@ -42,7 +42,7 @@ export async function addComment(cardId: string, content: string) {
 }
 
 export async function updateComment(commentId: string, content: string) {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServer();
 
   const {
     data: { user },
@@ -81,7 +81,7 @@ export async function updateComment(commentId: string, content: string) {
 }
 
 export async function deleteComment(commentId: string) {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServer();
 
   const {
     data: { user },
@@ -118,7 +118,7 @@ export async function deleteComment(commentId: string) {
 }
 
 export async function getCardComments(cardId: string) {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServer();
 
   const {
     data: { user },

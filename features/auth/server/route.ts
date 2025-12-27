@@ -56,7 +56,7 @@ const app = new Hono()
       return c.json({ response: 'Account created. Please log in.' });
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : 'My Internal Server Error';
+        error instanceof Error ? error.message : 'Internal Server Error';
       return c.json({ error: errorMessage });
     }
   })

@@ -8,3 +8,5 @@ const routes = app.route('/auth', auth);
 
 export const GET = handle(routes);
 export const POST = handle(routes);
+
+export type TAppRoutes = typeof routes;

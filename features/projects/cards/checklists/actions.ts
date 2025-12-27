@@ -1,10 +1,10 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createSupabaseServer } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 
 export async function createChecklist(cardId: string, title: string) {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServer();
 
   const {
     data: { user },
@@ -53,7 +53,7 @@ export async function createChecklist(cardId: string, title: string) {
 }
 
 export async function addChecklistItem(checklistId: string, title: string) {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServer();
 
   const {
     data: { user },
@@ -104,7 +104,7 @@ export async function addChecklistItem(checklistId: string, title: string) {
 }
 
 export async function toggleChecklistItem(itemId: string, completed: boolean) {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServer();
 
   const {
     data: { user },
@@ -144,7 +144,7 @@ export async function toggleChecklistItem(itemId: string, completed: boolean) {
 }
 
 export async function deleteChecklistItem(itemId: string) {
-  const supabase = await createClient();
+  const supabase = await createSupabaseServer();
 
   const {
     data: { user },

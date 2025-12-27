@@ -1,6 +1,6 @@
 import { Header } from '@/components/header/Header';
 import { PublicProfile } from '@/features/profile/components/PublicProfile';
-import { createClient } from '@/lib/supabase/server';
+import { createSupabaseServer } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 
 interface ProfilePageProps {
@@ -11,7 +11,7 @@ interface ProfilePageProps {
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
   const { id } = await params;
-  const supabase = await createClient();
+  const supabase = await createSupabaseServer();
 
   // Fetch the profile of the requested user
   const { data: profile, error } = await supabase
