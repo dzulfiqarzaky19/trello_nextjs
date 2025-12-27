@@ -3,7 +3,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SignupForm } from './SignupForm';
 import { toast } from 'sonner';
 
-// 1. Mock Next.js Navigation
 const mockPush = vi.fn();
 const mockRefresh = vi.fn();
 vi.mock('next/navigation', () => ({
@@ -13,7 +12,6 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-// 2. Mock Sonner toast
 vi.mock('sonner', () => ({
   toast: {
     success: vi.fn(),
@@ -21,7 +19,6 @@ vi.mock('sonner', () => ({
   },
 }));
 
-// 3. Mock useRegister mutation hook
 const mockMutateAsync = vi.fn();
 vi.mock('../api/useRegister', () => ({
   useRegister: () => ({
@@ -54,7 +51,6 @@ describe('SignupForm', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
-    // This catches the Zod superRefine error
     expect(
       await screen.findByText(/the passwords did not match/i)
     ).toBeInTheDocument();
@@ -62,7 +58,6 @@ describe('SignupForm', () => {
   });
 
   it('handles successful registration with auto-login', async () => {
-    // Simulate successful session response
     mockMutateAsync.mockResolvedValue({ response: { session: {} } });
 
     render(<SignupForm />);
