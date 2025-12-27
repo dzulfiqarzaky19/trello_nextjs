@@ -16,11 +16,17 @@ export const FormInput = ({
   className,
   ...props
 }: IFormInput) => {
+  const inputId = props.id || props.name;
+
   return (
     <Field>
-      <FieldLabel htmlFor={props.name}>{label}</FieldLabel>
+      <FieldLabel htmlFor={inputId}>{label}</FieldLabel>
       <div className="relative">
-        <Input className={cn(icon && 'pl-10', className)} {...props} />
+        <Input
+          className={cn(icon && 'pl-10', className)}
+          id={inputId}
+          {...props}
+        />
         {icon && (
           <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
             {icon}

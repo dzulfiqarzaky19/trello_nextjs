@@ -11,10 +11,12 @@ export const FormPasswordInput = React.forwardRef<
   HTMLInputElement,
   IFormPasswordInput
 >(({ label, error, ...props }, ref) => {
+  const inputId = props.id || props.name;
+
   return (
     <Field>
-      <FieldLabel htmlFor={props.name}>{label}</FieldLabel>
-      <PasswordInput ref={ref} {...props} />
+      <FieldLabel htmlFor={inputId}>{label}</FieldLabel>
+      <PasswordInput id={inputId} ref={ref} {...props} />
       {error && <FieldError>{error}</FieldError>}
     </Field>
   );
