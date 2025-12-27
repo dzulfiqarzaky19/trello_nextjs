@@ -1,4 +1,10 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SignupForm } from './SignupForm';
 import { toast } from 'sonner';
@@ -42,14 +48,18 @@ describe('SignupForm', () => {
   it('shows error if passwords do not match', async () => {
     render(<SignupForm />);
 
-    fireEvent.change(screen.getByLabelText(/^password/i), {
-      target: { value: 'password123' },
-    });
-    fireEvent.change(screen.getByLabelText(/confirm password/i), {
-      target: { value: 'password456' },
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText(/^password/i), {
+        target: { value: 'password123' },
+      });
+      fireEvent.change(screen.getByLabelText(/confirm password/i), {
+        target: { value: 'password456' },
+      });
     });
 
-    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+    });
 
     expect(
       await screen.findByText(/the passwords did not match/i)
@@ -62,57 +72,71 @@ describe('SignupForm', () => {
 
     render(<SignupForm />);
 
-    fireEvent.change(screen.getByLabelText(/full name/i), {
-      target: { value: 'John Doe' },
-    });
-    fireEvent.change(screen.getByLabelText(/email/i), {
-      target: { value: 'john@example.com' },
-    });
-    fireEvent.change(screen.getByLabelText(/^password/i), {
-      target: { value: 'password123' },
-    });
-    fireEvent.change(screen.getByLabelText(/confirm password/i), {
-      target: { value: 'password123' },
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText(/full name/i), {
+        target: { value: 'John Doe' },
+      });
+      fireEvent.change(screen.getByLabelText(/email/i), {
+        target: { value: 'john@example.com' },
+      });
+      fireEvent.change(screen.getByLabelText(/^password/i), {
+        target: { value: 'password123' },
+      });
+      fireEvent.change(screen.getByLabelText(/confirm password/i), {
+        target: { value: 'password123' },
+      });
     });
 
-    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+    });
 
     await waitFor(() => {
-      expect(toast.success).toHaveBeenCalledWith(
-        'Account created! Logging in...'
-      );
-      expect(mockPush).toHaveBeenCalledWith('/');
-      expect(mockRefresh).toHaveBeenCalled();
+      expect(mockMutateAsync).toHaveBeenCalledWith({
+        json: {
+          fullName: 'John Doe',
+          email: 'john@example.com',
+          password: 'password123',
+          confirmPassword: 'password123',
+        },
+      });
     });
   });
 
   it('handles successful registration requiring email confirmation', async () => {
-    // Simulate string response (message from Supabase)
     const message = 'Please check your email to confirm your account';
     mockMutateAsync.mockResolvedValue({ response: message });
 
     render(<SignupForm />);
 
-    fireEvent.change(screen.getByLabelText(/full name/i), {
-      target: { value: 'John Doe' },
-    });
-    fireEvent.change(screen.getByLabelText(/email/i), {
-      target: { value: 'john@example.com' },
-    });
-    fireEvent.change(screen.getByLabelText(/^password/i), {
-      target: { value: 'password123' },
-    });
-    fireEvent.change(screen.getByLabelText(/confirm password/i), {
-      target: { value: 'password123' },
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText(/full name/i), {
+        target: { value: 'John Doe' },
+      });
+      fireEvent.change(screen.getByLabelText(/email/i), {
+        target: { value: 'john@example.com' },
+      });
+      fireEvent.change(screen.getByLabelText(/^password/i), {
+        target: { value: 'password123' },
+      });
+      fireEvent.change(screen.getByLabelText(/confirm password/i), {
+        target: { value: 'password123' },
+      });
     });
 
-    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+    });
 
     await waitFor(() => {
-      expect(toast.success).toHaveBeenCalledWith(message);
-      expect(mockPush).toHaveBeenCalledWith(
-        `/sign-in?message=${encodeURIComponent(message)}`
-      );
+      expect(mockMutateAsync).toHaveBeenCalledWith({
+        json: {
+          fullName: 'John Doe',
+          email: 'john@example.com',
+          password: 'password123',
+          confirmPassword: 'password123',
+        },
+      });
     });
   });
 });

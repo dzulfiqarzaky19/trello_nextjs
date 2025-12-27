@@ -43,14 +43,18 @@ export const ProfileForm = () => {
   const onSubmit = async (data: IProfileForm) => {
     if (!isDirty) return;
 
-    const result = await mutateAsync({
-      json: data,
-    });
+    try {
+      const result = await mutateAsync({
+        json: data,
+      });
 
-    if ('error' in result) {
-      return;
+      if ('error' in result) {
+        return;
+      }
+      reset(data);
+    } catch {
+      // Error handled by useMutation.onError
     }
-    reset(data);
   };
 
   if (!data) {
