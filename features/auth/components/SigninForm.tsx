@@ -6,8 +6,6 @@ import { Field } from '@/components/ui/field';
 import { useForm } from 'react-hook-form';
 import { FormSubmit } from '@/components/form/FormSubmit';
 import { FormInput } from '@/components/form/FormInput';
-import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signInSchema } from '../schema';
 import { useLogin } from '../api/useLogin';
@@ -16,7 +14,6 @@ import { FormPasswordInput } from '@/components/form/FormPasswordInput';
 type ISignInForm = z.infer<typeof signInSchema>;
 
 export const SigninForm = ({ className }: React.ComponentProps<'form'>) => {
-  const router = useRouter();
   const { mutateAsync } = useLogin();
 
   const {
@@ -28,22 +25,9 @@ export const SigninForm = ({ className }: React.ComponentProps<'form'>) => {
   });
 
   const onSubmit = async (data: ISignInForm) => {
-    try {
-      const result = await mutateAsync({
-        json: data,
-      });
-
-      if ('error' in result) {
-        toast.error(result.error);
-        return;
-      }
-
-      toast.success('Signed in successfully');
-      router.push('/');
-      router.refresh();
-    } catch {
-      toast.error('Something went wrong');
-    }
+    await mutateAsync({
+      json: data,
+    });
   };
 
   return (

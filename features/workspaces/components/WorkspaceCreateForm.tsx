@@ -9,7 +9,6 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { createWorkspaceSchema, ICreateWorkspace } from '../schema';
-import { toast } from 'sonner';
 import { useCreateWorkspace } from '../api/useCreateWorkspace';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -54,23 +53,11 @@ export const WorkspaceCreateForm = () => {
   const onSubmit = async (data: ICreateWorkspace) => {
     if (!isDirty) return;
 
-    try {
-      const result = await mutateAsync({
-        json: data,
-      });
+    await mutateAsync({
+      json: data,
+    });
 
-      if ('error' in result) {
-        toast.error(result.error);
-        return;
-      }
-
-      queryClient.invalidateQueries({ queryKey: ['workspaces'] });
-
-      toast.success('Workspace Created!');
-      reset();
-    } catch {
-      toast.error('Something went wrong');
-    }
+    reset();
   };
 
   return (

@@ -3,9 +3,6 @@
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import { Field } from '@/components/ui/field';
-
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
 import { FormInput } from '@/components/form/FormInput';
 import { FormSubmit } from '@/components/form/FormSubmit';
 import { useForm } from 'react-hook-form';
@@ -17,7 +14,6 @@ import { FormPasswordInput } from '@/components/form/FormPasswordInput';
 type ISignUpForm = z.infer<typeof signUpSchema>;
 
 export const SignupForm = ({ className }: React.ComponentProps<'form'>) => {
-  const router = useRouter();
   const { mutateAsync } = useRegister();
 
   const {
@@ -29,28 +25,9 @@ export const SignupForm = ({ className }: React.ComponentProps<'form'>) => {
   });
 
   const onSubmit = async (data: ISignUpForm) => {
-    try {
-      const result = await mutateAsync({
-        json: data,
-      });
-
-      if ('error' in result) {
-        toast.error(result.error);
-        return;
-      }
-
-      if (typeof result.response === 'string') {
-        toast.success(result.response);
-        router.push(`/sign-in?message=${encodeURIComponent(result.response)}`);
-        return;
-      }
-
-      toast.success('Account created! Logging in...');
-      router.push('/');
-      router.refresh();
-    } catch {
-      toast.error('Something went wrong');
-    }
+    await mutateAsync({
+      json: data,
+    });
   };
 
   return (

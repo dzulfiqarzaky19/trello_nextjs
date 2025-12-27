@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { CardContent, CardFooter } from '@/components/ui/card';
 import { useSecurity } from '../api/useSecurity';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 import { securitySchema } from '../schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormSubmit } from '@/components/form/FormSubmit';
@@ -23,26 +22,29 @@ export const SecurityForm = () => {
     formState: { errors, isSubmitting, isDirty },
   } = useForm<ISecurityForm>({
     resolver: zodResolver(securitySchema),
+    values: {
+      currentPassword: '',
+      newPassword: '',
+    },
+    resetOptions: {
+      keepValues: true,
+    },
   });
+
+  console.log(isDirty, isSubmitting);
 
   const onSubmit = async (data: ISecurityForm) => {
     if (!isDirty) return;
 
-    try {
-      const result = await mutateAsync({
-        json: data,
-      });
+    const result = await mutateAsync({
+      json: data,
+    });
 
-      if ('error' in result) {
-        toast.error(result.error);
-        return;
-      }
-
-      toast.success('Password updated successfully');
-      reset();
-    } catch {
-      toast.error('Something went wrong');
+    if ('error' in result) {
+      return;
     }
+
+    reset();
   };
 
   return (

@@ -2,10 +2,8 @@
 
 import { z } from 'zod';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { toast } from 'sonner';
 import { Loader2, Mail } from 'lucide-react';
 import { useMe } from '@/features/auth/api/useMe';
-import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { profileSchema } from '../schema';
@@ -45,21 +43,14 @@ export const ProfileForm = () => {
   const onSubmit = async (data: IProfileForm) => {
     if (!isDirty) return;
 
-    try {
-      const result = await mutateAsync({
-        json: data,
-      });
+    const result = await mutateAsync({
+      json: data,
+    });
 
-      if ('error' in result) {
-        toast.error(result.error);
-        return;
-      }
-
-      toast.success('Profile updated successfully');
-      reset(data);
-    } catch (e) {
-      toast.error('Failed to update profile');
+    if ('error' in result) {
+      return;
     }
+    reset(data);
   };
 
   if (!data) {
@@ -118,16 +109,6 @@ export const ProfileForm = () => {
       </CardContent>
 
       <CardFooter className="flex justify-end gap-2 pt-6">
-        <Button
-          variant="ghost"
-          className="hover:bg-muted"
-          onClick={() => reset()}
-          type="button"
-          disabled={!isDirty || isSubmitting}
-        >
-          Cancel
-        </Button>
-
         <FormSubmit
           label="Save Changes"
           isSubmitting={isSubmitting}
