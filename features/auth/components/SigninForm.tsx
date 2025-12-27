@@ -9,7 +9,7 @@ import { FormInput } from '@/components/form/FormInput';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { signInSchema } from '../schemas';
+import { signInSchema } from '../schema';
 import { useLogin } from '../api/useLogin';
 import { FormPasswordInput } from '@/components/form/FormPasswordInput';
 
@@ -53,16 +53,13 @@ export const SigninForm = ({ className }: React.ComponentProps<'form'>) => {
     >
       <FormInput
         label="Email"
-        type="email"
         placeholder="m@example.com"
-        required
         {...register('email')}
         error={errors.email?.message}
       />
 
       <FormPasswordInput
         label="Password"
-        required
         {...register('password')}
         error={errors.password?.message}
       />

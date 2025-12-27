@@ -1,13 +1,13 @@
 import { z } from 'zod';
 
 export const signInSchema = z.object({
-  email: z.email('Invalid email address').trim(),
+  email: z.string().email('Invalid email address').trim(),
   password: z.string().trim().min(6, 'Password must be at least 6 characters'),
 });
 
 export const signUpSchema = z
   .object({
-    email: z.email('Invalid email address').trim(),
+    email: z.string().email('Invalid email address').trim(),
     password: z
       .string()
       .trim()

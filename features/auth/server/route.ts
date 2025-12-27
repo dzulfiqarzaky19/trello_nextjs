@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
-import { signInSchema, signUpSchema } from '../schemas';
+import { signInSchema, signUpSchema } from '../schema';
 import { createSupabaseServer } from '@/lib/supabase/server';
 
 const app = new Hono()
