@@ -10,7 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { createWorkspaceSchema, ICreateWorkspace } from '../schema';
 import { useCreateWorkspace } from '../api/useCreateWorkspace';
-import { useQueryClient } from '@tanstack/react-query';
+import { FormImageInput } from '@/components/form/FormImageInput';
 
 const slugify = (text: string) =>
   text
@@ -22,7 +22,6 @@ const slugify = (text: string) =>
 
 export const WorkspaceCreateForm = () => {
   const { mutateAsync } = useCreateWorkspace();
-  const queryClient = useQueryClient();
 
   const {
     register,
@@ -30,12 +29,13 @@ export const WorkspaceCreateForm = () => {
     reset,
     setValue,
     formState: { errors, isSubmitting, isDirty },
+    control,
   } = useForm<ICreateWorkspace>({
     resolver: zodResolver(createWorkspaceSchema),
     defaultValues: {
       name: '',
       slug: '',
-      imageUrl: '',
+      image: undefined,
     },
   });
 
@@ -54,7 +54,7 @@ export const WorkspaceCreateForm = () => {
     if (!isDirty) return;
 
     await mutateAsync({
-      json: data,
+      form: data,
     });
 
     reset();
@@ -86,12 +86,7 @@ export const WorkspaceCreateForm = () => {
         error={errors.slug?.message}
       />
 
-      <FormInput
-        label="Workspace Image URL"
-        placeholder="e.g. https://example.com/image.jpg"
-        {...register('imageUrl')}
-        error={errors.imageUrl?.message}
-      />
+      <FormImageInput label="Workspace Image" control={control} name="image" />
 
       <DialogFooter className="flex justify-end gap-2 pt-6">
         <FormSubmit

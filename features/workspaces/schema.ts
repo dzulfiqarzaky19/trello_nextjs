@@ -15,12 +15,7 @@ export const createWorkspaceSchema = z.object({
       /^[a-z0-9-]+$/,
       'Slug can only contain letters, numbers, and hyphens'
     ),
-
-  imageUrl: z
-    .string()
-    .url('Please provide a valid image URL')
-    .optional()
-    .or(z.literal('')),
+  image: z.union([z.instanceof(File), z.string()]).optional(),
 });
 
 export const workspaceSchema = z.object({

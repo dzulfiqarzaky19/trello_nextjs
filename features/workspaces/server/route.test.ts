@@ -80,7 +80,7 @@ describe('Workspaces Hono Routes', () => {
     const validPayload = {
       name: 'New Workspace',
       slug: 'new-ws',
-      imageUrl: 'https://example.com/img.png',
+      image: 'https://example.com/img.png',
     };
 
     it('successfully creates a workspace and an admin member', async () => {
@@ -96,10 +96,14 @@ describe('Workspaces Hono Routes', () => {
         .mockReturnValueOnce({ select: mockSelect })
         .mockResolvedValueOnce({ error: null });
 
+      const formData = new FormData();
+      formData.append('name', validPayload.name);
+      formData.append('slug', validPayload.slug);
+      formData.append('image', validPayload.image);
+
       const res = await app.request('/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(validPayload),
+        body: formData,
       });
 
       const body = await res.json();
@@ -114,10 +118,14 @@ describe('Workspaces Hono Routes', () => {
         error: { code: '23505' },
       });
 
+      const formData = new FormData();
+      formData.append('name', validPayload.name);
+      formData.append('slug', validPayload.slug);
+      formData.append('image', validPayload.image);
+
       const res = await app.request('/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(validPayload),
+        body: formData,
       });
 
       const body = await res.json();
@@ -142,10 +150,14 @@ describe('Workspaces Hono Routes', () => {
         eq: vi.fn().mockResolvedValue({ error: null }),
       });
 
+      const formData = new FormData();
+      formData.append('name', validPayload.name);
+      formData.append('slug', validPayload.slug);
+      formData.append('image', validPayload.image);
+
       const res = await app.request('/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(validPayload),
+        body: formData,
       });
 
       const body = await res.json();
@@ -156,10 +168,12 @@ describe('Workspaces Hono Routes', () => {
     });
 
     it('returns 400 if validation fails', async () => {
+      const formData = new FormData();
+      formData.append('name', 'ab');
+
       const res = await app.request('/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: 'ab' }),
+        body: formData,
       });
 
       expect(res.status).toBe(400);

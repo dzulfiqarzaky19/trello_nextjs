@@ -7,12 +7,31 @@ import { createSupabaseServer } from '@/lib/supabase/server';
 const app = new Hono()
   .post(
     '/',
-    zValidator('json', createWorkspaceSchema),
+    zValidator('form', createWorkspaceSchema),
     sessionMiddleware,
     async (c) => {
       const supabase = await createSupabaseServer();
       const user = c.get('user');
-      const { name, slug, imageUrl } = c.req.valid('json');
+      const { name, slug, image } = c.req.valid('form');
+
+      let imageUrl = null;
+      if (image instanceof File) {
+        const fileName = `${user.id}/${Date.now()}-${image.name}`;
+        const { data, error } = await supabase.storage
+          .from('workspace_image')
+          .upload(fileName, image, {
+            cacheControl: '3600',
+            upsert: false,
+          });
+
+        if (error) return c.json({ error: error.message }, 500);
+
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from('workspace_image').getPublicUrl(data.path);
+
+        imageUrl = publicUrl;
+      }
 
       const { data: workspace, error: workspaceError } = await supabase
         .from('workspaces')
@@ -73,6 +92,32 @@ const app = new Hono()
     }
 
     return c.json({ workspaces: result.data });
+  })
+  .post('/upload', sessionMiddleware, async (c) => {
+    const supabase = await createSupabaseServer();
+    const user = c.get('user');
+
+    const body = await c.req.parseBody();
+    const file = body['file'] as File;
+
+    if (!file) return c.json({ error: 'No file uploaded' }, 400);
+
+    const fileName = `${user.id}/${Date.now()}-${file.name}`;
+
+    const { data, error } = await supabase.storage
+      .from('workspace_image')
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false,
+      });
+
+    if (error) return c.json({ error: error.message }, 500);
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('workspace_image').getPublicUrl(data.path);
+
+    return c.json({ url: publicUrl });
   });
 
 export default app;

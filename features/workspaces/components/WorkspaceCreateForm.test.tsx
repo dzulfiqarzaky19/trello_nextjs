@@ -48,7 +48,7 @@ describe('WorkspaceCreateForm', () => {
     render(<WorkspaceCreateForm />);
     expect(screen.getByLabelText(/workspace name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/workspace slug/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/workspace image url/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/workspace image/i)).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /save changes/i })
     ).toBeInTheDocument();
@@ -88,10 +88,10 @@ describe('WorkspaceCreateForm', () => {
 
     await waitFor(() => {
       expect(mockMutateAsync).toHaveBeenCalledWith({
-        json: {
+        form: {
           name: 'Valid Name',
           slug: 'valid-name',
-          imageUrl: '',
+          image: undefined,
         },
       });
       expect(toast.success).toHaveBeenCalledWith('Workspace Created!');
