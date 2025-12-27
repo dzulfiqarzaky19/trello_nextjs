@@ -20,12 +20,14 @@ export const SecurityForm = () => {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<ISecurityForm>({
     resolver: zodResolver(securitySchema),
   });
 
   const onSubmit = async (data: ISecurityForm) => {
+    if (!isDirty) return;
+
     try {
       const result = await mutateAsync({
         json: data,
@@ -68,11 +70,16 @@ export const SecurityForm = () => {
           variant="ghost"
           className="hover:bg-muted"
           onClick={() => reset()}
+          disabled={!isDirty || isSubmitting}
         >
           Cancel
         </Button>
 
-        <FormSubmit label="Save Changes" isSubmitting={isSubmitting} />
+        <FormSubmit
+          label="Save Changes"
+          isSubmitting={isSubmitting}
+          isDisabled={!isDirty}
+        />
       </CardFooter>
     </form>
   );

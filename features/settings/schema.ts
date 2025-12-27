@@ -20,3 +20,10 @@ export const securitySchema = z
       });
     }
   });
+
+export const profileSchema = z.object({
+  avatarUrl: z.string().trim().optional(),
+  bio: z.string().trim().optional(),
+  fullName: z.string().trim().min(3, 'Full name must be at least 3 characters'),
+  role: z.string().trim().min(3, 'Role must be at least 3 characters'),
+});

@@ -1,54 +1,68 @@
 'use client';
 
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from '@/components/ui/card';
+import { z } from 'zod';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { updateProfile } from '../actions';
 import { toast } from 'sonner';
-import { useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Mail } from 'lucide-react';
 import { useMe } from '@/features/auth/api/useMe';
+import { Button } from '@/components/ui/button';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { profileSchema } from '../schema';
+import { FormInput } from '@/components/form/FormInput';
+import { FormTextarea } from '@/components/form/FormTextarea';
+import { FormSubmit } from '@/components/form/FormSubmit';
+import { CardContent, CardFooter } from '@/components/ui/card';
+import { useProfile } from '../api/useProfile';
+
+type IProfileForm = z.infer<typeof profileSchema>;
 
 export const ProfileForm = () => {
-  const { data, isLoading: isLoadingUser } = useMe();
-  const [loading, setLoading] = useState(false);
-
-  console.log({ data });
-
-  // We can use local state or just derive from data
-  // But since it's a form, we might want uncontrolled inputs with defaultValues (which only set on mount/key change)
-  // or controlled inputs. The original code used defaultValues.
+  const { data } = useMe();
+  const { mutateAsync } = useProfile();
 
   const profile = data && 'profile' in data ? data.profile : null;
   const userEmail = data && 'user' in data ? data.user.email : null;
   const fullName = profile?.full_name || '';
 
-  const handleSubmit = async (formData: FormData) => {
-    setLoading(true);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting, isDirty },
+  } = useForm<IProfileForm>({
+    resolver: zodResolver(profileSchema),
+    values: {
+      fullName: profile?.full_name || '',
+      role: profile?.role || '',
+      bio: profile?.bio || '',
+    },
+    resetOptions: {
+      keepDirtyValues: true,
+    },
+  });
+
+  const onSubmit = async (data: IProfileForm) => {
+    if (!isDirty) return;
+
     try {
-      const result = await updateProfile(formData);
-      if (result.error) {
+      const result = await mutateAsync({
+        json: data,
+      });
+
+      if ('error' in result) {
         toast.error(result.error);
-      } else {
-        toast.success('Profile updated successfully');
+        return;
       }
+
+      toast.success('Profile updated successfully');
+      reset(data);
     } catch (e) {
       toast.error('Failed to update profile');
-    } finally {
-      setLoading(false);
     }
   };
 
-  if (isLoadingUser) {
+  if (!data) {
     return (
       <div className="flex justify-center p-8">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -56,115 +70,70 @@ export const ProfileForm = () => {
     );
   }
 
-  console.log(profile);
-
   return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-bold">Public Profile</h3>
-        <p className="text-sm text-muted-foreground">
-          This information will be displayed publicly so be careful what you
-          share.
-        </p>
-      </div>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <CardContent className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Avatar className="h-16 w-16 bg-orange-100">
+            <AvatarImage src={profile?.avatar_url || ''} />
+            <AvatarFallback>
+              {fullName && fullName[0] ? fullName[0] : 'U'}
+            </AvatarFallback>
+          </Avatar>
 
-      <Card className="border-none">
-        <CardHeader>
-          <CardTitle className="sr-only">Profile Settings</CardTitle>
-          <CardDescription className="sr-only">
-            Update your avatar and personal information
-          </CardDescription>
-        </CardHeader>
+          <div className="flex flex-col">
+            <p className="font-medium">Avatar</p>
+            <p className="text-xs text-muted-foreground">
+              Managed via Supabase / UI Avatars for now
+            </p>
+          </div>
+        </div>
 
-        <CardContent className="space-y-6">
-          <form action={handleSubmit} className="space-y-6">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16 bg-orange-100">
-                <AvatarImage src={profile?.avatar_url} />
-                <AvatarFallback>{fullName[0] || 'U'}</AvatarFallback>
-              </Avatar>
+        <FormInput
+          label="Full Name"
+          {...register('fullName')}
+          error={errors.fullName?.message}
+        />
 
-              <div className="flex flex-col">
-                <p className="font-medium">Avatar</p>
-                <p className="text-xs text-muted-foreground">
-                  Managed via Supabase / UI Avatars for now
-                </p>
-              </div>
-            </div>
+        <FormInput
+          label="Role"
+          {...register('role')}
+          error={errors.role?.message}
+        />
 
-            <div className="space-y-2">
-              <Label htmlFor="fullName">Full Name</Label>
-              <Input id="fullName" name="fullName" defaultValue={fullName} />
-            </div>
+        <FormInput
+          label="Email Address"
+          id="email"
+          defaultValue={userEmail || ''}
+          disabled
+          icon={<Mail width={16} height={16} />}
+        />
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="role">Role</Label>
-                <Input
-                  id="role"
-                  name="role"
-                  defaultValue={profile?.role || ''}
-                  placeholder="e.g. Product Manager"
-                />
-              </div>
-              {/* Tags - basic text input for now, could be improved to tag input */}
-              <div className="space-y-2">
-                <Label htmlFor="tags">Tags (comma separated)</Label>
-                <Input id="tags" name="tags" defaultValue={''} disabled />
-              </div>
-            </div>
+        <FormTextarea
+          label="Bio"
+          className="min-h-[100px] resize-none"
+          {...register('bio')}
+          error={errors.bio?.message}
+        />
+      </CardContent>
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
-              <div className="relative">
-                <Input
-                  id="email"
-                  defaultValue={userEmail || ''}
-                  className="pl-10"
-                  disabled
-                />
-                <svg
-                  className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect width="20" height="16" x="2" y="4" rx="2" />
-                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                </svg>
-              </div>
-            </div>
+      <CardFooter className="flex justify-end gap-2 pt-6">
+        <Button
+          variant="ghost"
+          className="hover:bg-muted"
+          onClick={() => reset()}
+          type="button"
+          disabled={!isDirty || isSubmitting}
+        >
+          Cancel
+        </Button>
 
-            <div className="space-y-2">
-              <Label htmlFor="bio">Bio</Label>
-              <Textarea
-                id="bio"
-                name="bio"
-                defaultValue={profile?.bio || ''}
-                className="min-h-[100px] resize-none"
-              />
-              <p className="text-xs text-right text-muted-foreground">
-                Markdown supported
-              </p>
-            </div>
-
-            <div className="flex justify-end">
-              <Button
-                type="submit"
-                disabled={loading}
-                className="bg-red-500 hover:bg-red-600 text-white"
-              >
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Save Changes
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+        <FormSubmit
+          label="Save Changes"
+          isSubmitting={isSubmitting}
+          isDisabled={!isDirty}
+        />
+      </CardFooter>
+    </form>
   );
 };

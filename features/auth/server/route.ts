@@ -73,8 +73,6 @@ const app = new Hono()
         data: { user },
       } = await supabase.auth.getUser();
 
-      console.log({ user });
-
       if (!user) {
         return c.json({ error: 'User not found' });
       }
@@ -84,8 +82,6 @@ const app = new Hono()
         .select('*')
         .eq('id', user.id)
         .single();
-
-      console.log({ profile, profileError });
 
       if (!profile) {
         return c.json({ error: 'Profile not found' });

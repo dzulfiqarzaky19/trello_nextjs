@@ -9,5 +9,6 @@ const routes = app.route('/auth', auth).route('/settings', settings);
 
 export const GET = handle(routes);
 export const POST = handle(routes);
+export const PUT = handle(routes);
 
 export type TAppRoutes = typeof routes;
