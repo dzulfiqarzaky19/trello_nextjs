@@ -13,7 +13,7 @@ export const WorkspaceList = ({ workspaces }: IWorkspaceListProps) => {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       {workspaces &&
         workspaces.map((workspace) => (
-          <Link key={workspace.id} href={`/workspaces/${workspace.id}`}>
+          <Link key={workspace.id} href={`/workspaces/${workspace.slug}`}>
             <Card className="hover:shadow-lg transition-shadow cursor-pointer h-32 relative overflow-hidden group">
               {workspace.image_url && (
                 <div
