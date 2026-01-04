@@ -84,6 +84,7 @@ describe('Workspace Schemas', () => {
           slug: 'main',
           image_url: null,
           user_id: 'user-1',
+          invite_code: 'invite-code-1',
           created_at: '2023-01-01T00:00:00Z',
           updated_at: null,
           members: [{ user_id: 'user-1' }, { user_id: 'user-2' }],

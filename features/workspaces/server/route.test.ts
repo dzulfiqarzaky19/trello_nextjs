@@ -63,6 +63,7 @@ describe('Workspaces Hono Routes', () => {
     slug: 'ws-1',
     image_url: 'http://example.com/workspace_image/old.png',
     user_id: 'test-user-id',
+    invite_code: 'invite-code-1',
     created_at: '2023-01-01',
     updated_at: null,
     members: [{ user_id: 'test-user-id' }],

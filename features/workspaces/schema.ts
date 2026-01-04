@@ -34,6 +34,7 @@ export const workspaceSchema = z.object({
       user_id: z.string(),
     })
   ),
+  invite_code: z.string(),
 });
 
 export const workspacesListSchema = z.array(workspaceSchema);
