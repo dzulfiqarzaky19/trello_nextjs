@@ -203,30 +203,34 @@ const app = new Hono()
 
     const { data, error } = await supabase
       .from('workspaces')
-      .select(
-        `
-          *,
-          user:profiles!user_id (
-            id,
-            full_name,
-            avatar_url
-          ),
-          members!inner (
-            user_id,
-            role,
-            profiles!user_id (
-              id,
-              full_name,
-              avatar_url
-            )
-          )
-        `
+      .select(`
+    *,
+    user:user_id ( 
+      id,
+      full_name,
+      avatar_url,
+      role,
+      email
+    ),
+    members (
+    user_id,
+      role,
+      profiles:user_id ( 
+        id,
+        full_name,
+        avatar_url,
+        email
       )
+    )
+  `)
       .eq('members.user_id', user.id);
 
     if (error) {
+      console.error(error)
       return c.json({ error: 'Something went wrong' }, 500);
     }
+
+    console.log({ data, user: data?.[0].user, members: data?.[0].members })
 
     const result = workspacesListSchema.safeParse(data);
 

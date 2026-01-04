@@ -36,20 +36,20 @@ export const workspaceSchema = z.object({
       id: z.string(),
       full_name: z.string().nullable(),
       avatar_url: z.string().nullable(),
-    })
-    .nullable()
-    .optional(),
+      role: z.enum(['ADMIN', 'MEMBER']),
+      email: z.string(),
+    }),
   members: z.array(
     z.object({
       user_id: z.string(),
+      role: z.enum(['ADMIN', 'MEMBER']),
       profiles: z
         .object({
           id: z.string(),
           full_name: z.string().nullable(),
           avatar_url: z.string().nullable(),
-        })
-        .nullable()
-        .optional(),
+          email: z.string(),
+        }),
     })
   ),
   invite_code: z.string(),
