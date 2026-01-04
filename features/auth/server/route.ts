@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
+import { z } from 'zod';
 import { signInSchema, signUpSchema } from '../schema';
 import { createSupabaseServer } from '@/lib/supabase/server';
 
@@ -88,6 +89,28 @@ const app = new Hono()
       }
 
       return c.json({ user, profile });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Internal Server Error';
+      return c.json({ error: errorMessage });
+    }
+  })
+  .get('/:id', zValidator('param', z.object({ id: z.string() })), async (c) => {
+    const supabase = await createSupabaseServer();
+    const { id } = c.req.valid('param');
+
+    try {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        return c.json({ error: error.message });
+      }
+
+      return c.json({ profile });
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Internal Server Error';

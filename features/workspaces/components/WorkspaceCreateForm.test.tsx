@@ -7,7 +7,6 @@ import {
 } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { WorkspaceCreateForm } from './WorkspaceCreateForm';
-import { toast } from 'sonner';
 
 const mockMutateAsync = vi.fn();
 vi.mock('../api/useCreateWorkspace', () => ({
@@ -106,10 +105,10 @@ describe('WorkspaceCreateForm', () => {
           name: 'Valid Name',
           slug: 'valid-name',
           image: undefined,
+          description: '',
         },
       });
     });
-    // Check that form reset worked (submit button should be disabled again)
     expect(submitButton).toBeDisabled();
   });
 

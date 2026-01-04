@@ -12,6 +12,7 @@ import { createWorkspaceSchema, ICreateWorkspace } from '../schema';
 import { useCreateWorkspace } from '../api/useCreateWorkspace';
 import { FormImageInput } from '@/components/form/FormImageInput';
 import { slugify } from '../utils';
+import { FormTextarea } from '@/components/form/FormTextarea';
 
 export const WorkspaceCreateForm = ({
   closeModal,
@@ -34,6 +35,7 @@ export const WorkspaceCreateForm = ({
       name: '',
       slug: '',
       image: undefined,
+      description: '',
     },
   });
 
@@ -86,6 +88,13 @@ export const WorkspaceCreateForm = ({
         placeholder="e.g. website-redesign"
         {...register('slug')}
         error={errors.slug?.message}
+      />
+
+      <FormTextarea
+        label="Workspace Description"
+        placeholder="e.g. Website Redesign"
+        {...register('description')}
+        error={errors.description?.message}
       />
 
       <FormImageInput label="Workspace Image" control={control} name="image" />

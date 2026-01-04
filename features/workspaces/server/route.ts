@@ -16,7 +16,7 @@ const app = new Hono()
     async (c) => {
       const supabase = await createSupabaseServer();
       const user = c.get('user');
-      const { name, slug, image } = c.req.valid('form');
+      const { name, slug, image, description } = c.req.valid('form');
 
       let imageUrl = null;
       if (image instanceof File) {
@@ -44,6 +44,7 @@ const app = new Hono()
           slug,
           image_url: imageUrl,
           user_id: user.id,
+          description,
         })
         .select()
         .single();
@@ -80,7 +81,7 @@ const app = new Hono()
       const supabase = await createSupabaseServer();
       const user = c.get('user');
       const { workspaceId } = c.req.param();
-      const { name, slug, image } = c.req.valid('form');
+      const { name, slug, image, description } = c.req.valid('form');
 
       const { data: member, error: memberError } = await supabase
         .from('members')
@@ -121,6 +122,7 @@ const app = new Hono()
       const updateData: any = {};
       if (name !== undefined) updateData.name = name;
       if (slug !== undefined) updateData.slug = slug;
+      if (description !== undefined) updateData.description = description;
 
       if (imageUrl !== undefined) {
         updateData.image_url = imageUrl;
@@ -201,7 +203,25 @@ const app = new Hono()
 
     const { data, error } = await supabase
       .from('workspaces')
-      .select(`*, members!inner(user_id)`)
+      .select(
+        `
+          *,
+          user:profiles!user_id (
+            id,
+            full_name,
+            avatar_url
+          ),
+          members!inner (
+            user_id,
+            role,
+            profiles!user_id (
+              id,
+              full_name,
+              avatar_url
+            )
+          )
+        `
+      )
       .eq('members.user_id', user.id);
 
     if (error) {

@@ -63,10 +63,26 @@ describe('Workspaces Hono Routes', () => {
     slug: 'ws-1',
     image_url: 'http://example.com/workspace_image/old.png',
     user_id: 'test-user-id',
+    user: {
+      id: 'test-user-id',
+      full_name: 'Test User',
+      avatar_url: 'http://example.com/avatar.png',
+      email: 'test@example.com',
+    },
     invite_code: 'invite-code-1',
     created_at: '2023-01-01',
     updated_at: null,
-    members: [{ user_id: 'test-user-id' }],
+    members: [
+      {
+        user_id: 'test-user-id',
+        profiles: {
+          id: 'test-user-id',
+          full_name: 'Test User',
+          avatar_url: 'http://example.com/avatar.png',
+          email: 'test@example.com',
+        },
+      },
+    ],
   };
 
   describe('GET /', () => {

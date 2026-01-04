@@ -19,19 +19,37 @@ export const createWorkspaceSchema = z.object({
     .union([z.instanceof(File), z.string()])
     .optional()
     .nullable(),
+  description: z.string().optional(),
 });
 
 export const workspaceSchema = z.object({
   id: z.string(),
   name: z.string(),
   slug: z.string(),
+  description: z.string().optional(),
   image_url: z.string().nullable(),
   user_id: z.string(),
   created_at: z.string().nullable(),
   updated_at: z.string().nullable(),
+  user: z
+    .object({
+      id: z.string(),
+      full_name: z.string().nullable(),
+      avatar_url: z.string().nullable(),
+    })
+    .nullable()
+    .optional(),
   members: z.array(
     z.object({
       user_id: z.string(),
+      profiles: z
+        .object({
+          id: z.string(),
+          full_name: z.string().nullable(),
+          avatar_url: z.string().nullable(),
+        })
+        .nullable()
+        .optional(),
     })
   ),
   invite_code: z.string(),
