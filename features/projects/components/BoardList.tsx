@@ -6,39 +6,35 @@ import { Plus, Users } from 'lucide-react';
 import Link from 'next/link';
 import { Modal } from '@/components/Modal';
 import { CreateBoardForm } from './CreateBoardForm';
-
-interface Board {
-  id: string;
-  title: string;
-  image_url: string | null;
-  created_at: string;
-  board_members: Array<{ user_id: string; role: string }>;
-}
+import { Project } from '../types';
 
 interface BoardListProps {
-  boards: Board[];
+  boards: Project[]; // Renamed from boards to projects conceptually but keeping prop name or changing it? Let's keep it to minimize shift or change to projects
+  workspaceId?: string; // Optional context for creation
 }
 
-export const BoardList = ({ boards }: BoardListProps) => {
+export const BoardList = ({ boards, workspaceId }: BoardListProps) => {
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-8">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {boards.map((board) => (
           <Link key={board.id} href={`/projects/${board.id}`}>
             <Card className="hover:shadow-lg transition-shadow cursor-pointer h-32 relative overflow-hidden group">
-              {board.image_url && (
+              {board.image_url ? (
                 <div
                   className="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity"
                   style={{ backgroundImage: `url(${board.image_url})` }}
                 />
+              ) : (
+                <div className="absolute inset-0 bg-linear-to-br from-indigo-500 to-purple-500 opacity-20 group-hover:opacity-30 transition-opacity" />
               )}
               <CardHeader className="relative z-10">
-                <CardTitle className="text-lg">{board.title}</CardTitle>
+                <CardTitle className="text-lg">{board.name}</CardTitle>
               </CardHeader>
               <CardContent className="relative z-10">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Users className="w-4 h-4" />
-                  <span>{board.board_members?.length || 0} members</span>
+                  {/* Status badge? */}
+                  <span className="text-xs px-2 py-1 rounded bg-secondary">{board.status}</span>
                 </div>
               </CardContent>
             </Card>
@@ -58,14 +54,14 @@ export const BoardList = ({ boards }: BoardListProps) => {
             </Card>
           }
         >
-          <CreateBoardForm />
+          <CreateBoardForm workspaceId={workspaceId} />
         </Modal>
       </div>
 
       {boards.length === 0 && (
         <div className="text-center py-12">
           <p className="text-muted-foreground mb-4">
-            You don't have any boards yet. Create one to get started!
+            You don't have any projects yet. Create one to get started!
           </p>
         </div>
       )}

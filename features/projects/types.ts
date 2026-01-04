@@ -5,99 +5,52 @@ export interface Profile {
   role: string | null;
 }
 
-export interface CardMember {
+export interface Member {
+  id: string;
+  workspace_id: string;
   user_id: string;
+  role: 'ADMIN' | 'MEMBER';
   profiles: Profile;
 }
 
-export interface Label {
-  id: string;
-  board_id: string;
-  name: string;
-  color: string;
-  created_at: string;
-}
-
-export interface CardLabel {
-  label_id: string;
-  labels: Label;
-}
-
-export interface ChecklistItem {
-  id: string;
-  checklist_id: string;
-  title: string;
-  completed: boolean;
-  order: number;
-  created_at: string;
-}
-
-export interface Checklist {
-  id: string;
-  card_id: string;
-  title: string;
-  order: number;
-  created_at: string;
-  checklist_items: ChecklistItem[];
-}
-
-export interface Comment {
-  id: string;
-  card_id: string;
-  user_id: string;
-  content: string;
-  created_at: string;
-  profiles: Profile;
-}
-
-export interface Attachment {
-  id: string;
-  card_id: string;
-  file_name: string;
-  file_url: string;
-  file_size: number | null;
-  file_type: string | null;
-  uploaded_by: string | null;
-  created_at: string;
-}
-
-export interface Card {
+export interface Task {
   id: string;
   title: string;
   description: string | null;
-  order: number;
-  list_id: string;
-  due_date: string | null;
-  priority: 'low' | 'medium' | 'high' | null;
+  project_id: string;
+  column_id: string;
+  position: number;
   created_at: string;
-  card_members: CardMember[];
-  card_labels?: CardLabel[];
-  checklists?: Checklist[];
-  comments?: Comment[];
-  attachments?: Attachment[];
+  updated_at: string;
+  // Relations not in core schema but used in UI (mocked/optional for now)
+  card_members?: any[];
+  card_labels?: any[];
+  checklists?: any[];
+  comments?: any[];
+  attachments?: any[];
+  due_date?: string | null;
+  priority?: 'low' | 'medium' | 'high' | null;
 }
 
-export interface List {
+export type Card = Task; // Alias for backward compatibility
+
+export interface Column {
   id: string;
-  title: string;
-  order: number;
-  board_id: string;
+  name: string;
+  project_id: string;
+  position: number;
   created_at: string;
-  cards: Card[];
+  updated_at: string;
+  tasks: Task[];
 }
 
-export interface BoardMember {
-  user_id: string;
-  role: 'admin' | 'member' | 'observer';
-  profiles: Profile;
-}
-
-export interface Board {
+export interface Project {
   id: string;
-  title: string;
+  name: string;
   image_url: string | null;
-  owner_id: string;
+  workspace_id: string;
+  status: 'ACTIVE' | 'COMPLETED' | 'ARCHIVED';
   created_at: string;
-  lists: List[];
-  board_members: BoardMember[];
+  updated_at: string;
+  columns: Column[];
 }

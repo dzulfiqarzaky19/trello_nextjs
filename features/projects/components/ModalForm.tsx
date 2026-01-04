@@ -15,10 +15,7 @@ import {
   AlignLeft,
   Archive,
   CheckSquare,
-  Clock,
   Copy,
-  CreditCard,
-  Eye,
   FileText,
   Laptop,
   Move,
@@ -26,8 +23,6 @@ import {
   Tag,
   Trash2,
   User,
-  Calendar,
-  Flag,
 } from 'lucide-react';
 import {
   Select,
@@ -43,21 +38,10 @@ interface ModalFormProps {
   boardId?: string;
 }
 
-export const ModalForm = ({ card, listTitle, boardId }: ModalFormProps) => {
+export const ModalForm = ({ card, listTitle }: ModalFormProps) => {
   const [selectedPriority, setSelectedPriority] = useState<string>(
     card?.priority || 'none'
   );
-
-  // Calculate checklist progress
-  const calculateProgress = () => {
-    if (!card?.checklists || card.checklists.length === 0) return 0;
-
-    const allItems = card.checklists.flatMap((cl) => cl.checklist_items);
-    if (allItems.length === 0) return 0;
-
-    const completed = allItems.filter((item) => item.completed).length;
-    return Math.round((completed / allItems.length) * 100);
-  };
 
   return (
     <div className="grid grid-cols-[1fr_auto] gap-6 h-full min-h-0">
@@ -98,7 +82,7 @@ export const ModalForm = ({ card, listTitle, boardId }: ModalFormProps) => {
               </div>
               <CardAvatar
                 assignees={
-                  card?.card_members?.map((cm) => ({
+                  card?.card_members?.map((cm: any) => ({
                     id: cm.user_id,
                     name: cm.profiles.full_name || 'Unknown',
                     image: cm.profiles.avatar_url || '',
@@ -114,7 +98,7 @@ export const ModalForm = ({ card, listTitle, boardId }: ModalFormProps) => {
                 Labels
               </div>
               <div className="flex flex-wrap gap-1">
-                {card?.card_labels?.map((cl) => (
+                {card?.card_labels?.map((cl: any) => (
                   <Badge
                     key={cl.label_id}
                     style={{ backgroundColor: cl.labels.color }}
@@ -199,10 +183,10 @@ export const ModalForm = ({ card, listTitle, boardId }: ModalFormProps) => {
                 </div>
 
                 <div className="space-y-4">
-                  {card.checklists.map((checklist) => {
+                  {card.checklists.map((checklist: any) => {
                     const items = checklist.checklist_items || [];
                     const completed = items.filter(
-                      (item) => item.completed
+                      (item: any) => item.completed
                     ).length;
                     const progress =
                       items.length > 0
@@ -223,7 +207,7 @@ export const ModalForm = ({ card, listTitle, boardId }: ModalFormProps) => {
                         )}
 
                         <div className="space-y-2 ml-2">
-                          {items.map((item) => (
+                          {items.map((item: any) => (
                             <div
                               key={item.id}
                               className="flex items-center gap-2"
@@ -258,7 +242,7 @@ export const ModalForm = ({ card, listTitle, boardId }: ModalFormProps) => {
               <div className="space-y-3">
                 <h3 className="font-semibold">Attachments</h3>
                 <div className="space-y-2">
-                  {card.attachments.map((attachment) => (
+                  {card.attachments.map((attachment: any) => (
                     <div
                       key={attachment.id}
                       className="flex items-center gap-3 p-2 border rounded-lg hover:bg-accent cursor-pointer"
@@ -290,7 +274,7 @@ export const ModalForm = ({ card, listTitle, boardId }: ModalFormProps) => {
                 <h3 className="font-semibold">Activity</h3>
 
                 <div className="space-y-4">
-                  {card.comments.map((comment) => (
+                  {card.comments.map((comment: any) => (
                     <div key={comment.id} className="flex items-start gap-2">
                       <CardAvatar
                         assignees={[

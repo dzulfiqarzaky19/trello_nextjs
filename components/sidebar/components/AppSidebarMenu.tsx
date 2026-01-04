@@ -28,11 +28,6 @@ const data = {
       icon: Folder,
     },
     {
-      title: 'Projects',
-      url: '/projects',
-      icon: Folder,
-    },
-    {
       title: 'Team',
       url: '/team',
       icon: Users,

@@ -1,3 +1,4 @@
+'use client';
 import { Button } from '@/components/ui/button';
 import {
   DialogFooter,
@@ -7,8 +8,20 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Check } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useCreateColumn } from '../api/useCreateColumn';
+import { useForm } from 'react-hook-form';
+
+const formSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  description: z.string().optional(),
+  headerColor: z.string().optional(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 const COLORS = [
   { id: 'blue', value: 'bg-blue-500', label: 'Blue' },
@@ -19,9 +32,48 @@ const COLORS = [
   { id: 'gray', value: 'bg-gray-500', label: 'Gray' },
 ];
 
-export const ModalColumnForm = () => {
+interface ModalColumnFormProps {
+  projectId: string;
+  closeModal?: () => void;
+}
+
+export const ModalColumnForm = ({ projectId, closeModal }: ModalColumnFormProps) => {
+  const { mutate, isPending } = useCreateColumn({ projectId });
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: '',
+      description: '',
+      headerColor: 'bg-blue-500',
+    }
+  });
+
+  const selectedColor = watch('headerColor');
+
+  const onSubmit = (data: FormValues) => {
+    mutate({
+      param: { projectId },
+      json: {
+        title: data.title,
+        description: data.description,
+        headerColor: data.headerColor
+      }
+    }, {
+      onSuccess: () => {
+        closeModal?.();
+      }
+    });
+  };
+
   return (
-    <div className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <DialogHeader>
         <DialogTitle className="text-xl font-bold">
           Create New Column
@@ -35,10 +87,12 @@ export const ModalColumnForm = () => {
           </Label>
           <Input
             id="title"
-            name="title"
+            {...register('title')}
             placeholder="e.g. QA Review, Backlog"
-            required
           />
+          {errors.title && (
+            <p className="text-sm text-red-500">{errors.title.message}</p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -48,11 +102,11 @@ export const ModalColumnForm = () => {
               <div key={color.id} className="relative">
                 <input
                   type="radio"
-                  name="headerColor"
                   id={`color-${color.id}`}
                   value={color.value}
                   className="peer sr-only"
-                  defaultChecked={color.id === 'blue'}
+                  checked={selectedColor === color.value}
+                  onChange={() => setValue('headerColor', color.value)}
                 />
                 <Label
                   htmlFor={`color-${color.id}`}
@@ -78,7 +132,7 @@ export const ModalColumnForm = () => {
           </div>
           <Textarea
             id="description"
-            name="description"
+            {...register('description')}
             placeholder="What is this column for?"
             className="min-h-[100px]"
           />
@@ -86,16 +140,18 @@ export const ModalColumnForm = () => {
       </div>
 
       <DialogFooter>
-        <Button variant="outline" type="button">
+        <Button variant="outline" type="button" onClick={() => closeModal?.()}>
           Cancel
         </Button>
         <Button
           type="submit"
           className="bg-red-500 hover:bg-red-600 text-white"
+          disabled={isPending}
         >
+          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Create Column
         </Button>
       </DialogFooter>
-    </div>
+    </form>
   );
 };

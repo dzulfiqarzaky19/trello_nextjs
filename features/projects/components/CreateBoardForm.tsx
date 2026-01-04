@@ -2,76 +2,104 @@
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { createBoard } from '../actions';
+import { useCreateProject } from '../api/useCreateProject';
 import { toast } from 'sonner';
-import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { createProjectSchema } from '../schema';
+import { z } from 'zod';
+import { FormInput } from '@/components/form/FormInput'; // Assuming these exist from workspace form
+import { FormImageInput } from '@/components/form/FormImageInput';
+import { DialogFooter, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
-export const CreateBoardForm = () => {
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
+interface CreateBoardFormProps {
+  workspaceId?: string;
+  closeModal?: () => void;
+}
 
-  const handleSubmit = async (formData: FormData) => {
-    setLoading(true);
-    try {
-      const result = await createBoard(formData);
-      if (result.error) {
-        toast.error(result.error);
-      } else {
-        toast.success('Board created successfully!');
-        router.refresh();
-        // Close modal by resetting form or using modal context
-      }
-    } catch (e) {
-      toast.error('Failed to create board');
-    } finally {
-      setLoading(false);
+// We can infer type from schema, but schema expects File | string for image.
+// React Hook Form handles FileList usually.
+type FormValues = z.infer<typeof createProjectSchema>;
+
+export const CreateBoardForm = ({ workspaceId: propWorkspaceId, closeModal }: CreateBoardFormProps) => {
+  const { mutate, isPending } = useCreateProject();
+  const params = useParams();
+
+  const workspaceId = propWorkspaceId || (params.workspaceId as string);
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(createProjectSchema),
+    defaultValues: {
+      name: '',
+      workspace_id: workspaceId || '',
+      // image: undefined, // Let image be handled by FormImageInput which expects field value
     }
+  });
+
+  const { register, handleSubmit, control, formState: { errors } } = form;
+
+  const onSubmit = (data: FormValues) => {
+    if (!workspaceId) {
+      toast.error('Workspace ID is missing');
+      return;
+    }
+
+    // Explicitly set workspace_id if not in form (though we set default)
+    data.workspace_id = workspaceId;
+
+    mutate({
+      form: {
+        ...data,
+        // Image handling depends on how FormImageInput passes value. 
+        // If it passes File, we act accordingly.
+        // Hono RPC form helper usually handles File objects automatically if we pass FormData or object that converts to it.
+      }
+    }, {
+      onSuccess: () => {
+        closeModal?.();
+      }
+    });
   };
 
   return (
-    <form action={handleSubmit} className="space-y-4">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Create New Board</h2>
-        <p className="text-sm text-muted-foreground">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <DialogHeader>
+        <DialogTitle className="text-2xl font-bold mb-2">
+          Create New Board
+        </DialogTitle>
+        <DialogDescription className="text-sm text-muted-foreground">
           Start organizing your tasks in a new project board.
-        </p>
-      </div>
+        </DialogDescription>
+      </DialogHeader>
 
-      <div className="space-y-2">
-        <Label htmlFor="title">Board Title *</Label>
-        <Input
-          id="title"
-          name="title"
-          placeholder="e.g. Website Redesign"
-          required
-          disabled={loading}
-        />
-      </div>
+      <FormInput
+        id="name"
+        label="Board Title"
+        placeholder="e.g. Website Redesign"
+        {...register('name')}
+        error={errors.name?.message}
+        disabled={isPending}
+      />
 
-      <div className="space-y-2">
-        <Label htmlFor="imageUrl">Cover Image URL (optional)</Label>
-        <Input
-          id="imageUrl"
-          name="imageUrl"
-          type="url"
-          placeholder="https://example.com/image.jpg"
-          disabled={loading}
-        />
-      </div>
+      <FormImageInput
+        label="Cover Image"
+        control={control}
+        name="image"
+      />
 
-      <div className="flex justify-end gap-2 pt-4">
+      <DialogFooter className="flex justify-end gap-2 pt-4">
         <Button
           type="submit"
-          disabled={loading}
-          className="bg-red-500 hover:bg-red-600"
+          disabled={isPending || !workspaceId}
+          className="bg-red-500 hover:bg-red-600 text-white"
         >
-          {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Create Board
         </Button>
-      </div>
+      </DialogFooter>
     </form>
   );
 };
