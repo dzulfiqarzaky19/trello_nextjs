@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import app from './route';
 
-const createChain = (finalResult = { data: null, error: null }) => {
+const createChain = (finalResult: any = { data: null, error: null }) => {
     const chain: any = {
         select: vi.fn(() => chain),
         eq: vi.fn(() => chain),
@@ -57,7 +57,6 @@ describe('Projects Hono Route', () => {
     it('POST / creates a project', async () => {
         const mockProject = { id: 'p1', name: 'New Project', workspace_id: 'ws-1', status: 'ACTIVE' };
 
-        // Mock membership check success
         (createSupabaseServer as any).mockImplementation(async () => ({
             from: vi.fn((table) => {
                 if (table === 'members') return createChain({ data: { role: 'ADMIN' }, error: null });

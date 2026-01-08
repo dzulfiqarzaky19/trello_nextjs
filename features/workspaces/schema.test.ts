@@ -84,10 +84,38 @@ describe('Workspace Schemas', () => {
           slug: 'main',
           image_url: null,
           user_id: 'user-1',
+          user: {
+            id: 'user-1',
+            full_name: 'User 1',
+            avatar_url: null,
+            role: 'ADMIN',
+            email: 'user1@example.com',
+          },
           invite_code: 'invite-code-1',
           created_at: '2023-01-01T00:00:00Z',
           updated_at: null,
-          members: [{ user_id: 'user-1' }, { user_id: 'user-2' }],
+          members: [
+            {
+              user_id: 'user-1',
+              role: 'ADMIN',
+              profiles: {
+                id: 'user-1',
+                full_name: 'User 1',
+                avatar_url: null,
+                email: 'user1@example.com',
+              },
+            },
+            {
+              user_id: 'user-2',
+              role: 'MEMBER',
+              profiles: {
+                id: 'user-2',
+                full_name: 'User 2',
+                avatar_url: null,
+                email: 'user2@example.com',
+              },
+            },
+          ],
         },
       ];
       const result = workspacesListSchema.safeParse(validList);

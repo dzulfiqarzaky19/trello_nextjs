@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import app from './route';
 
-const createChain = (finalResult = { data: null, error: null }) => {
+const createChain = (finalResult: any = { data: null, error: null }) => {
     const chain: any = {
         select: vi.fn(() => chain),
         eq: vi.fn(() => chain),
@@ -49,7 +49,8 @@ describe('Workspace Detail Hono Route', () => {
             id: 'test-user-id',
             full_name: 'Test Creator',
             avatar_url: null,
-            email: 'creator@example.com'
+            email: 'creator@example.com',
+            role: 'ADMIN',
         },
         members: [
             {

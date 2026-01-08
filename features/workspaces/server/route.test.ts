@@ -4,7 +4,7 @@ import app from './route';
 const mockRemove = vi.fn();
 const mockUpload = vi.fn();
 
-const createChain = (finalResult = { data: null, error: null }) => {
+const createChain = (finalResult: any = { data: null, error: null }) => {
   const chain: any = {
     select: vi.fn(() => chain),
     eq: vi.fn(() => chain),
@@ -67,6 +67,7 @@ describe('Workspaces Hono Routes', () => {
       id: 'test-user-id',
       full_name: 'Test User',
       avatar_url: 'http://example.com/avatar.png',
+      role: 'ADMIN',
       email: 'test@example.com',
     },
     invite_code: 'invite-code-1',
@@ -75,6 +76,7 @@ describe('Workspaces Hono Routes', () => {
     members: [
       {
         user_id: 'test-user-id',
+        role: 'ADMIN',
         profiles: {
           id: 'test-user-id',
           full_name: 'Test User',
