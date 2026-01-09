@@ -17,6 +17,7 @@ import { useUpdateWorkspace } from '../api/useUpdateWorkspace';
 import { FormImageInput } from '@/components/form/FormImageInput';
 import { z } from 'zod';
 import { slugify } from '../utils';
+import { FormTextarea } from '@/components/form/FormTextarea';
 
 interface IWorkspaceEditFormProps {
   workspace: z.infer<typeof workspaceSchema>;
@@ -44,6 +45,7 @@ export const WorkspaceEditForm = ({
       name: workspace.name,
       slug: workspace.slug,
       image: workspace.image_url || undefined,
+      description: workspace.description || undefined,
     },
   });
 
@@ -59,16 +61,12 @@ export const WorkspaceEditForm = ({
   const onSubmit = async (data: IUpdateWorkspace) => {
     if (!isDirty) return;
 
-    try {
-      await mutateAsync({
-        param: { workspaceId: workspace.id },
-        form: data,
-      });
-      onSuccess?.();
-      closeModal?.();
-    } catch {
-      // Error handled by useMutation.onError
-    }
+    await mutateAsync({
+      param: { workspaceId: workspace.id },
+      form: data,
+    });
+    onSuccess?.();
+    closeModal?.();
   };
 
   return (
@@ -95,6 +93,13 @@ export const WorkspaceEditForm = ({
         placeholder="e.g. website-redesign"
         {...register('slug')}
         error={errors.slug?.message}
+      />
+
+      <FormTextarea
+        label="Workspace Description"
+        placeholder="e.g. Website Redesign"
+        {...register('description')}
+        error={errors.description?.message}
       />
 
       <FormImageInput label="Workspace Image" control={control} name="image" />

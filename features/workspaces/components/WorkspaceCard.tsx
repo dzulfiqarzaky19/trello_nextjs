@@ -12,7 +12,6 @@ import { workspaceSchema } from '../schema';
 import { z } from 'zod';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton';
 import { CardAvatar } from '@/components/CardAvatar';
 
 interface IWorkspaceListProps {
@@ -33,10 +32,7 @@ export const WorkspaceCard = ({ workspace }: IWorkspaceListProps) => {
       key={workspace.id}
       className="group relative flex flex-col h-full min-h-[250px] overflow-hidden rounded-xl border border-gray-100 dark:border-gray-800 hover:shadow-lg transition-shadow cursor-pointer py-0"
     >
-      <Link
-        href={`/workspaces/${workspace.slug}`}
-        className="flex flex-col grow"
-      >
+      <Link href={`/workspaces/${workspace.slug}`} className="flex flex-col grow">
         <div className="relative h-32 w-full bg-muted">
           {workspace.image_url ? (
             <img

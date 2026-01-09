@@ -44,7 +44,6 @@ export const WorkspaceDetailMain = () => {
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="members">Members & Roles</TabsTrigger>
                     <TabsTrigger value="projects">Projects</TabsTrigger>
-                    {/* Settings removed as per requirement */}
                 </TabsList>
 
                 <TabsContent value="overview">
