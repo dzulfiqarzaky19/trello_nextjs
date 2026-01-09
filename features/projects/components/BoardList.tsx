@@ -34,7 +34,9 @@ export const BoardList = ({ boards, workspaceId }: BoardListProps) => {
               <CardContent className="relative z-10">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   {/* Status badge? */}
-                  <span className="text-xs px-2 py-1 rounded bg-secondary">{board.status}</span>
+                  <span className="text-xs px-2 py-1 rounded bg-secondary">
+                    {board.status}
+                  </span>
                 </div>
               </CardContent>
             </Card>

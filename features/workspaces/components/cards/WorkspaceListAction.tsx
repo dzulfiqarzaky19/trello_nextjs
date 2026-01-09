@@ -25,10 +25,8 @@ export const WorkspaceListAction = ({
   const { openModal: openEditModal, closeWithReplace: closeEditModal } =
     useModal('edit-workspace');
 
-  const {
-    openModal: openDeleteModal,
-    closeWithBack: closeDeleteModal,
-  } = useModal('delete-workspace');
+  const { openModal: openDeleteModal, closeWithBack: closeDeleteModal } =
+    useModal('delete-workspace');
 
   if (!isAdmin) return null;
 

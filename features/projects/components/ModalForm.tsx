@@ -1,16 +1,15 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import {
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card as CardType } from '../types';
-import {
-  AlignLeft,
-  Laptop,
-  Trash2,
-  Loader2,
-} from 'lucide-react';
+import { AlignLeft, Laptop, Trash2, Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -33,59 +32,80 @@ interface ModalFormProps {
   closeModal?: () => void;
 }
 
-export const ModalForm = ({ card, listTitle, boardId, columnId, closeModal }: ModalFormProps) => {
+export const ModalForm = ({
+  card,
+  listTitle,
+  boardId,
+  columnId,
+  closeModal,
+}: ModalFormProps) => {
   const isEditing = !!card;
   const projectId = boardId || '';
 
-  const { mutate: updateTask, isPending: isUpdating } = useUpdateTask({ projectId });
-  const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask({ projectId });
-  const { mutate: createTask, isPending: isCreating } = useCreateTask({ projectId });
+  const { mutate: updateTask, isPending: isUpdating } = useUpdateTask({
+    projectId,
+  });
+  const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask({
+    projectId,
+  });
+  const { mutate: createTask, isPending: isCreating } = useCreateTask({
+    projectId,
+  });
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isDirty }
+    formState: { errors, isDirty },
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: card?.title || '',
       description: card?.description || '',
-    }
+    },
   });
 
   const onSubmit = (data: FormValues) => {
     if (isEditing && card) {
-      updateTask({
-        param: { projectId, taskId: card.id },
-        json: {
-          title: data.title,
-          description: data.description,
+      updateTask(
+        {
+          param: { projectId, taskId: card.id },
+          json: {
+            title: data.title,
+            description: data.description,
+          },
+        },
+        {
+          onSuccess: () => closeModal?.(),
         }
-      }, {
-        onSuccess: () => closeModal?.()
-      });
+      );
     } else if (columnId && projectId) {
-      createTask({
-        param: { projectId },
-        json: {
-          title: data.title,
-          description: data.description || '',
-          columnId,
+      createTask(
+        {
+          param: { projectId },
+          json: {
+            title: data.title,
+            description: data.description || '',
+            columnId,
+          },
+        },
+        {
+          onSuccess: () => closeModal?.(),
         }
-      }, {
-        onSuccess: () => closeModal?.()
-      });
+      );
     }
   };
 
   const onDelete = () => {
     if (card) {
       if (confirm('Are you sure you want to delete this task?')) {
-        deleteTask({
-          param: { projectId, taskId: card.id }
-        }, {
-          onSuccess: () => closeModal?.()
-        });
+        deleteTask(
+          {
+            param: { projectId, taskId: card.id },
+          },
+          {
+            onSuccess: () => closeModal?.(),
+          }
+        );
       }
     }
   };
@@ -106,9 +126,12 @@ export const ModalForm = ({ card, listTitle, boardId, columnId, closeModal }: Mo
                   className="font-semibold text-xl border-none shadow-none focus-visible:ring-0 px-0 h-auto p-0 bg-transparent placeholder:text-muted-foreground/50"
                 />
               </DialogTitle>
-              {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
+              {errors.title && (
+                <p className="text-red-500 text-sm">{errors.title.message}</p>
+              )}
               <div className="text-sm text-muted-foreground">
-                in list <span className="font-medium text-foreground">{listTitle}</span>
+                in list{' '}
+                <span className="font-medium text-foreground">{listTitle}</span>
               </div>
             </div>
           </div>
@@ -137,16 +160,31 @@ export const ModalForm = ({ card, listTitle, boardId, columnId, closeModal }: Mo
             disabled={isLoading}
             className="gap-2"
           >
-            {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+            {isDeleting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Trash2 className="h-4 w-4" />
+            )}
             Delete Task
           </Button>
-        ) : <div />} {/* Spacer */}
-
+        ) : (
+          <div />
+        )}{' '}
+        {/* Spacer */}
         <div className="flex gap-2">
-          <Button type="button" variant="outline" onClick={() => closeModal?.()} disabled={isLoading}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => closeModal?.()}
+            disabled={isLoading}
+          >
             Cancel
           </Button>
-          <Button type="submit" disabled={isLoading || (isEditing && !isDirty)} className="bg-blue-600 hover:bg-blue-700 text-white min-w-[100px]">
+          <Button
+            type="submit"
+            disabled={isLoading || (isEditing && !isDirty)}
+            className="bg-blue-600 hover:bg-blue-700 text-white min-w-[100px]"
+          >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isEditing ? 'Save Changes' : 'Create Task'}
           </Button>

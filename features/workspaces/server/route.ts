@@ -44,7 +44,10 @@ const app = new Hono()
         return c.json({ data: workspace });
       } catch (error: any) {
         if (error.code === '23505') {
-          return c.json({ error: 'Workspace with this slug already exists' }, 400);
+          return c.json(
+            { error: 'Workspace with this slug already exists' },
+            400
+          );
         }
         return c.json({ error: error.message || 'Something went wrong' }, 500);
       }
@@ -98,7 +101,10 @@ const app = new Hono()
         return c.json({ data });
       } catch (error: any) {
         if (error.code === '23505') {
-          return c.json({ error: 'Workspace with this slug already exists' }, 400);
+          return c.json(
+            { error: 'Workspace with this slug already exists' },
+            400
+          );
         }
         return c.json({ error: error.message || 'Something went wrong' }, 500);
       }

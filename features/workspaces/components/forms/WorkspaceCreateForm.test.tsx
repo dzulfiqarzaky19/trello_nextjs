@@ -152,7 +152,10 @@ describe('WorkspaceCreateForm', () => {
   });
 
   it('handles unexpected throwing error', async () => {
-    mockMutateAsync.mockRejectedValue(new Error('Network error'));
+    // Use mockImplementationOnce with a controlled rejection
+    mockMutateAsync.mockImplementationOnce(() =>
+      Promise.reject(new Error('Network error'))
+    );
     const queryClient = new QueryClient();
     render(
       <QueryClientProvider client={queryClient}>
@@ -166,11 +169,11 @@ describe('WorkspaceCreateForm', () => {
       });
     });
 
-    // Wrapped in act to handle the side effects and the rejection
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
     });
 
+    // Wait for the form to handle the rejection
     await waitFor(() => {
       expect(mockMutateAsync).toHaveBeenCalled();
     });

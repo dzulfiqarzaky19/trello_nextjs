@@ -48,12 +48,15 @@ export const WorkspaceCreateForm = ({
   const onSubmit = async (data: ICreateWorkspace) => {
     if (!isDirty) return;
 
-    await mutateAsync({
-      form: data,
-    });
-    reset();
-    closeModal?.();
-
+    try {
+      await mutateAsync({
+        form: data,
+      });
+      reset();
+      closeModal?.();
+    } catch {
+      // Error handled by useMutation.onError
+    }
   };
 
   return (

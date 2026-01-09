@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
 import { WorkspaceDetailMain } from '@/features/workspaceDetail/components/WorkspaceDetailMain';
 
 const WorkspaceIdPage = () => {
-    return (
-        <div className="flex flex-col gap-y-4">
-            <WorkspaceDetailMain />
-        </div>
-    );
+  return (
+    <div className="flex flex-col gap-y-4">
+      <WorkspaceDetailMain />
+    </div>
+  );
 };
 
 export default WorkspaceIdPage;

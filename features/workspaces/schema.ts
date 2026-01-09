@@ -31,25 +31,23 @@ export const workspaceSchema = z.object({
   user_id: z.string(),
   created_at: z.string().nullable(),
   updated_at: z.string().nullable(),
-  user: z
-    .object({
-      id: z.string(),
-      full_name: z.string().nullable(),
-      avatar_url: z.string().nullable(),
-      role: z.enum(['ADMIN', 'MEMBER']),
-      email: z.string(),
-    }),
+  user: z.object({
+    id: z.string(),
+    full_name: z.string().nullable(),
+    avatar_url: z.string().nullable(),
+    role: z.enum(['ADMIN', 'MEMBER']),
+    email: z.string(),
+  }),
   members: z.array(
     z.object({
       user_id: z.string(),
       role: z.enum(['ADMIN', 'MEMBER']),
-      profiles: z
-        .object({
-          id: z.string(),
-          full_name: z.string().nullable(),
-          avatar_url: z.string().nullable(),
-          email: z.string(),
-        }),
+      profiles: z.object({
+        id: z.string(),
+        full_name: z.string().nullable(),
+        avatar_url: z.string().nullable(),
+        email: z.string(),
+      }),
     })
   ),
   invite_code: z.string(),

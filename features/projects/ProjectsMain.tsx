@@ -25,7 +25,12 @@ import { useUpdateTask } from './api/useUpdateTask';
 import { useUpdateColumn } from './api/useUpdateColumn';
 import { useDeleteColumn } from './api/useDeleteColumn';
 import { Project, Column, Task } from './types';
-import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from '@hello-pangea/dnd';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -41,11 +46,13 @@ export const ProjectsMain = ({ projectId }: ProjectsMainProps) => {
   useEffect(() => {
     if (rawProject) {
       const project = rawProject as unknown as Project;
-      const sortedCols = [...(project.columns || [])].sort((a, b) => a.position - b.position);
+      const sortedCols = [...(project.columns || [])].sort(
+        (a, b) => a.position - b.position
+      );
 
-      const colsWithSortedTasks = sortedCols.map(col => ({
+      const colsWithSortedTasks = sortedCols.map((col) => ({
         ...col,
-        tasks: [...(col.tasks || [])].sort((a, b) => a.position - b.position)
+        tasks: [...(col.tasks || [])].sort((a, b) => a.position - b.position),
       }));
 
       setOrderedData(colsWithSortedTasks);
@@ -77,13 +84,17 @@ export const ProjectsMain = ({ projectId }: ProjectsMainProps) => {
 
       updateColumn({
         param: { projectId, columnId: removed.id },
-        json: { position: destination.index + 1 }
+        json: { position: destination.index + 1 },
       });
       return;
     }
 
-    const startColIndex = orderedData.findIndex(col => col.id === source.droppableId);
-    const finishColIndex = orderedData.findIndex(col => col.id === destination.droppableId);
+    const startColIndex = orderedData.findIndex(
+      (col) => col.id === source.droppableId
+    );
+    const finishColIndex = orderedData.findIndex(
+      (col) => col.id === destination.droppableId
+    );
 
     if (startColIndex === -1 || finishColIndex === -1) return;
 
@@ -105,8 +116,8 @@ export const ProjectsMain = ({ projectId }: ProjectsMainProps) => {
         param: { projectId, taskId: movedTask.id },
         json: {
           columnId: startCol.id,
-          position: destination.index + 1
-        }
+          position: destination.index + 1,
+        },
       });
     } else {
       const startTasks = [...startCol.tasks];
@@ -128,27 +139,31 @@ export const ProjectsMain = ({ projectId }: ProjectsMainProps) => {
         param: { projectId, taskId: movedTask.id },
         json: {
           columnId: finishCol.id,
-          position: destination.index + 1
-        }
+          position: destination.index + 1,
+        },
       });
     }
   };
 
   const handleDeleteColumn = (columnId: string) => {
-    if (confirm('Are you sure you want to delete this list? All tasks in it will be deleted.')) {
+    if (
+      confirm(
+        'Are you sure you want to delete this list? All tasks in it will be deleted.'
+      )
+    ) {
       deleteColumn({ param: { projectId, columnId } });
     }
-  }
+  };
 
   const handleRenameColumn = (columnId: string, currentName: string) => {
     const newName = prompt('Enter new list name:', currentName);
     if (newName && newName !== currentName) {
       updateColumn({
         param: { projectId, columnId },
-        json: { title: newName }
+        json: { title: newName },
       });
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -183,13 +198,23 @@ export const ProjectsMain = ({ projectId }: ProjectsMainProps) => {
                     {...provided.draggableProps}
                     className="h-full"
                   >
-                    <Card
-                      className="border-none shadow-none rounded-none bg-transparent min-w-[300px] flex flex-col max-h-full"
-                    >
-                      <CardHeader className="flex items-center justify-between p-2" {...provided.dragHandleProps}>
+                    <Card className="border-none shadow-none rounded-none bg-transparent min-w-[300px] flex flex-col max-h-full">
+                      <CardHeader
+                        className="flex items-center justify-between p-2"
+                        {...provided.dragHandleProps}
+                      >
                         <div className="flex items-center gap-2">
-                          <div className={cn('size-2 rounded-full', column.tasks?.length ? 'bg-blue-500' : 'bg-gray-500')} />
-                          <CardTitle className="text-sm font-semibold">{column.name}</CardTitle>
+                          <div
+                            className={cn(
+                              'size-2 rounded-full',
+                              column.tasks?.length
+                                ? 'bg-blue-500'
+                                : 'bg-gray-500'
+                            )}
+                          />
+                          <CardTitle className="text-sm font-semibold">
+                            {column.name}
+                          </CardTitle>
                           <div className="size-5 rounded-full bg-gray-200 flex items-center justify-center text-xs">
                             {column.tasks?.length || 0}
                           </div>
@@ -197,20 +222,30 @@ export const ProjectsMain = ({ projectId }: ProjectsMainProps) => {
 
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                            >
                               <Ellipsis className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleRenameColumn(column.id, column.name)}>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleRenameColumn(column.id, column.name)
+                              }
+                            >
                               Rename List
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleDeleteColumn(column.id)} className="text-red-600 focus:text-red-600">
+                            <DropdownMenuItem
+                              onClick={() => handleDeleteColumn(column.id)}
+                              className="text-red-600 focus:text-red-600"
+                            >
                               Delete List
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
-
                       </CardHeader>
 
                       <Droppable droppableId={column.id} type="TASK">
@@ -221,7 +256,11 @@ export const ProjectsMain = ({ projectId }: ProjectsMainProps) => {
                             {...provided.droppableProps}
                           >
                             {column.tasks?.map((task, index) => (
-                              <Draggable key={task.id} draggableId={task.id} index={index}>
+                              <Draggable
+                                key={task.id}
+                                draggableId={task.id}
+                                index={index}
+                              >
                                 {(provided) => (
                                   <div
                                     ref={provided.innerRef}
@@ -244,15 +283,19 @@ export const ProjectsMain = ({ projectId }: ProjectsMainProps) => {
                                         listTitle={column.name}
                                         boardId={projectId}
                                         closeModal={() => {
-                                          // Modal close logic handled by Modal component typically, 
-                                          // but ModalForm expects closeModal. 
+                                          // Modal close logic handled by Modal component typically,
+                                          // but ModalForm expects closeModal.
                                           // We need to ensure Modal component passes it or we wrap it.
-                                          // Usually Trigger handles close implicitly if we click outside, 
-                                          // but for onSubmit we need manual control. 
-                                          // The current Modal implementation might not expose a close hook easily 
+                                          // Usually Trigger handles close implicitly if we click outside,
+                                          // but for onSubmit we need manual control.
+                                          // The current Modal implementation might not expose a close hook easily
                                           // unless we control opanness state.
                                           // For now, assuming Modal handles close on button click or we just rely on invalidation.
-                                          document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })); // Hacky close
+                                          document.dispatchEvent(
+                                            new KeyboardEvent('keydown', {
+                                              key: 'Escape',
+                                            })
+                                          ); // Hacky close
                                         }}
                                       />
                                     </Modal>
@@ -268,7 +311,10 @@ export const ProjectsMain = ({ projectId }: ProjectsMainProps) => {
                       <CardFooter className="p-2">
                         <Modal
                           trigger={
-                            <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800">
+                            <Button
+                              variant="ghost"
+                              className="w-full justify-start text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800"
+                            >
                               <Plus className="mr-2 h-4 w-4" />
                               Add Task
                             </Button>
@@ -280,7 +326,9 @@ export const ProjectsMain = ({ projectId }: ProjectsMainProps) => {
                             boardId={projectId}
                             columnId={column.id}
                             closeModal={() => {
-                              document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+                              document.dispatchEvent(
+                                new KeyboardEvent('keydown', { key: 'Escape' })
+                              );
                             }}
                           />
                         </Modal>
@@ -295,7 +343,10 @@ export const ProjectsMain = ({ projectId }: ProjectsMainProps) => {
             <div className="min-w-[300px]">
               <Modal
                 trigger={
-                  <Button variant="ghost" className="w-full justify-start bg-white/50 hover:bg-white/80 dark:bg-black/20 dark:hover:bg-black/40 h-12">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start bg-white/50 hover:bg-white/80 dark:bg-black/20 dark:hover:bg-black/40 h-12"
+                  >
                     <Plus className="mr-2 h-4 w-4" />
                     Add List
                   </Button>

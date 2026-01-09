@@ -37,7 +37,10 @@ interface ModalColumnFormProps {
   closeModal?: () => void;
 }
 
-export const ModalColumnForm = ({ projectId, closeModal }: ModalColumnFormProps) => {
+export const ModalColumnForm = ({
+  projectId,
+  closeModal,
+}: ModalColumnFormProps) => {
   const { mutate, isPending } = useCreateColumn({ projectId });
 
   const {
@@ -52,24 +55,27 @@ export const ModalColumnForm = ({ projectId, closeModal }: ModalColumnFormProps)
       title: '',
       description: '',
       headerColor: 'bg-blue-500',
-    }
+    },
   });
 
   const selectedColor = watch('headerColor');
 
   const onSubmit = (data: FormValues) => {
-    mutate({
-      param: { projectId },
-      json: {
-        title: data.title,
-        description: data.description,
-        headerColor: data.headerColor
+    mutate(
+      {
+        param: { projectId },
+        json: {
+          title: data.title,
+          description: data.description,
+          headerColor: data.headerColor,
+        },
+      },
+      {
+        onSuccess: () => {
+          closeModal?.();
+        },
       }
-    }, {
-      onSuccess: () => {
-        closeModal?.();
-      }
-    });
+    );
   };
 
   return (

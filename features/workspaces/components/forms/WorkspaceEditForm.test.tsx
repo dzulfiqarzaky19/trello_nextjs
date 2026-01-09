@@ -86,9 +86,8 @@ describe('WorkspaceEditForm', () => {
     expect(slugInput).toHaveValue('brand-new');
   });
 
-  it('submits successfully and calls callbacks', async () => {
+  it('submits successfully and calls closeModal', async () => {
     mockMutateAsync.mockResolvedValue({ data: { id: 'ws-1' } });
-    const mockSuccess = vi.fn();
     const mockCloseModal = vi.fn();
 
     const queryClient = new QueryClient();
@@ -96,7 +95,6 @@ describe('WorkspaceEditForm', () => {
       <QueryClientProvider client={queryClient}>
         <WorkspaceEditForm
           workspace={mockWorkspace}
-          onSuccess={mockSuccess}
           closeModal={mockCloseModal}
         />
       </QueryClientProvider>
@@ -119,7 +117,6 @@ describe('WorkspaceEditForm', () => {
           name: 'Updated Name',
         }),
       });
-      expect(mockSuccess).toHaveBeenCalled();
       expect(mockCloseModal).toHaveBeenCalled();
     });
   });

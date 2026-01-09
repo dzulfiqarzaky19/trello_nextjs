@@ -13,7 +13,12 @@ import { createProjectSchema } from '../schema';
 import { z } from 'zod';
 import { FormInput } from '@/components/form/FormInput'; // Assuming these exist from workspace form
 import { FormImageInput } from '@/components/form/FormImageInput';
-import { DialogFooter, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import {
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 
 interface CreateBoardFormProps {
   workspaceId?: string;
@@ -24,7 +29,10 @@ interface CreateBoardFormProps {
 // React Hook Form handles FileList usually.
 type FormValues = z.infer<typeof createProjectSchema>;
 
-export const CreateBoardForm = ({ workspaceId: propWorkspaceId, closeModal }: CreateBoardFormProps) => {
+export const CreateBoardForm = ({
+  workspaceId: propWorkspaceId,
+  closeModal,
+}: CreateBoardFormProps) => {
   const { mutate, isPending } = useCreateProject();
   const params = useParams();
 
@@ -36,10 +44,15 @@ export const CreateBoardForm = ({ workspaceId: propWorkspaceId, closeModal }: Cr
       name: '',
       workspace_id: workspaceId || '',
       // image: undefined, // Let image be handled by FormImageInput which expects field value
-    }
+    },
   });
 
-  const { register, handleSubmit, control, formState: { errors } } = form;
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = form;
 
   const onSubmit = (data: FormValues) => {
     if (!workspaceId) {
@@ -50,18 +63,21 @@ export const CreateBoardForm = ({ workspaceId: propWorkspaceId, closeModal }: Cr
     // Explicitly set workspace_id if not in form (though we set default)
     data.workspace_id = workspaceId;
 
-    mutate({
-      form: {
-        ...data,
-        // Image handling depends on how FormImageInput passes value. 
-        // If it passes File, we act accordingly.
-        // Hono RPC form helper usually handles File objects automatically if we pass FormData or object that converts to it.
+    mutate(
+      {
+        form: {
+          ...data,
+          // Image handling depends on how FormImageInput passes value.
+          // If it passes File, we act accordingly.
+          // Hono RPC form helper usually handles File objects automatically if we pass FormData or object that converts to it.
+        },
+      },
+      {
+        onSuccess: () => {
+          closeModal?.();
+        },
       }
-    }, {
-      onSuccess: () => {
-        closeModal?.();
-      }
-    });
+    );
   };
 
   return (
@@ -84,11 +100,7 @@ export const CreateBoardForm = ({ workspaceId: propWorkspaceId, closeModal }: Cr
         disabled={isPending}
       />
 
-      <FormImageInput
-        label="Cover Image"
-        control={control}
-        name="image"
-      />
+      <FormImageInput label="Cover Image" control={control} name="image" />
 
       <DialogFooter className="flex justify-end gap-2 pt-4">
         <Button

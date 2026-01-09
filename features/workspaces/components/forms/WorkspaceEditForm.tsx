@@ -54,12 +54,15 @@ export const WorkspaceEditForm = ({
   const onSubmit = async (data: IUpdateWorkspace) => {
     if (!isDirty) return;
 
-    await mutateAsync({
-      param: { workspaceId: workspace.id },
-      form: data,
-    });
-    closeModal?.();
-
+    try {
+      await mutateAsync({
+        param: { workspaceId: workspace.id },
+        form: data,
+      });
+      closeModal?.();
+    } catch {
+      // Error handled by useMutation.onError
+    }
   };
 
   return (
