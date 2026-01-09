@@ -1,17 +1,11 @@
 import { FormInput } from '@/components/form/FormInput';
 import { FormSubmit } from '@/components/form/FormSubmit';
-import {
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { DialogFooter } from '@/components/ui/dialog';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { createWorkspaceSchema, ICreateWorkspace } from '../../schema';
 import { useCreateWorkspace } from '../../api/useCreateWorkspace';
 import { FormImageInput } from '@/components/form/FormImageInput';
-import { FormWrapper } from '@/components/form/FormWrapper';
 import { slugify } from '../../utils';
 import { FormTextarea } from '@/components/form/FormTextarea';
 
@@ -54,28 +48,16 @@ export const WorkspaceCreateForm = ({
   const onSubmit = async (data: ICreateWorkspace) => {
     if (!isDirty) return;
 
-    try {
-      await mutateAsync({
-        form: data,
-      });
-      reset();
-      closeModal?.();
-    } catch {
-      // Error handled by useMutation.onError
-    }
+    await mutateAsync({
+      form: data,
+    });
+    reset();
+    closeModal?.();
+
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <DialogHeader>
-        <DialogTitle className="text-2xl font-bold mb-2">
-          Create New Board
-        </DialogTitle>
-        <DialogDescription className="text-sm text-muted-foreground">
-          Start organizing your tasks in a new project board.
-        </DialogDescription>
-      </DialogHeader>
-
       <FormInput
         label="Workspace Name"
         placeholder="e.g. Website Redesign"

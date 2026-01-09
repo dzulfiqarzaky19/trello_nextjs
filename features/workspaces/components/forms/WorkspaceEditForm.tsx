@@ -1,11 +1,6 @@
 import { FormInput } from '@/components/form/FormInput';
 import { FormSubmit } from '@/components/form/FormSubmit';
-import {
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { DialogFooter } from '@/components/ui/dialog';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import {
@@ -18,17 +13,14 @@ import { FormImageInput } from '@/components/form/FormImageInput';
 import { z } from 'zod';
 import { slugify } from '../../utils';
 import { FormTextarea } from '@/components/form/FormTextarea';
-import { FormWrapper } from '@/components/form/FormWrapper';
 
 interface IWorkspaceEditFormProps {
   workspace: z.infer<typeof workspaceSchema>;
-  onSuccess?: () => void;
   closeModal?: () => void;
 }
 
 export const WorkspaceEditForm = ({
   workspace,
-  onSuccess,
   closeModal,
 }: IWorkspaceEditFormProps) => {
   const { mutateAsync } = useUpdateWorkspace();
@@ -62,29 +54,16 @@ export const WorkspaceEditForm = ({
   const onSubmit = async (data: IUpdateWorkspace) => {
     if (!isDirty) return;
 
-    try {
-      await mutateAsync({
-        param: { workspaceId: workspace.id },
-        form: data,
-      });
-      onSuccess?.();
-      closeModal?.();
-    } catch {
-      // Error handled by useMutation.onError
-    }
+    await mutateAsync({
+      param: { workspaceId: workspace.id },
+      form: data,
+    });
+    closeModal?.();
+
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <DialogHeader>
-        <DialogTitle className="text-2xl font-bold mb-2">
-          Edit Workspace
-        </DialogTitle>
-        <DialogDescription className="text-sm text-muted-foreground">
-          Update your workspace details.
-        </DialogDescription>
-      </DialogHeader>
-
       <FormInput
         label="Workspace Name"
         placeholder="e.g. Website Redesign"

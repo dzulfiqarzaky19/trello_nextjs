@@ -4,6 +4,8 @@ import './globals.css';
 import { AuthProviderWrapper } from '@/components/providers/AuthProviderWrapper';
 import { QueryProviders } from '@/components/providers/QueryProviders';
 import { Toaster } from '@/components/ui/sonner';
+import { ModalProvider } from '@/components/providers/ModalProvider';
+import { GlobalModal } from '@/components/GlobalModal';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -31,7 +33,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <QueryProviders>
-          <AuthProviderWrapper>{children}</AuthProviderWrapper>
+          <ModalProvider>
+            <AuthProviderWrapper>
+              {children}
+              <GlobalModal />
+            </AuthProviderWrapper>
+          </ModalProvider>
         </QueryProviders>
         <Toaster />
       </body>
