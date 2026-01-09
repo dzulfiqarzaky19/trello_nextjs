@@ -7,6 +7,7 @@ import {
 } from '../schema';
 import { sessionMiddleware } from '@/lib/session-middleware';
 import { createSupabaseServer } from '@/lib/supabase/server';
+import { WorkspaceService } from './services';
 
 const app = new Hono()
   .post(
@@ -15,62 +16,38 @@ const app = new Hono()
     sessionMiddleware,
     async (c) => {
       const supabase = await createSupabaseServer();
+      const service = new WorkspaceService(supabase);
       const user = c.get('user');
       const { name, slug, image, description } = c.req.valid('form');
 
-      let imageUrl = null;
-      if (image instanceof File) {
-        const fileName = `${user.id}/${Date.now()}-${image.name}`;
-        const { data, error } = await supabase.storage
-          .from('workspace_image')
-          .upload(fileName, image, {
-            cacheControl: '3600',
-            upsert: false,
-          });
+      try {
+        let imageUrl = null;
+        if (image instanceof File) {
+          imageUrl = await service.uploadImage(user.id, image);
+        }
 
-        if (error) return c.json({ error: error.message }, 500);
-
-        const {
-          data: { publicUrl },
-        } = supabase.storage.from('workspace_image').getPublicUrl(data.path);
-
-        imageUrl = publicUrl;
-      }
-
-      const { data: workspace, error: workspaceError } = await supabase
-        .from('workspaces')
-        .insert({
+        const workspace = await service.createWorkspace({
           name,
           slug,
           image_url: imageUrl,
           user_id: user.id,
           description,
-        })
-        .select()
-        .single();
+        });
 
-      if (workspaceError) {
-        if (workspaceError.code === '23505') {
-          return c.json(
-            { error: 'Workspace with this slug already exists' },
-            400
-          );
+        try {
+          await service.addMember(workspace.id, user.id, 'ADMIN');
+        } catch (memberError) {
+          await service.deleteWorkspace(workspace.id);
+          throw memberError;
         }
-        return c.json({ error: 'Something went wrong' }, 500);
+
+        return c.json({ data: workspace });
+      } catch (error: any) {
+        if (error.code === '23505') {
+          return c.json({ error: 'Workspace with this slug already exists' }, 400);
+        }
+        return c.json({ error: error.message || 'Something went wrong' }, 500);
       }
-
-      const { error: memberError } = await supabase.from('members').insert({
-        workspace_id: workspace.id,
-        user_id: user.id,
-        role: 'ADMIN',
-      });
-
-      if (memberError) {
-        await supabase.from('workspaces').delete().eq('id', workspace.id);
-        return c.json({ error: 'Something went wrong' }, 500);
-      }
-
-      return c.json({ data: workspace });
     }
   )
   .patch(
@@ -79,169 +56,100 @@ const app = new Hono()
     zValidator('form', updateWorkspaceSchema),
     async (c) => {
       const supabase = await createSupabaseServer();
+      const service = new WorkspaceService(supabase);
       const user = c.get('user');
       const { workspaceId } = c.req.param();
       const { name, slug, image, description } = c.req.valid('form');
 
-      const { data: member, error: memberError } = await supabase
-        .from('members')
-        .select('role, workspaces(image_url)')
-        .eq('workspace_id', workspaceId)
-        .eq('user_id', user.id)
-        .single();
+      const member = await service.getMember(workspaceId, user.id);
 
-      if (memberError || member?.role !== 'ADMIN') {
+      if (!member || member.role !== 'ADMIN') {
         return c.json({ error: 'Unauthorized' }, 401);
       }
 
       const existingImageUrl = (member.workspaces as any)?.image_url;
       let imageUrl: string | undefined | null = undefined;
 
-      if (image instanceof File) {
-        const fileName = `${user.id}/${Date.now()}-${image.name}`;
-        const { data, error } = await supabase.storage
-          .from('workspace_image')
-          .upload(fileName, image, {
-            cacheControl: '3600',
-            upsert: false,
-          });
+      try {
+        if (image instanceof File) {
+          imageUrl = await service.uploadImage(user.id, image);
+        } else if (typeof image === 'string') {
+          imageUrl = image;
+        } else if (image === null) {
+          imageUrl = null;
+        }
 
-        if (error) return c.json({ error: error.message }, 500);
+        const updateData: any = {};
+        if (name !== undefined) updateData.name = name;
+        if (slug !== undefined) updateData.slug = slug;
+        if (description !== undefined) updateData.description = description;
+        if (imageUrl !== undefined) updateData.image_url = imageUrl;
 
-        const {
-          data: { publicUrl },
-        } = supabase.storage.from('workspace_image').getPublicUrl(data.path);
+        const data = await service.updateWorkspace(workspaceId, updateData);
 
-        imageUrl = publicUrl;
-      } else if (typeof image === 'string') {
-        imageUrl = image;
-      } else if (image === null) {
-        imageUrl = null;
-      }
+        if (
+          imageUrl !== undefined &&
+          existingImageUrl &&
+          existingImageUrl !== imageUrl
+        ) {
+          await service.deleteImage(existingImageUrl);
+        }
 
-      const updateData: any = {};
-      if (name !== undefined) updateData.name = name;
-      if (slug !== undefined) updateData.slug = slug;
-      if (description !== undefined) updateData.description = description;
-
-      if (imageUrl !== undefined) {
-        updateData.image_url = imageUrl;
-      }
-
-      const { data, error } = await supabase
-        .from('workspaces')
-        .update(updateData)
-        .eq('id', workspaceId)
-        .select()
-        .single();
-
-      if (error) {
+        return c.json({ data });
+      } catch (error: any) {
         if (error.code === '23505') {
-          return c.json(
-            { error: 'Workspace with this slug already exists' },
-            400
-          );
+          return c.json({ error: 'Workspace with this slug already exists' }, 400);
         }
-        return c.json({ error: 'Something went wrong' }, 500);
+        return c.json({ error: error.message || 'Something went wrong' }, 500);
       }
-
-      if (
-        imageUrl !== undefined &&
-        existingImageUrl &&
-        existingImageUrl !== imageUrl
-      ) {
-        const parts = existingImageUrl.split('workspace_image/');
-        if (parts.length > 1) {
-          const path = parts[parts.length - 1];
-          await supabase.storage.from('workspace_image').remove([path]);
-        }
-      }
-
-      return c.json({ data });
     }
   )
   .delete('/:workspaceId', sessionMiddleware, async (c) => {
     const supabase = await createSupabaseServer();
+    const service = new WorkspaceService(supabase);
     const user = c.get('user');
     const { workspaceId } = c.req.param();
 
-    const { data: member, error: memberError } = await supabase
-      .from('members')
-      .select('role, workspaces(image_url)')
-      .eq('workspace_id', workspaceId)
-      .eq('user_id', user.id)
-      .single();
+    const member = await service.getMember(workspaceId, user.id);
 
-    if (memberError || member?.role !== 'ADMIN') {
+    if (!member || member.role !== 'ADMIN') {
       return c.json({ error: 'Unauthorized' }, 401);
     }
 
     const imageUrl = (member.workspaces as any)?.image_url;
 
-    if (imageUrl) {
-      const parts = imageUrl.split('workspace_image/');
-      if (parts.length > 1) {
-        const path = parts[parts.length - 1];
-        await supabase.storage.from('workspace_image').remove([path]);
+    try {
+      if (imageUrl) {
+        await service.deleteImage(imageUrl);
       }
+
+      await service.deleteWorkspace(workspaceId);
+      return c.json({ data: { id: workspaceId } });
+    } catch (error: any) {
+      return c.json({ error: error.message || 'Something went wrong' }, 500);
     }
-
-    const { error } = await supabase
-      .from('workspaces')
-      .delete()
-      .eq('id', workspaceId);
-
-    if (error) {
-      return c.json({ error: 'Something went wrong' }, 500);
-    }
-
-    return c.json({ data: { id: workspaceId } });
   })
   .get('/', sessionMiddleware, async (c) => {
     const supabase = await createSupabaseServer();
+    const service = new WorkspaceService(supabase);
     const user = c.get('user');
 
-    const { data, error } = await supabase
-      .from('workspaces')
-      .select(`
-    *,
-    user:user_id ( 
-      id,
-      full_name,
-      avatar_url,
-      role,
-      email
-    ),
-    members (
-    user_id,
-      role,
-      profiles:user_id ( 
-        id,
-        full_name,
-        avatar_url,
-        email
-      )
-    )
-  `)
-      .eq('members.user_id', user.id);
+    try {
+      const data = await service.listWorkspaces(user.id);
+      const result = workspacesListSchema.safeParse(data);
 
-    if (error) {
-      console.error(error)
+      if (!result.success) {
+        return c.json({ error: 'Data validation failed' }, 500);
+      }
+
+      return c.json({ workspaces: result.data });
+    } catch (error: any) {
       return c.json({ error: 'Something went wrong' }, 500);
     }
-
-    console.log({ data, user: data?.[0].user, members: data?.[0].members })
-
-    const result = workspacesListSchema.safeParse(data);
-
-    if (!result.success) {
-      return c.json({ error: 'Data validation failed' }, 500);
-    }
-
-    return c.json({ workspaces: result.data });
   })
   .post('/upload', sessionMiddleware, async (c) => {
     const supabase = await createSupabaseServer();
+    const service = new WorkspaceService(supabase);
     const user = c.get('user');
 
     const body = await c.req.parseBody();
@@ -249,22 +157,12 @@ const app = new Hono()
 
     if (!file) return c.json({ error: 'No file uploaded' }, 400);
 
-    const fileName = `${user.id}/${Date.now()}-${file.name}`;
-
-    const { data, error } = await supabase.storage
-      .from('workspace_image')
-      .upload(fileName, file, {
-        cacheControl: '3600',
-        upsert: false,
-      });
-
-    if (error) return c.json({ error: error.message }, 500);
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from('workspace_image').getPublicUrl(data.path);
-
-    return c.json({ url: publicUrl });
+    try {
+      const url = await service.uploadImage(user.id, file);
+      return c.json({ url });
+    } catch (error: any) {
+      return c.json({ error: error.message }, 500);
+    }
   });
 
 export default app;

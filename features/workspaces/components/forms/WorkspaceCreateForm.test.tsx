@@ -7,20 +7,16 @@ import {
 } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { WorkspaceCreateForm } from './WorkspaceCreateForm';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const mockMutateAsync = vi.fn();
-vi.mock('../api/useCreateWorkspace', () => ({
+vi.mock('../../api/useCreateWorkspace', () => ({
   useCreateWorkspace: () => ({
     mutateAsync: mockMutateAsync,
   }),
 }));
 
-const mockInvalidateQueries = vi.fn();
-vi.mock('@tanstack/react-query', () => ({
-  useQueryClient: () => ({
-    invalidateQueries: mockInvalidateQueries,
-  }),
-}));
+// Removed redundant @tanstack/react-query mock as we use QueryClientProvider
 
 vi.mock('sonner', () => ({
   toast: {
@@ -50,7 +46,12 @@ describe('WorkspaceCreateForm', () => {
   });
 
   it('renders all form fields', () => {
-    render(<WorkspaceCreateForm />);
+    const queryClient = new QueryClient();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <WorkspaceCreateForm />
+      </QueryClientProvider>
+    );
     expect(screen.getByLabelText(/workspace name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/workspace slug/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/workspace image/i)).toBeInTheDocument();
@@ -60,7 +61,12 @@ describe('WorkspaceCreateForm', () => {
   });
 
   it('automatically updates the slug when name is entered', async () => {
-    render(<WorkspaceCreateForm />);
+    const queryClient = new QueryClient();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <WorkspaceCreateForm />
+      </QueryClientProvider>
+    );
     const nameInput = screen.getByLabelText(/workspace name/i);
     const slugInput = screen.getByLabelText(/workspace slug/i);
 
@@ -72,7 +78,12 @@ describe('WorkspaceCreateForm', () => {
   });
 
   it('shows validation error for short workspace name', async () => {
-    render(<WorkspaceCreateForm />);
+    const queryClient = new QueryClient();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <WorkspaceCreateForm />
+      </QueryClientProvider>
+    );
     const nameInput = screen.getByLabelText(/workspace name/i);
 
     await act(async () => {
@@ -87,7 +98,12 @@ describe('WorkspaceCreateForm', () => {
 
   it('successfully submits the form', async () => {
     mockMutateAsync.mockResolvedValue({ data: { id: '123' } });
-    render(<WorkspaceCreateForm />);
+    const queryClient = new QueryClient();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <WorkspaceCreateForm />
+      </QueryClientProvider>
+    );
 
     const nameInput = screen.getByLabelText(/workspace name/i);
     await act(async () => {
@@ -114,7 +130,12 @@ describe('WorkspaceCreateForm', () => {
 
   it('handles API error response', async () => {
     mockMutateAsync.mockResolvedValue({ error: 'Slug already taken' });
-    render(<WorkspaceCreateForm />);
+    const queryClient = new QueryClient();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <WorkspaceCreateForm />
+      </QueryClientProvider>
+    );
 
     await act(async () => {
       fireEvent.change(screen.getByLabelText(/workspace name/i), {
@@ -132,7 +153,12 @@ describe('WorkspaceCreateForm', () => {
 
   it('handles unexpected throwing error', async () => {
     mockMutateAsync.mockRejectedValue(new Error('Network error'));
-    render(<WorkspaceCreateForm />);
+    const queryClient = new QueryClient();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <WorkspaceCreateForm />
+      </QueryClientProvider>
+    );
 
     await act(async () => {
       fireEvent.change(screen.getByLabelText(/workspace name/i), {

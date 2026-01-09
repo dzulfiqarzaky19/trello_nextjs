@@ -1,7 +1,7 @@
 import { Modal } from '@/components/Modal';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus } from 'lucide-react';
-import { WorkspaceCreateForm } from './WorkspaceCreateForm';
+import { WorkspaceCreateForm } from './forms/WorkspaceCreateForm';
 
 export const WorkspaceCreate = () => (
   <Modal

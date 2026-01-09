@@ -12,12 +12,13 @@ import {
   updateWorkspaceSchema,
   IUpdateWorkspace,
   workspaceSchema,
-} from '../schema';
-import { useUpdateWorkspace } from '../api/useUpdateWorkspace';
+} from '../../schema';
+import { useUpdateWorkspace } from '../../api/useUpdateWorkspace';
 import { FormImageInput } from '@/components/form/FormImageInput';
 import { z } from 'zod';
-import { slugify } from '../utils';
+import { slugify } from '../../utils';
 import { FormTextarea } from '@/components/form/FormTextarea';
+import { FormWrapper } from '@/components/form/FormWrapper';
 
 interface IWorkspaceEditFormProps {
   workspace: z.infer<typeof workspaceSchema>;
@@ -61,12 +62,16 @@ export const WorkspaceEditForm = ({
   const onSubmit = async (data: IUpdateWorkspace) => {
     if (!isDirty) return;
 
-    await mutateAsync({
-      param: { workspaceId: workspace.id },
-      form: data,
-    });
-    onSuccess?.();
-    closeModal?.();
+    try {
+      await mutateAsync({
+        param: { workspaceId: workspace.id },
+        form: data,
+      });
+      onSuccess?.();
+      closeModal?.();
+    } catch {
+      // Error handled by useMutation.onError
+    }
   };
 
   return (

@@ -1,6 +1,6 @@
 import { Header } from '@/components/header/Header';
 import { getAuthContext } from '@/features/auth/server/queries';
-import { WorkspaceLoadingSkeleton } from '@/features/workspaces/components/WorkspaceLoadingSkeleton';
+import { WorkspaceLoadingSkeleton } from '@/features/workspaces/components/skeletons/WorkspaceLoadingSkeleton';
 import dynamic from 'next/dynamic';
 
 const WorkspaceMain = dynamic(

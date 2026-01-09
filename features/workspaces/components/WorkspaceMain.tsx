@@ -1,9 +1,9 @@
 'use client';
 
 import { useGetWorkspace } from '../api/useGetWorkspace';
-import { WorkspaceLoadingSkeleton } from './WorkspaceLoadingSkeleton';
+import { WorkspaceLoadingSkeleton } from './skeletons/WorkspaceLoadingSkeleton';
 import { WorkspaceCreate } from './WorkspaceCreate';
-import { WorkspaceCard } from './WorkspaceCard';
+import { WorkspaceCard } from './cards/WorkspaceCard';
 
 export const WorkspaceMain = () => {
   const { data: workspaces, isLoading } = useGetWorkspace();

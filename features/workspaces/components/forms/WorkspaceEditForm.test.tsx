@@ -7,9 +7,10 @@ import {
 } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { WorkspaceEditForm } from './WorkspaceEditForm';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const mockMutateAsync = vi.fn();
-vi.mock('../api/useUpdateWorkspace', () => ({
+vi.mock('../../api/useUpdateWorkspace', () => ({
   useUpdateWorkspace: () => ({
     mutateAsync: mockMutateAsync,
   }),
@@ -54,7 +55,12 @@ describe('WorkspaceEditForm', () => {
   });
 
   it('renders with initial values', () => {
-    render(<WorkspaceEditForm workspace={mockWorkspace} />);
+    const queryClient = new QueryClient();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <WorkspaceEditForm workspace={mockWorkspace} />
+      </QueryClientProvider>
+    );
     expect(screen.getByLabelText(/workspace name/i)).toHaveValue(
       'Original Name'
     );
@@ -64,7 +70,12 @@ describe('WorkspaceEditForm', () => {
   });
 
   it('updates slug automatically when name changes', async () => {
-    render(<WorkspaceEditForm workspace={mockWorkspace} />);
+    const queryClient = new QueryClient();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <WorkspaceEditForm workspace={mockWorkspace} />
+      </QueryClientProvider>
+    );
     const nameInput = screen.getByLabelText(/workspace name/i);
     const slugInput = screen.getByLabelText(/workspace slug/i);
 
@@ -80,12 +91,15 @@ describe('WorkspaceEditForm', () => {
     const mockSuccess = vi.fn();
     const mockCloseModal = vi.fn();
 
+    const queryClient = new QueryClient();
     render(
-      <WorkspaceEditForm
-        workspace={mockWorkspace}
-        onSuccess={mockSuccess}
-        closeModal={mockCloseModal}
-      />
+      <QueryClientProvider client={queryClient}>
+        <WorkspaceEditForm
+          workspace={mockWorkspace}
+          onSuccess={mockSuccess}
+          closeModal={mockCloseModal}
+        />
+      </QueryClientProvider>
     );
 
     const nameInput = screen.getByLabelText(/workspace name/i);
@@ -111,13 +125,23 @@ describe('WorkspaceEditForm', () => {
   });
 
   it('disables submit button if not dirty', () => {
-    render(<WorkspaceEditForm workspace={mockWorkspace} />);
+    const queryClient = new QueryClient();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <WorkspaceEditForm workspace={mockWorkspace} />
+      </QueryClientProvider>
+    );
     const submitButton = screen.getByRole('button', { name: /save changes/i });
     expect(submitButton).toBeDisabled();
   });
 
   it('shows validation error for invalid slug', async () => {
-    render(<WorkspaceEditForm workspace={mockWorkspace} />);
+    const queryClient = new QueryClient();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <WorkspaceEditForm workspace={mockWorkspace} />
+      </QueryClientProvider>
+    );
     const slugInput = screen.getByLabelText(/workspace slug/i);
 
     await act(async () => {
@@ -134,7 +158,12 @@ describe('WorkspaceEditForm', () => {
 
   it('handles unexpected throwing error in onSubmit', async () => {
     mockMutateAsync.mockRejectedValue(new Error('Network Error'));
-    render(<WorkspaceEditForm workspace={mockWorkspace} />);
+    const queryClient = new QueryClient();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <WorkspaceEditForm workspace={mockWorkspace} />
+      </QueryClientProvider>
+    );
 
     await act(async () => {
       fireEvent.change(screen.getByLabelText(/workspace name/i), {

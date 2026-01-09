@@ -8,10 +8,11 @@ import {
 } from '@/components/ui/dialog';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { createWorkspaceSchema, ICreateWorkspace } from '../schema';
-import { useCreateWorkspace } from '../api/useCreateWorkspace';
+import { createWorkspaceSchema, ICreateWorkspace } from '../../schema';
+import { useCreateWorkspace } from '../../api/useCreateWorkspace';
 import { FormImageInput } from '@/components/form/FormImageInput';
-import { slugify } from '../utils';
+import { FormWrapper } from '@/components/form/FormWrapper';
+import { slugify } from '../../utils';
 import { FormTextarea } from '@/components/form/FormTextarea';
 
 export const WorkspaceCreateForm = ({

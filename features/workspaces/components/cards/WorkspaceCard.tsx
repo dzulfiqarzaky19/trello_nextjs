@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/card';
 import Link from 'next/link';
 import { WorkspaceListAction } from './WorkspaceListAction';
-import { workspaceSchema } from '../schema';
+import { workspaceSchema } from '../../schema';
 import { z } from 'zod';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';

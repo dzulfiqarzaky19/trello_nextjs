@@ -1,16 +1,10 @@
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { MoreVertical, Edit, Trash } from 'lucide-react';
+import { ActionDropdown } from '@/components/ActionDropdown';
 import { Button } from '@/components/ui/button';
-import { workspaceSchema } from '../schema';
+import { workspaceSchema } from '../../schema';
 import { z } from 'zod';
-import { useDeleteWorkspace } from '../api/useDeleteWorkspace';
+import { useDeleteWorkspace } from '../../api/useDeleteWorkspace';
 import { Modal } from '@/components/Modal';
-import { WorkspaceEditForm } from './WorkspaceEditForm';
+import { WorkspaceEditForm } from '../forms/WorkspaceEditForm';
 import { useState } from 'react';
 import { useMe } from '@/features/auth/api/useMe';
 
@@ -39,47 +33,11 @@ export const WorkspaceListAction = ({
 
   return (
     <>
-      <div className="absolute top-2 right-2 z-20">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-foreground bg-background/50 backdrop-blur-sm"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-            >
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-            <DropdownMenuItem
-              onSelect={(e) => {
-                e.preventDefault();
-                setIsEditOpen(true);
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Edit className="h-4 w-4 mr-2" />
-              Edit
-            </DropdownMenuItem>
-
-            <DropdownMenuItem
-              onSelect={(e) => {
-                e.preventDefault();
-                setIsDeleteOpen(true);
-              }}
-              onClick={(e) => e.stopPropagation()}
-              className="text-destructive focus:text-destructive"
-            >
-              <Trash className="h-4 w-4 mr-2" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      <ActionDropdown
+        onEdit={() => setIsEditOpen(true)}
+        onDelete={() => setIsDeleteOpen(true)}
+        disabled={isDeleting}
+      />
 
       <Modal open={isEditOpen} onOpenChange={setIsEditOpen} trigger={null}>
         <WorkspaceEditForm
