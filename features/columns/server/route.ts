@@ -101,17 +101,25 @@ const app = new Hono()
         const projectId = currentCol.project_id;
 
         if (newPos > oldPos) {
-          await supabase.rpc('decrement_column_positions', {
-            p_project_id: projectId,
-            p_start_pos: oldPos + 1,
-            p_end_pos: newPos,
-          });
+          const { error: rpcError } = await supabase.rpc(
+            'decrement_column_positions',
+            {
+              p_project_id: projectId,
+              p_start_pos: oldPos + 1,
+              p_end_pos: newPos,
+            }
+          );
+          if (rpcError) return c.json({ error: rpcError.message }, 500);
         } else {
-          await supabase.rpc('increment_column_positions', {
-            p_project_id: projectId,
-            p_start_pos: newPos,
-            p_end_pos: oldPos - 1,
-          });
+          const { error: rpcError } = await supabase.rpc(
+            'increment_column_positions',
+            {
+              p_project_id: projectId,
+              p_start_pos: newPos,
+              p_end_pos: oldPos - 1,
+            }
+          );
+          if (rpcError) return c.json({ error: rpcError.message }, 500);
         }
         updates.position = newPos;
       }

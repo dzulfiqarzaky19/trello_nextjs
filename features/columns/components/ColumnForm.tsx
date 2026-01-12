@@ -79,12 +79,6 @@ export const ColumnForm = ({ closeModal }: ModalColumnFormProps) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <DialogHeader>
-        <DialogTitle className="text-xl font-bold">
-          Create New Column
-        </DialogTitle>
-      </DialogHeader>
-
       <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="title" className="font-semibold">

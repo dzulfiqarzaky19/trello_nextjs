@@ -59,6 +59,12 @@ export const useUpdateColumn = () => {
               newColumns.length
             );
             newColumns.splice(insertIndex, 0, movedColumn);
+
+            // Important: Update position properties for ALL columns to reflect new order
+            // because useProjectBoard sorts by position!
+            newColumns.forEach((col: any, index: number) => {
+              col.position = index + 1;
+            });
           }
         }
 

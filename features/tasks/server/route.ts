@@ -84,29 +84,45 @@ const app = new Hono()
         if (oldColumnId === newColumnId) {
           if (oldPosition !== newPosition) {
             if (newPosition > oldPosition) {
-              await supabase.rpc('decrement_task_positions', {
-                p_column_id: oldColumnId,
-                p_start_pos: oldPosition + 1,
-                p_end_pos: newPosition,
-              });
+              const { error: rpcError } = await supabase.rpc(
+                'decrement_task_positions',
+                {
+                  p_column_id: oldColumnId,
+                  p_start_pos: oldPosition + 1,
+                  p_end_pos: newPosition,
+                }
+              );
+              if (rpcError) return c.json({ error: rpcError.message }, 500);
             } else {
-              await supabase.rpc('increment_task_positions', {
-                p_column_id: oldColumnId,
-                p_start_pos: newPosition,
-                p_end_pos: oldPosition - 1,
-              });
+              const { error: rpcError } = await supabase.rpc(
+                'increment_task_positions',
+                {
+                  p_column_id: oldColumnId,
+                  p_start_pos: newPosition,
+                  p_end_pos: oldPosition - 1,
+                }
+              );
+              if (rpcError) return c.json({ error: rpcError.message }, 500);
             }
           }
         } else {
-          await supabase.rpc('decrement_task_positions_from', {
-            p_column_id: oldColumnId,
-            p_start_pos: oldPosition + 1,
-          });
+          const { error: rpcError1 } = await supabase.rpc(
+            'decrement_task_positions_from',
+            {
+              p_column_id: oldColumnId,
+              p_start_pos: oldPosition + 1,
+            }
+          );
+          if (rpcError1) return c.json({ error: rpcError1.message }, 500);
 
-          await supabase.rpc('increment_task_positions_from', {
-            p_column_id: newColumnId,
-            p_start_pos: newPosition,
-          });
+          const { error: rpcError2 } = await supabase.rpc(
+            'increment_task_positions_from',
+            {
+              p_column_id: newColumnId,
+              p_start_pos: newPosition,
+            }
+          );
+          if (rpcError2) return c.json({ error: rpcError2.message }, 500);
         }
 
         updates.column_id = newColumnId;
@@ -118,10 +134,14 @@ const app = new Hono()
           .eq('column_id', columnId);
         const newPos = (count || 0) + 1;
 
-        await supabase.rpc('decrement_task_positions_from', {
-          p_column_id: currentTask.column_id,
-          p_start_pos: currentTask.position + 1,
-        });
+        const { error: rpcError } = await supabase.rpc(
+          'decrement_task_positions_from',
+          {
+            p_column_id: currentTask.column_id,
+            p_start_pos: currentTask.position + 1,
+          }
+        );
+        if (rpcError) return c.json({ error: rpcError.message }, 500);
 
         updates.column_id = columnId;
         updates.position = newPos;

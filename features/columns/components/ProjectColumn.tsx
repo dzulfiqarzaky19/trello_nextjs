@@ -15,12 +15,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { Ellipsis, Plus } from 'lucide-react';
-import { Modal } from '@/components/Modal';
 import { TaskForm } from '../../tasks/components/TaskForm';
 import { ProjectTask } from '../../tasks/components/ProjectTask';
 import { Column } from '../../projects/types';
 import { useDeleteColumn } from '@/features/columns/api/useDeleteColumn';
-import { useUpdateColumn } from '@/features/columns/api/useUpdateColumn';
+import { useGlobalModal } from '@/components/providers/ModalProvider';
+import { RenameColumnForm } from '../../columns/components/RenameColumnForm';
 
 interface ProjectColumnProps {
   column: Column;
@@ -29,26 +29,50 @@ interface ProjectColumnProps {
 
 export const ProjectColumn = ({ column, index }: ProjectColumnProps) => {
   const { mutate: deleteColumn } = useDeleteColumn();
-  const { mutate: updateColumn } = useUpdateColumn();
+  const { openModal, closeWithBack } = useGlobalModal();
 
   const handleDeleteColumn = (columnId: string) => {
-    if (
-      confirm(
-        'Are you sure you want to delete this list? All tasks in it will be deleted.'
-      )
-    ) {
-      deleteColumn({ param: { columnId } });
-    }
+    openModal('delete-column', {
+      title: 'Delete List',
+      description:
+        'Are you sure you want to delete this list? All tasks in it will be deleted.',
+      children: null,
+      config: {
+        showFooter: true,
+        confirmLabel: 'Delete',
+        confirmVariant: 'destructive',
+        onConfirm: () => {
+          deleteColumn(
+            { param: { columnId } },
+            {
+              onSuccess: () => closeWithBack(),
+            }
+          );
+        },
+      },
+    });
   };
 
   const handleRenameColumn = (columnId: string, currentName: string) => {
-    const newName = prompt('Enter new list name:', currentName);
-    if (newName && newName !== currentName) {
-      updateColumn({
-        param: { columnId },
-        json: { title: newName },
-      });
-    }
+    openModal('rename-column', {
+      title: 'Rename List',
+      children: (
+        <RenameColumnForm columnId={columnId} currentTitle={currentName} />
+      ),
+    });
+  };
+
+  const handleAddTask = () => {
+    openModal('add-task', {
+      title: 'Create Task',
+      children: (
+        <TaskForm
+          listTitle={column.name}
+          columnId={column.id}
+          closeModal={closeWithBack}
+        />
+      ),
+    });
   };
 
   return (
@@ -122,28 +146,14 @@ export const ProjectColumn = ({ column, index }: ProjectColumnProps) => {
             </Droppable>
 
             <CardFooter className="p-2">
-              <Modal
-                trigger={
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800"
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Task
-                  </Button>
-                }
-                modalClass="sm:max-w-2xl"
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800"
+                onClick={handleAddTask}
               >
-                <TaskForm
-                  listTitle={column.name}
-                  columnId={column.id}
-                  closeModal={() => {
-                    document.dispatchEvent(
-                      new KeyboardEvent('keydown', { key: 'Escape' })
-                    );
-                  }}
-                />
-              </Modal>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Task
+              </Button>
             </CardFooter>
           </Card>
         </div>

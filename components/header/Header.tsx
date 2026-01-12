@@ -7,7 +7,6 @@ interface IHeaderProps {
   isProjectsPage?: boolean;
   isTeamPage?: boolean;
   isCalendarPage?: boolean;
-  boardId?: string;
 }
 
 export const Header = ({
@@ -16,7 +15,6 @@ export const Header = ({
   isProjectsPage,
   isTeamPage,
   isCalendarPage,
-  boardId,
 }: IHeaderProps) => {
   return (
     <header>

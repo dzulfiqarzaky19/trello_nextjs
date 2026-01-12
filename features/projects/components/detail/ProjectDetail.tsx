@@ -1,14 +1,15 @@
 'use client';
-import { Modal } from '@/components/Modal';
 import { Button } from '@/components/ui/button';
 import { Plus, Loader2 } from 'lucide-react';
 import { ProjectColumn } from '../../../columns/components/ProjectColumn';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import { useProjectBoard } from '../../hooks/useProjectBoard';
 import { ColumnForm } from '@/features/columns/components/ColumnForm';
+import { useGlobalModal } from '@/components/providers/ModalProvider';
 
 export const ProjectDetail = () => {
   const { orderedData, isLoading, error, onDragEnd } = useProjectBoard();
+  const { openModal, closeWithBack } = useGlobalModal();
 
   if (isLoading) {
     return (
@@ -42,19 +43,19 @@ export const ProjectDetail = () => {
             {provided.placeholder}
 
             <div className="min-w-[300px]">
-              <Modal
-                trigger={
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start bg-white/50 hover:bg-white/80 dark:bg-black/20 dark:hover:bg-black/40 h-12"
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add List
-                  </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start bg-white/50 hover:bg-white/80 dark:bg-black/20 dark:hover:bg-black/40 h-12"
+                onClick={() =>
+                  openModal('create-column', {
+                    title: 'Create New Column',
+                    children: <ColumnForm closeModal={closeWithBack} />,
+                  })
                 }
               >
-                <ColumnForm />
-              </Modal>
+                <Plus className="mr-2 h-4 w-4" />
+                Add List
+              </Button>
             </div>
           </main>
         )}

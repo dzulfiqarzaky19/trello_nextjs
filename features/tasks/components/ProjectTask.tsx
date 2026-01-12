@@ -1,8 +1,8 @@
 import { Draggable } from '@hello-pangea/dnd';
-import { Modal } from '@/components/Modal';
 import { CardDemo } from '@/components/Card';
-import { ModalTaskForm } from './TaskForm';
+import { TaskForm } from './TaskForm';
 import { Task } from '@/features/tasks/types';
+import { useGlobalModal } from '@/components/providers/ModalProvider';
 
 interface ProjectTaskProps {
   task: Task;
@@ -11,6 +11,21 @@ interface ProjectTaskProps {
 }
 
 export const ProjectTask = ({ task, index, columnName }: ProjectTaskProps) => {
+  const { openModal, closeWithBack } = useGlobalModal();
+
+  const handleOpenTask = () => {
+    openModal('view-task', {
+      title: 'Edit Task',
+      children: (
+        <TaskForm
+          card={task}
+          listTitle={columnName}
+          closeModal={closeWithBack}
+        />
+      ),
+    });
+  };
+
   return (
     <Draggable draggableId={task.id} index={index}>
       {(provided) => (
@@ -19,26 +34,9 @@ export const ProjectTask = ({ task, index, columnName }: ProjectTaskProps) => {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
         >
-          <Modal
-            trigger={
-              <div className="cursor-pointer">
-                <CardDemo title={task.title} description={task.description} />
-              </div>
-            }
-            modalClass="sm:max-w-2xl"
-          >
-            <ModalTaskForm
-              card={task as any}
-              listTitle={columnName}
-              closeModal={() => {
-                document.dispatchEvent(
-                  new KeyboardEvent('keydown', {
-                    key: 'Escape',
-                  })
-                );
-              }}
-            />
-          </Modal>
+          <div className="cursor-pointer" onClick={handleOpenTask}>
+            <CardDemo title={task.title} description={task.description} />
+          </div>
         </div>
       )}
     </Draggable>

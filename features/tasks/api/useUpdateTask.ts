@@ -79,6 +79,18 @@ export const useUpdateTask = () => {
                 destColumn.tasks.length
               );
               destColumn.tasks.splice(insertIndex, 0, movedTask);
+
+              // Update positions for tasks in destination column
+              destColumn.tasks.forEach((t: any, idx: number) => {
+                t.position = idx + 1;
+              });
+
+              // Optional: Update positions in source column if needed (usually less critical for sorting if empty, but good practice)
+              if (sourceColumn && sourceColumn !== destColumn) {
+                sourceColumn.tasks.forEach((t: any, idx: number) => {
+                  t.position = idx + 1;
+                });
+              }
             }
           }
         }

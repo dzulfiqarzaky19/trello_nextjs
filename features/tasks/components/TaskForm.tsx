@@ -17,6 +17,7 @@ import { useUpdateTask } from '@/features/tasks/api/useUpdateTask';
 import { useDeleteTask } from '@/features/tasks/api/useDeleteTask';
 import { useCreateTask } from '@/features/tasks/api/useCreateTask';
 import { useProjectId } from '../../projects/hooks/useProjectId';
+import { useGlobalModal } from '@/components/providers/ModalProvider';
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -32,7 +33,7 @@ interface ModalFormProps {
   closeModal?: () => void;
 }
 
-export const ModalTaskForm = ({
+export const TaskForm = ({
   card,
   listTitle,
   columnId,
@@ -40,6 +41,7 @@ export const ModalTaskForm = ({
 }: ModalFormProps) => {
   const isEditing = !!card;
   const projectId = useProjectId();
+  const { openModal, closeWithBack } = useGlobalModal();
 
   const { mutate: updateTask, isPending: isUpdating } = useUpdateTask();
   const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask();
@@ -90,16 +92,26 @@ export const ModalTaskForm = ({
 
   const onDelete = () => {
     if (card) {
-      if (confirm('Are you sure you want to delete this task?')) {
-        deleteTask(
-          {
-            param: { taskId: card.id },
+      openModal('delete-task', {
+        title: 'Delete Task',
+        description: 'Are you sure you want to delete this task?',
+        children: null,
+        config: {
+          showFooter: true,
+          confirmLabel: 'Delete',
+          confirmVariant: 'destructive',
+          onConfirm: () => {
+            deleteTask(
+              {
+                param: { taskId: card.id },
+              },
+              {
+                onSuccess: () => closeWithBack(),
+              }
+            );
           },
-          {
-            onSuccess: () => closeModal?.(),
-          }
-        );
-      }
+        },
+      });
     }
   };
 
@@ -117,6 +129,7 @@ export const ModalTaskForm = ({
                   {...register('title')}
                   placeholder="Task Title"
                   className="font-semibold text-xl border-none shadow-none focus-visible:ring-0 px-0 h-auto p-0 bg-transparent placeholder:text-muted-foreground/50"
+                  disabled={isLoading}
                 />
               </DialogTitle>
               {errors.title && (
@@ -138,6 +151,7 @@ export const ModalTaskForm = ({
               {...register('description')}
               placeholder="Add a more detailed description..."
               className="min-h-[150px] resize-none"
+              disabled={isLoading}
             />
           </div>
         </div>
