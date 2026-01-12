@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { ProjectCreate } from './dashboard/ProjectCreate';
 import { ProjectCard } from './dashboard/ProjectCard';
@@ -9,13 +9,17 @@ import { Project } from '@/features/projects/types';
 import { useGetProjects } from '@/features/projects/api/useGetProjects';
 
 export const ProjectsGrid = () => {
-  const { data: workspaceData, isLoading: isLoadingWorkspace, error: workspaceError } = useGetWorkspace();
+  const {
+    data: workspaceData,
+    isLoading: isLoadingWorkspace,
+    error: workspaceError,
+  } = useGetWorkspace();
   const workspace = workspaceData?.data;
 
   const {
     data: projects,
     isLoading: isLoadingProjects,
-    error: projectsError
+    error: projectsError,
   } = useGetProjects();
 
   if (isLoadingWorkspace || (workspace?.id && isLoadingProjects)) {

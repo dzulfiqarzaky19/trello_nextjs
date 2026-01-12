@@ -7,7 +7,6 @@ export interface Task {
   position: number;
   created_at: string | null;
   updated_at: string | null;
-  // Relations not in core schema but used in UI (mocked/optional for now)
   card_members?: any[];
   card_labels?: any[];
   checklists?: any[];
@@ -17,4 +16,4 @@ export interface Task {
   priority?: 'low' | 'medium' | 'high' | null;
 }
 
-export type Card = Task; // Alias for backward compatibility
+export type Card = Task;

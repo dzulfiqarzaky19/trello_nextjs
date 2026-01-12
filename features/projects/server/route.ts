@@ -32,9 +32,6 @@ const app = new Hono()
             .single();
 
           if (!workspace) {
-            // If checking a specific workspace and it's not found, return empty or error.
-            // Returning empty list similar to "not a member" case for now or could be 404.
-            // But since this is a filter, empty seems appropriate if filtered by invalid workspace.
             return c.json({ data: [] });
           }
           workspaceUuid = workspace.id;

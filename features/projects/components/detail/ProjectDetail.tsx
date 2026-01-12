@@ -41,8 +41,16 @@ export const ProjectDetail = () => {
   const params = useParams();
   const projectId = params.projectId as string;
 
-  const { data: projectMetadata, isLoading: isLoadingMetadata, error: errorMetadata } = useGetProject({ projectId });
-  const { data: rawColumns, isLoading: isLoadingColumns, error: errorColumns } = useGetColumns({ projectId });
+  const {
+    data: projectMetadata,
+    isLoading: isLoadingMetadata,
+    error: errorMetadata,
+  } = useGetProject({ projectId });
+  const {
+    data: rawColumns,
+    isLoading: isLoadingColumns,
+    error: errorColumns,
+  } = useGetColumns({ projectId });
 
   const [orderedData, setOrderedData] = useState<Column[]>([]);
 
@@ -178,7 +186,8 @@ export const ProjectDetail = () => {
   if (errorMetadata || errorColumns) {
     return (
       <div className="p-8 text-center text-red-500">
-        Error loading project: {errorMetadata?.message || errorColumns?.message || 'Project not found'}
+        Error loading project:{' '}
+        {errorMetadata?.message || errorColumns?.message || 'Project not found'}
       </div>
     );
   }

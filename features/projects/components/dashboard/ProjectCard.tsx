@@ -29,12 +29,13 @@ export const ProjectCard = ({ project }: ProjectCardProps) => (
         </CardTitle>
         <div className="mt-2 flex items-center gap-2">
           <div
-            className={`px-2 py-0.5 rounded-full text-xs font-semibold text-white/90 ${project.status === 'ACTIVE'
-              ? 'bg-green-500/80'
-              : project.status === 'COMPLETED'
-                ? 'bg-blue-500/80'
-                : 'bg-gray-500/80'
-              }`}
+            className={`px-2 py-0.5 rounded-full text-xs font-semibold text-white/90 ${
+              project.status === 'ACTIVE'
+                ? 'bg-green-500/80'
+                : project.status === 'COMPLETED'
+                  ? 'bg-blue-500/80'
+                  : 'bg-gray-500/80'
+            }`}
           >
             {project.status || 'ACTIVE'}
           </div>

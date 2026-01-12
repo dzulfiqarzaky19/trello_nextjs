@@ -62,7 +62,6 @@ export const ProjectEditForm = ({
         error={errors.name?.message}
       />
 
-
       <FormImageInput label="Project Image" control={control} name="image" />
 
       <FormSelect
