@@ -3,7 +3,6 @@
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Loader2 } from 'lucide-react';
 import { MembersListSkeleton } from './MembersListSkeleton';
 import { AddMemberDialog } from './AddMemberDialog';
 import { MemberActions } from './MemberActions';
