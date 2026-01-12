@@ -13,7 +13,10 @@ export const projectSchema = z.object({
 
 export const workspaceDetailSchema = workspaceSchema.extend({
   projects: z.array(projectSchema),
+  isAdmin: z.boolean(),
+  currentUserId: z.string(),
 });
 
 export type IProject = z.infer<typeof projectSchema>;
 export type IWorkspaceDetail = z.infer<typeof workspaceDetailSchema>;
+

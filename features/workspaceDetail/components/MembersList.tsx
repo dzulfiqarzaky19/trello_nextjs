@@ -1,39 +1,18 @@
 'use client';
 
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { IWorkspaceDetail } from '../schema';
 import { Badge } from '@/components/ui/badge';
-import { Plus } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { UserSearchInput } from '@/features/users/components/UserSearchInput';
-import { IUserSearchResult } from '@/features/users/schema';
-import { useAddMember } from '../api/useAddMember';
+import { AddMemberDialog } from './AddMemberDialog';
+import { MemberActions } from './MemberActions';
 
 interface MembersListProps {
   workspace: IWorkspaceDetail;
 }
 
 export const MembersList = ({ workspace }: MembersListProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const addMember = useAddMember();
-
   const existingMemberIds = workspace.members.map((m) => m.user_id);
-
-  const handleSelectUser = (user: IUserSearchResult) => {
-    addMember.mutate(
-      { workspaceId: workspace.id, userId: user.id },
-      { onSuccess: () => setIsOpen(false) }
-    );
-  };
 
   return (
     <div className="flex flex-col gap-y-4">
@@ -45,29 +24,12 @@ export const MembersList = ({ workspace }: MembersListProps) => {
           </p>
         </div>
 
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Member
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add Member</DialogTitle>
-              <DialogDescription>
-                Search for a user by email or name to add them to this workspace.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="py-4">
-              <UserSearchInput
-                onSelect={handleSelectUser}
-                excludeIds={existingMemberIds}
-                placeholder="Search by email or name..."
-              />
-            </div>
-          </DialogContent>
-        </Dialog>
+        {workspace.isAdmin && (
+          <AddMemberDialog
+            workspaceId={workspace.id}
+            existingMemberIds={existingMemberIds}
+          />
+        )}
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700">
@@ -88,7 +50,7 @@ export const MembersList = ({ workspace }: MembersListProps) => {
                   <p className="text-sm font-medium">
                     {member.profiles?.full_name || 'Unknown Member'}
                   </p>
-                  {workspace.user?.id === member.user_id && (
+                  {workspace.currentUserId === member.user_id && (
                     <span className="text-xs text-muted-foreground">(You)</span>
                   )}
                 </div>
@@ -109,6 +71,14 @@ export const MembersList = ({ workspace }: MembersListProps) => {
                 >
                   MEMBER
                 </Badge>
+              )}
+              {workspace.isAdmin && workspace.currentUserId !== member.user_id && (
+                <MemberActions
+                  workspaceId={workspace.id}
+                  userId={member.user_id}
+                  memberName={member.profiles?.full_name || 'this member'}
+                  currentRole={member.role}
+                />
               )}
             </div>
           </div>

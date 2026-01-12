@@ -9,7 +9,7 @@ type ResponseType = InferResponseType<
 
 export const useWorkspaceDetail = (workspaceId: string) => {
   const query = useQuery<ResponseType, Error>({
-    queryKey: ['workspace', workspaceId],
+    queryKey: ['workspaceDetail', workspaceId],
     queryFn: async () => {
       const response = await client.api.workspaces[':workspaceId'].$get({
         param: { workspaceId },

@@ -18,18 +18,20 @@ export const ProjectsGrid = ({ workspace }: ProjectsGridProps) => {
     <div className="flex flex-col gap-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold">Workspace Projects</h2>
-        <div className="flex items-center gap-x-2">
-          <Modal
-            trigger={
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                New Project
-              </Button>
-            }
-          >
-            <CreateBoardForm workspaceId={workspace.id} />
-          </Modal>
-        </div>
+        {workspace.isAdmin && (
+          <div className="flex items-center gap-x-2">
+            <Modal
+              trigger={
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Project
+                </Button>
+              }
+            >
+              <CreateBoardForm workspaceId={workspace.id} />
+            </Modal>
+          </div>
+        )}
       </div>
 
       <BoardList boards={projects} workspaceId={workspace.id} />
