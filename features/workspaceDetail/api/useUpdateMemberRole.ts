@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 
 interface UpdateMemberRoleParams {
     workspaceId: string;
+    workspaceSlug: string;
     userId: string;
     role: 'ADMIN' | 'MEMBER';
 }
@@ -25,12 +26,13 @@ export const useUpdateMemberRole = () => {
 
             return response.json();
         },
-        onSuccess: (_, { workspaceId, role }) => {
+        onSuccess: (_, { workspaceSlug, role }) => {
             toast.success(`Member ${role === 'ADMIN' ? 'promoted to admin' : 'demoted to member'}`);
-            queryClient.invalidateQueries({ queryKey: ['workspaceDetail', workspaceId] });
+            queryClient.invalidateQueries({ queryKey: ['workspaceDetail', workspaceSlug] });
         },
         onError: (error: Error) => {
             toast.error(error.message);
         },
     });
 };
+

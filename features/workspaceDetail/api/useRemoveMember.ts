@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 
 interface RemoveMemberParams {
     workspaceId: string;
+    workspaceSlug: string;
     userId: string;
 }
 
@@ -23,12 +24,13 @@ export const useRemoveMember = () => {
 
             return response.json();
         },
-        onSuccess: (_, { workspaceId }) => {
+        onSuccess: (_, { workspaceSlug }) => {
             toast.success('Member removed from workspace');
-            queryClient.invalidateQueries({ queryKey: ['workspaceDetail', workspaceId] });
+            queryClient.invalidateQueries({ queryKey: ['workspaceDetail', workspaceSlug] });
         },
         onError: (error: Error) => {
             toast.error(error.message);
         },
     });
 };
+

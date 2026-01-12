@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 
 interface AddMemberParams {
     workspaceId: string;
+    workspaceSlug: string;
     userId: string;
     role?: 'ADMIN' | 'MEMBER';
 }
@@ -25,9 +26,9 @@ export const useAddMember = () => {
 
             return response.json();
         },
-        onSuccess: (_, { workspaceId }) => {
+        onSuccess: (_, { workspaceSlug }) => {
             toast.success('Member added successfully');
-            queryClient.invalidateQueries({ queryKey: ['workspaceDetail', workspaceId] });
+            queryClient.invalidateQueries({ queryKey: ['workspaceDetail', workspaceSlug] });
         },
         onError: (error: Error) => {
             toast.error(error.message);

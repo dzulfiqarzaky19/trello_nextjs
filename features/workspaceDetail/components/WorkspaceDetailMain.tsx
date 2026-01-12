@@ -57,7 +57,7 @@ export const WorkspaceDetailMain = () => {
         </TabsContent>
 
         <TabsContent value="members">
-          <MembersList workspace={workspace} />
+          <MembersList workspace={workspace} workspaceSlug={workspaceId} />
         </TabsContent>
 
         <TabsContent value="projects">

@@ -19,11 +19,13 @@ import { Plus } from 'lucide-react';
 
 interface AddMemberDialogProps {
     workspaceId: string;
+    workspaceSlug: string;
     existingMemberIds: string[];
 }
 
 export const AddMemberDialog = ({
     workspaceId,
+    workspaceSlug,
     existingMemberIds,
 }: AddMemberDialogProps) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -37,7 +39,7 @@ export const AddMemberDialog = ({
     const handleConfirmAdd = () => {
         if (!selectedUser) return;
         addMember.mutate(
-            { workspaceId, userId: selectedUser.id },
+            { workspaceId, workspaceSlug, userId: selectedUser.id },
             {
                 onSuccess: () => {
                     setIsOpen(false);

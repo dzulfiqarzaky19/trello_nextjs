@@ -25,6 +25,7 @@ import { useRemoveMember } from '../api/useRemoveMember';
 
 interface MemberActionsProps {
     workspaceId: string;
+    workspaceSlug: string;
     userId: string;
     memberName: string;
     currentRole: 'ADMIN' | 'MEMBER';
@@ -34,6 +35,7 @@ type ActionType = 'promote' | 'demote' | 'remove' | null;
 
 export const MemberActions = ({
     workspaceId,
+    workspaceSlug,
     userId,
     memberName,
     currentRole,
@@ -45,13 +47,13 @@ export const MemberActions = ({
     const handleConfirm = () => {
         switch (confirmAction) {
             case 'promote':
-                updateRole.mutate({ workspaceId, userId, role: 'ADMIN' });
+                updateRole.mutate({ workspaceId, workspaceSlug, userId, role: 'ADMIN' });
                 break;
             case 'demote':
-                updateRole.mutate({ workspaceId, userId, role: 'MEMBER' });
+                updateRole.mutate({ workspaceId, workspaceSlug, userId, role: 'MEMBER' });
                 break;
             case 'remove':
-                removeMember.mutate({ workspaceId, userId });
+                removeMember.mutate({ workspaceId, workspaceSlug, userId });
                 break;
         }
         setConfirmAction(null);

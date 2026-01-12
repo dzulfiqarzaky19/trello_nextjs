@@ -9,9 +9,10 @@ import { MemberActions } from './MemberActions';
 
 interface MembersListProps {
   workspace: IWorkspaceDetail;
+  workspaceSlug: string;
 }
 
-export const MembersList = ({ workspace }: MembersListProps) => {
+export const MembersList = ({ workspace, workspaceSlug }: MembersListProps) => {
   const existingMemberIds = workspace.members.map((m) => m.user_id);
 
   return (
@@ -27,6 +28,7 @@ export const MembersList = ({ workspace }: MembersListProps) => {
         {workspace.isAdmin && (
           <AddMemberDialog
             workspaceId={workspace.id}
+            workspaceSlug={workspaceSlug}
             existingMemberIds={existingMemberIds}
           />
         )}
@@ -75,6 +77,7 @@ export const MembersList = ({ workspace }: MembersListProps) => {
               {workspace.isAdmin && workspace.currentUserId !== member.user_id && (
                 <MemberActions
                   workspaceId={workspace.id}
+                  workspaceSlug={workspaceSlug}
                   userId={member.user_id}
                   memberName={member.profiles?.full_name || 'this member'}
                   currentRole={member.role}
