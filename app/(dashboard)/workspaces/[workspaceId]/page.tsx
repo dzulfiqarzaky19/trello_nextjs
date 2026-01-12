@@ -1,6 +1,6 @@
 'use client';
 
-import { WorkspaceDetailMain } from '@/features/workspaces/components/WorkspaceDetailMain';
+import { WorkspaceDetailMain } from '@/features/workspaces';
 
 const WorkspaceIdPage = () => {
   return (

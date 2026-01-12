@@ -6,7 +6,7 @@ import { useMemo } from 'react';
 import { useGetWorkspace } from '../../api/useGetWorkspace';
 
 export const OverviewStats = () => {
-  const { data, isLoading } = useGetWorkspace();
+  const { data } = useGetWorkspace();
 
   const stats = useMemo(() => {
     if (!data?.data) return [];
@@ -40,14 +40,6 @@ export const OverviewStats = () => {
       },
     ];
   }, [data]);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[100px]">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-      </div>
-    );
-  }
 
   return (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6 w-full">

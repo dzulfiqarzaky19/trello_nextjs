@@ -6,17 +6,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 import { Copy, Loader2 } from 'lucide-react';
 import { OverviewStats } from './OverviewStats';
+import { OverviewSkeleton } from './OverviewSkeleton';
 import { useGetWorkspace } from '../../api/useGetWorkspace';
 
 export const Overview = () => {
   const { data, isLoading, error } = useGetWorkspace();
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[200px]">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-      </div>
-    );
+    return <OverviewSkeleton />;
   }
 
   if (error || !data) {
