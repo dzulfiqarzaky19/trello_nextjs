@@ -14,7 +14,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCreateColumn } from '@/features/columns/api/useCreateColumn';
 import { useForm } from 'react-hook-form';
-import { useProjectId } from '../../hooks/useProjectId';
+import { useProjectId } from '@/features/projects/hooks/useProjectId';
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -37,7 +37,7 @@ interface ModalColumnFormProps {
   closeModal?: () => void;
 }
 
-export const ModalColumnForm = ({ closeModal }: ModalColumnFormProps) => {
+export const ColumnForm = ({ closeModal }: ModalColumnFormProps) => {
   const projectId = useProjectId();
 
   const { mutate, isPending } = useCreateColumn();

@@ -16,9 +16,9 @@ import {
 import { cn } from '@/lib/utils';
 import { Ellipsis, Plus } from 'lucide-react';
 import { Modal } from '@/components/Modal';
-import { ModalForm } from './ModalForm';
-import { ProjectTask } from './ProjectTask';
-import { Column } from '../../types';
+import { TaskForm } from '../../tasks/components/TaskForm';
+import { ProjectTask } from '../../tasks/components/ProjectTask';
+import { Column } from '../../projects/types';
 import { useDeleteColumn } from '@/features/columns/api/useDeleteColumn';
 import { useUpdateColumn } from '@/features/columns/api/useUpdateColumn';
 
@@ -134,7 +134,7 @@ export const ProjectColumn = ({ column, index }: ProjectColumnProps) => {
                 }
                 modalClass="sm:max-w-2xl"
               >
-                <ModalForm
+                <TaskForm
                   listTitle={column.name}
                   columnId={column.id}
                   closeModal={() => {

@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card as CardType } from '../../types';
+import { Card as CardType } from '../../projects/types';
 import { AlignLeft, Laptop, Trash2, Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -16,7 +16,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useUpdateTask } from '@/features/tasks/api/useUpdateTask';
 import { useDeleteTask } from '@/features/tasks/api/useDeleteTask';
 import { useCreateTask } from '@/features/tasks/api/useCreateTask';
-import { useProjectId } from '../../hooks/useProjectId';
+import { useProjectId } from '../../projects/hooks/useProjectId';
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -32,7 +32,7 @@ interface ModalFormProps {
   closeModal?: () => void;
 }
 
-export const ModalForm = ({
+export const ModalTaskForm = ({
   card,
   listTitle,
   columnId,

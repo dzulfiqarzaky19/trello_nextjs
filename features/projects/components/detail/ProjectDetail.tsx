@@ -2,10 +2,10 @@
 import { Modal } from '@/components/Modal';
 import { Button } from '@/components/ui/button';
 import { Plus, Loader2 } from 'lucide-react';
-import { ModalColumnForm } from './ModalColumnForm';
-import { ProjectColumn } from './ProjectColumn';
+import { ProjectColumn } from '../../../columns/components/ProjectColumn';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import { useProjectBoard } from '../../hooks/useProjectBoard';
+import { ColumnForm } from '@/features/columns/components/ColumnForm';
 
 export const ProjectDetail = () => {
   const { orderedData, isLoading, error, onDragEnd } = useProjectBoard();
@@ -53,7 +53,7 @@ export const ProjectDetail = () => {
                   </Button>
                 }
               >
-                <ModalColumnForm />
+                <ColumnForm />
               </Modal>
             </div>
           </main>

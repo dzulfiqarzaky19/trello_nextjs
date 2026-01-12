@@ -26,7 +26,6 @@ export const Header = ({
         isProjectsPage={isProjectsPage}
         isTeamPage={isTeamPage}
         isCalendarPage={isCalendarPage}
-        boardId={boardId}
       />
     </header>
   );

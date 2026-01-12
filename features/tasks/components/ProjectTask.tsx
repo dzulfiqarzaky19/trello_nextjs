@@ -1,7 +1,7 @@
 import { Draggable } from '@hello-pangea/dnd';
 import { Modal } from '@/components/Modal';
 import { CardDemo } from '@/components/Card';
-import { ModalForm } from './ModalForm';
+import { ModalTaskForm } from './TaskForm';
 import { Task } from '@/features/tasks/types';
 
 interface ProjectTaskProps {
@@ -27,7 +27,7 @@ export const ProjectTask = ({ task, index, columnName }: ProjectTaskProps) => {
             }
             modalClass="sm:max-w-2xl"
           >
-            <ModalForm
+            <ModalTaskForm
               card={task as any}
               listTitle={columnName}
               closeModal={() => {

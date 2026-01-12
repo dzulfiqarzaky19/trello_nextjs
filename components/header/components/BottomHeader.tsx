@@ -1,6 +1,5 @@
 import { Modal } from '@/components/Modal';
 import { Button } from '@/components/ui/button';
-import { ModalColumnForm } from '@/features/projects/components/detail/ModalColumnForm';
 import {
   ChevronLeft,
   ChevronRight,
@@ -20,7 +19,6 @@ export const BottomHeader = ({
   isProjectsPage,
   isTeamPage,
   isCalendarPage,
-  boardId,
 }: {
   isProjectsPage?: boolean;
   isTeamPage?: boolean;
@@ -45,7 +43,7 @@ export const BottomHeader = ({
           </Button>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <Modal
             trigger={
               <Button variant="default" className="cursor-pointer">
@@ -55,8 +53,7 @@ export const BottomHeader = ({
             modalClass="sm:max-w-xl"
           >
             {boardId && (
-              <ModalColumnForm
-                projectId={boardId}
+              <ColumnForm
                 closeModal={() => {
                   document.dispatchEvent(
                     new KeyboardEvent('keydown', { key: 'Escape' })
@@ -65,7 +62,7 @@ export const BottomHeader = ({
               />
             )}
           </Modal>
-        </div>
+        </div> */}
       </div>
     );
   }
