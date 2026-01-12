@@ -2,9 +2,8 @@ import { AuthProvider } from '@/context/AuthContext';
 import { createSupabaseServer } from '@/lib/supabase/server';
 import React from 'react';
 
-
 interface IAuthProviderWrapper {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 export const AuthProviderWrapper = async ({
   children,

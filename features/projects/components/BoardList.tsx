@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
@@ -31,7 +30,6 @@ export const BoardList = ({ boards, workspaceId }: BoardListProps) => {
               </CardHeader>
               <CardContent className="relative z-10">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-
                   <span className="text-xs px-2 py-1 rounded bg-secondary">
                     {board.status}
                   </span>

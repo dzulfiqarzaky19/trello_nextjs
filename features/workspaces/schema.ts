@@ -75,4 +75,3 @@ export type IUpdateWorkspace = z.infer<typeof updateWorkspaceSchema>;
 export type IGetWorkspace = z.infer<typeof workspacesListSchema>;
 export type IWorkspace = z.infer<typeof workspaceSchema>;
 export type IProject = z.infer<typeof projectSchema>;
-

@@ -67,7 +67,9 @@ const app = new Hono()
         return c.json({ error: 'Workspace not found' }, 404);
       }
 
-      const currentMember = data.members.find((m: any) => m.user_id === user.id);
+      const currentMember = data.members.find(
+        (m: any) => m.user_id === user.id
+      );
 
       if (!currentMember) {
         return c.json({ error: 'Unauthorized' }, 401);
@@ -251,4 +253,3 @@ const app = new Hono()
   });
 
 export default app;
-
