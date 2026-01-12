@@ -17,14 +17,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { Ellipsis, Plus, Loader2, Trash2, Pencil } from 'lucide-react'; // Pencil not imported
+import { Ellipsis, Plus, Loader2, Trash2, Pencil } from 'lucide-react';
 import { ModalForm } from './ModalForm';
 import { ModalColumnForm } from './ModalColumnForm';
 import { useGetProject } from '../../api/useGetProject';
+import { useGetColumns } from '@/features/columns/api/useGetColumns';
 import { useUpdateTask } from '@/features/tasks/api/useUpdateTask';
 import { useUpdateColumn } from '@/features/columns/api/useUpdateColumn';
 import { useDeleteColumn } from '@/features/columns/api/useDeleteColumn';
-import { Project, Column, Task } from '../../types';
+import { Column } from '../../types';
 import {
   DragDropContext,
   Droppable,
@@ -34,35 +35,31 @@ import {
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 
-interface ProjectDetailProps {
-  projectId: string;
-}
+// ...
 
 export const ProjectDetail = () => {
   const params = useParams();
   const projectId = params.projectId as string;
 
-  console.log({ params })
-
-  const { data: rawProject, isLoading, error } = useGetProject({ projectId });
+  const { data: projectMetadata, isLoading: isLoadingMetadata, error: errorMetadata } = useGetProject({ projectId });
+  const { data: rawColumns, isLoading: isLoadingColumns, error: errorColumns } = useGetColumns({ projectId });
 
   const [orderedData, setOrderedData] = useState<Column[]>([]);
 
   useEffect(() => {
-    if (rawProject) {
-      const project = rawProject as unknown as Project;
-      const sortedCols = [...(project.columns || [])].sort(
-        (a, b) => a.position - b.position
+    if (rawColumns) {
+      const sortedCols = [...(rawColumns || [])].sort(
+        (a: Column, b: Column) => a.position - b.position
       );
 
-      const colsWithSortedTasks = sortedCols.map((col) => ({
+      const colsWithSortedTasks = sortedCols.map((col: Column) => ({
         ...col,
         tasks: [...(col.tasks || [])].sort((a, b) => a.position - b.position),
       }));
 
       setOrderedData(colsWithSortedTasks);
     }
-  }, [rawProject]);
+  }, [rawColumns]);
 
   const { mutate: updateTask } = useUpdateTask({ projectId });
   const { mutate: updateColumn } = useUpdateColumn({ projectId });
@@ -170,7 +167,7 @@ export const ProjectDetail = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoadingMetadata || isLoadingColumns) {
     return (
       <div className="flex items-center justify-center p-8">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -178,10 +175,10 @@ export const ProjectDetail = () => {
     );
   }
 
-  if (error) {
+  if (errorMetadata || errorColumns) {
     return (
       <div className="p-8 text-center text-red-500">
-        Error loading project: {error?.message || 'Project not found'}
+        Error loading project: {errorMetadata?.message || errorColumns?.message || 'Project not found'}
       </div>
     );
   }

@@ -5,8 +5,8 @@ export interface Task {
   project_id: string;
   column_id: string;
   position: number;
-  created_at: string;
-  updated_at: string;
+  created_at: string | null;
+  updated_at: string | null;
   // Relations not in core schema but used in UI (mocked/optional for now)
   card_members?: any[];
   card_labels?: any[];

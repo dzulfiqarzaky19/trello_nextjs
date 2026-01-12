@@ -6,6 +6,34 @@ import { createSupabaseServer } from '@/lib/supabase/server';
 import { createColumnSchema, updateColumnSchema } from '../schema';
 
 const app = new Hono()
+  .get(
+    '/',
+    sessionMiddleware,
+    zValidator('query', z.object({ projectId: z.string() })),
+    async (c) => {
+      const supabase = await createSupabaseServer();
+      const { projectId } = c.req.valid('query');
+
+      const { data, error } = await supabase
+        .from('columns')
+        .select('*, tasks(*)')
+        .eq('project_id', projectId)
+        .order('position', { ascending: true });
+
+      if (error) {
+        return c.json({ error: error.message }, 500);
+      }
+
+      const columnsWithSortedTasks = data.map((column) => ({
+        ...column,
+        tasks: Array.isArray(column.tasks)
+          ? column.tasks.sort((a, b) => a.position - b.position)
+          : [],
+      }));
+
+      return c.json({ data: columnsWithSortedTasks });
+    }
+  )
   .post(
     '/',
     sessionMiddleware,

@@ -16,9 +16,34 @@ const app = new Hono()
       const { workspaceId } = c.req.valid('query');
 
       let query = supabase.from('projects').select('*');
+      let workspaceUuid = workspaceId;
 
       if (workspaceId) {
-        query = query.eq('workspace_id', workspaceId);
+        const isUuid =
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+            workspaceId
+          );
+
+        if (!isUuid) {
+          const { data: workspace } = await supabase
+            .from('workspaces')
+            .select('id')
+            .eq('slug', workspaceId)
+            .single();
+
+          if (!workspace) {
+            // If checking a specific workspace and it's not found, return empty or error.
+            // Returning empty list similar to "not a member" case for now or could be 404.
+            // But since this is a filter, empty seems appropriate if filtered by invalid workspace.
+            return c.json({ data: [] });
+          }
+          workspaceUuid = workspace.id;
+        }
+
+        if (!workspaceUuid) {
+          return c.json({ data: [] });
+        }
+        query = query.eq('workspace_id', workspaceUuid);
       } else {
         const { data: userMemberWorkspaces } = await supabase
           .from('members')
@@ -111,7 +136,7 @@ const app = new Hono()
 
       const { data, error } = await supabase
         .from('projects')
-        .select('*, columns(*, tasks(*))')
+        .select('*')
         .eq('id', projectId)
         .single();
 

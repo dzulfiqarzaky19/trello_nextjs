@@ -27,8 +27,8 @@ export interface Project {
   name: string;
   image_url: string | null;
   workspace_id: string;
-  status: 'ACTIVE' | 'COMPLETED' | 'ARCHIVED';
-  created_at: string;
-  updated_at: string;
+  status: 'ACTIVE' | 'COMPLETED' | 'ARCHIVED' | null;
+  created_at: string | null;
+  updated_at: string | null;
   columns?: Column[];
 }

@@ -5,7 +5,7 @@ export interface Column {
   name: string;
   project_id: string;
   position: number;
-  created_at: string;
-  updated_at: string;
+  created_at: string | null;
+  updated_at: string | null;
   tasks: Task[];
 }
