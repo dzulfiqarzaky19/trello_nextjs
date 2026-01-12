@@ -1,3 +1,5 @@
+'use client'
+
 import { ProjectCreate } from './dashboard/ProjectCreate';
 import { ProjectCard } from './dashboard/ProjectCard';
 import { useGetWorkspace } from '@/features/workspaces/api/useGetWorkspace';

@@ -1,6 +1,6 @@
 import { Modal } from '@/components/Modal';
 import { Button } from '@/components/ui/button';
-import { ModalColumnForm } from '@/features/projects/components/ModalColumnForm';
+import { ModalColumnForm } from '@/features/projects/components/detail/ModalColumnForm';
 import {
   ChevronLeft,
   ChevronRight,

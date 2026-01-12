@@ -1,3 +1,5 @@
+'use client';
+
 import { useGetWorkspace } from '../../api/useGetWorkspace';
 import { HeaderSkeleton } from '@/components/skeleton/HeaderSkeleton';
 

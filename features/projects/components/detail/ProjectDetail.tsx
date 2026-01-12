@@ -18,13 +18,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { Ellipsis, Plus, Loader2, Trash2, Pencil } from 'lucide-react'; // Pencil not imported
-import { ModalForm } from './components/ModalForm';
-import { ModalColumnForm } from './components/ModalColumnForm';
-import { useGetProject } from './api/useGetProject';
+import { ModalForm } from './ModalForm';
+import { ModalColumnForm } from './ModalColumnForm';
+import { useGetProject } from '../../api/useGetProject';
 import { useUpdateTask } from '@/features/tasks/api/useUpdateTask';
 import { useUpdateColumn } from '@/features/columns/api/useUpdateColumn';
 import { useDeleteColumn } from '@/features/columns/api/useDeleteColumn';
-import { Project, Column, Task } from './types';
+import { Project, Column, Task } from '../../types';
 import {
   DragDropContext,
   Droppable,
@@ -32,13 +32,18 @@ import {
   DropResult,
 } from '@hello-pangea/dnd';
 import { useState, useEffect } from 'react';
-import { toast } from 'sonner';
+import { useParams } from 'next/navigation';
 
-interface ProjectsMainProps {
+interface ProjectDetailProps {
   projectId: string;
 }
 
-export const ProjectsMain = ({ projectId }: ProjectsMainProps) => {
+export const ProjectDetail = () => {
+  const params = useParams();
+  const projectId = params.projectId as string;
+
+  console.log({ params })
+
   const { data: rawProject, isLoading, error } = useGetProject({ projectId });
 
   const [orderedData, setOrderedData] = useState<Column[]>([]);

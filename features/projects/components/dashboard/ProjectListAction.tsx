@@ -12,7 +12,6 @@ import { useModal } from '@/components/providers/ModalProvider';
 import { Project } from '../../types';
 import { useDeleteProject } from '../../api/useDeleteProject';
 import { ProjectEditForm } from '../forms/ProjectEditForm';
-import { toast } from 'sonner';
 
 interface IProjectListActionProps {
   project: Project;

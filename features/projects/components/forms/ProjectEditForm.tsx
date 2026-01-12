@@ -5,6 +5,7 @@ import { FormSubmit } from '@/components/form/FormSubmit';
 import { DialogFooter } from '@/components/ui/dialog';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { FormSelect } from '@/components/form/FormSelect';
 import { z } from 'zod';
 import { updateProjectSchema } from '../../schema';
 import { useUpdateProject } from '../../api/useUpdateProject';
@@ -61,7 +62,20 @@ export const ProjectEditForm = ({
         error={errors.name?.message}
       />
 
+
       <FormImageInput label="Project Image" control={control} name="image" />
+
+      <FormSelect
+        control={control}
+        name="status"
+        label="Status"
+        placeholder="Select Status"
+        options={[
+          { label: 'Active', value: 'ACTIVE' },
+          { label: 'Completed', value: 'COMPLETED' },
+          { label: 'Archived', value: 'ARCHIVED' },
+        ]}
+      />
 
       <DialogFooter className="flex justify-end gap-2 pt-6">
         <FormSubmit
