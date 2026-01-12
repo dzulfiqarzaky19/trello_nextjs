@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Loader2 } from 'lucide-react';
+import { MembersListSkeleton } from './MembersListSkeleton';
 import { AddMemberDialog } from './AddMemberDialog';
 import { MemberActions } from './MemberActions';
 import { useGetMembers } from '../api/useGetMembers';
@@ -12,11 +13,7 @@ export const MembersList = () => {
   const { data, isLoading, error } = useGetMembers();
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[200px]">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-      </div>
-    );
+    return <MembersListSkeleton />;
   }
 
   if (error || !data) {

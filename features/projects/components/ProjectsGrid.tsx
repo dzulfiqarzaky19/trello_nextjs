@@ -3,9 +3,8 @@
 import { ProjectCreate } from './dashboard/ProjectCreate';
 import { ProjectCard } from './dashboard/ProjectCard';
 import { useGetWorkspace } from '@/features/workspaces/api/useGetWorkspace';
-import { Loader2 } from 'lucide-react';
-import { Project } from '@/features/projects/types';
-
+import { ProjectsGridSkeleton } from './ProjectsGridSkeleton';
+import { Project } from '../types';
 import { useGetProjects } from '@/features/projects/api/useGetProjects';
 
 export const ProjectsGrid = () => {
@@ -23,11 +22,7 @@ export const ProjectsGrid = () => {
   } = useGetProjects();
 
   if (isLoadingWorkspace || (workspace?.id && isLoadingProjects)) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <ProjectsGridSkeleton />;
   }
 
   if (workspaceError || !workspace) {
