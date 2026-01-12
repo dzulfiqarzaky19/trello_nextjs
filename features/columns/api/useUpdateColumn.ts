@@ -4,34 +4,32 @@ import { InferRequestType, InferResponseType } from 'hono';
 import { toast } from 'sonner';
 
 type ResponseType = InferResponseType<
-  (typeof client.api.projects)[':projectId']['tasks'][':taskId']['$delete'],
+  (typeof client.api.columns)[':columnId']['$patch'],
   200
 >;
+type RequestType = InferRequestType<
+  (typeof client.api.columns)[':columnId']['$patch']
+>;
 
-export const useDeleteTask = ({ projectId }: { projectId: string }) => {
+export const useUpdateColumn = ({ projectId }: { projectId: string }) => {
   const queryClient = useQueryClient();
 
-  const mutation = useMutation<
-    ResponseType,
-    Error,
-    { param: { projectId: string; taskId: string } }
-  >({
-    mutationFn: async ({ param }) => {
-      const response = await client.api.projects[':projectId']['tasks'][
-        ':taskId'
-      ].$delete({
+  const mutation = useMutation<ResponseType, Error, RequestType>({
+    mutationFn: async ({ param, json }) => {
+      const response = await client.api.columns[':columnId'].$patch({
         param,
+        json,
       });
 
       if (!response.ok) {
         const errorData = (await response.json()) as { error?: string };
-        throw new Error(errorData.error || 'Failed to delete task');
+        throw new Error(errorData.error || 'Failed to update column');
       }
 
       return await response.json();
     },
     onSuccess: () => {
-      toast.success('Task deleted');
+      toast.success('Column updated');
       queryClient.invalidateQueries({ queryKey: ['project', projectId] });
     },
     onError: (e) => {

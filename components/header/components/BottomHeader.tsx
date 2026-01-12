@@ -1,5 +1,3 @@
-import { createList } from '@/features/projects/lists/actions';
-import { FormWrapper } from '@/components/form/FormWrapper';
 import { Modal } from '@/components/Modal';
 import { Button } from '@/components/ui/button';
 import { ModalColumnForm } from '@/features/projects/components/ModalColumnForm';
@@ -57,9 +55,14 @@ export const BottomHeader = ({
             modalClass="sm:max-w-xl"
           >
             {boardId && (
-              <FormWrapper action={createList.bind(null, boardId)}>
-                <ModalColumnForm />
-              </FormWrapper>
+              <ModalColumnForm
+                projectId={boardId}
+                closeModal={() => {
+                  document.dispatchEvent(
+                    new KeyboardEvent('keydown', { key: 'Escape' })
+                  );
+                }}
+              />
             )}
           </Modal>
         </div>

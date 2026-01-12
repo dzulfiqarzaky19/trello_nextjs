@@ -1,11 +1,7 @@
-'use client';
-
-import { Button } from '@/components/ui/button';
-import { Loader2, Plus } from 'lucide-react';
-import { BoardList } from './BoardList';
-import { Modal } from '@/components/Modal';
-import { CreateBoardForm } from './CreateBoardForm';
+import { ProjectCreate } from './dashboard/ProjectCreate';
+import { ProjectCard } from './dashboard/ProjectCard';
 import { useGetWorkspace } from '@/features/workspaces/api/useGetWorkspace';
+import { Loader2 } from 'lucide-react';
 
 export const ProjectsGrid = () => {
   const { data, isLoading, error } = useGetWorkspace();
@@ -38,23 +34,22 @@ export const ProjectsGrid = () => {
     <div className="flex flex-col gap-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold">Workspace Projects</h2>
-        {workspace.isAdmin && (
-          <div className="flex items-center gap-x-2">
-            <Modal
-              trigger={
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  New Project
-                </Button>
-              }
-            >
-              <CreateBoardForm workspaceId={workspace.id} />
-            </Modal>
-          </div>
-        )}
       </div>
 
-      <BoardList boards={projects} workspaceId={workspace.id} />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {projects.map((project) => (
+          <ProjectCard key={project.id} project={project} />
+        ))}
+        {workspace.isAdmin && <ProjectCreate workspaceId={workspace.id} />}
+      </div>
+
+      {projects.length === 0 && !workspace.isAdmin && (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground mb-4">
+            No projects found in this workspace.
+          </p>
+        </div>
+      )}
     </div>
   );
 };

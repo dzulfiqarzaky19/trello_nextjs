@@ -4,24 +4,19 @@ import { InferRequestType, InferResponseType } from 'hono';
 import { toast } from 'sonner';
 
 type ResponseType = InferResponseType<
-  (typeof client.api.projects)[':projectId']['columns']['$post'],
+  (typeof client.api.columns)['$post'],
   200
 >;
-type RequestType = InferRequestType<
-  (typeof client.api.projects)[':projectId']['columns']['$post']
->;
+type RequestType = InferRequestType<(typeof client.api.columns)['$post']>;
 
 export const useCreateColumn = ({ projectId }: { projectId: string }) => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ param, json }) => {
-      const response = await client.api.projects[':projectId']['columns'].$post(
-        {
-          param,
-          json,
-        }
-      );
+    mutationFn: async ({ json }) => {
+      const response = await client.api.columns.$post({
+        json,
+      });
 
       if (!response.ok) {
         throw new Error('Failed to create column');

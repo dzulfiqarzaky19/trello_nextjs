@@ -267,6 +267,30 @@ export type Database = {
         Args: { user_uuid: string; workspace_uuid: string };
         Returns: boolean;
       };
+      decrement_task_positions: {
+        Args: { p_column_id: string; p_start_pos: number; p_end_pos: number };
+        Returns: void;
+      };
+      increment_task_positions: {
+        Args: { p_column_id: string; p_start_pos: number; p_end_pos: number };
+        Returns: void;
+      };
+      decrement_task_positions_from: {
+        Args: { p_column_id: string; p_start_pos: number };
+        Returns: void;
+      };
+      increment_task_positions_from: {
+        Args: { p_column_id: string; p_start_pos: number };
+        Returns: void;
+      };
+      decrement_column_positions: {
+        Args: { p_project_id: string; p_start_pos: number; p_end_pos: number };
+        Returns: void;
+      };
+      increment_column_positions: {
+        Args: { p_project_id: string; p_start_pos: number; p_end_pos: number };
+        Returns: void;
+      };
     };
     Enums: {
       member_role: 'ADMIN' | 'MEMBER';

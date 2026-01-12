@@ -12,7 +12,7 @@ import { Check, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useCreateColumn } from '../api/useCreateColumn';
+import { useCreateColumn } from '@/features/columns/api/useCreateColumn';
 import { useForm } from 'react-hook-form';
 
 const formSchema = z.object({
@@ -63,11 +63,11 @@ export const ModalColumnForm = ({
   const onSubmit = (data: FormValues) => {
     mutate(
       {
-        param: { projectId },
         json: {
           title: data.title,
           description: data.description,
           headerColor: data.headerColor,
+          projectId,
         },
       },
       {

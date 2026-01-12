@@ -13,9 +13,9 @@ import { AlignLeft, Laptop, Trash2, Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useUpdateTask } from '../api/useUpdateTask';
-import { useDeleteTask } from '../api/useDeleteTask';
-import { useCreateTask } from '../api/useCreateTask';
+import { useUpdateTask } from '@/features/tasks/api/useUpdateTask';
+import { useDeleteTask } from '@/features/tasks/api/useDeleteTask';
+import { useCreateTask } from '@/features/tasks/api/useCreateTask';
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -68,7 +68,7 @@ export const ModalForm = ({
     if (isEditing && card) {
       updateTask(
         {
-          param: { projectId, taskId: card.id },
+          param: { taskId: card.id },
           json: {
             title: data.title,
             description: data.description,
@@ -81,11 +81,11 @@ export const ModalForm = ({
     } else if (columnId && projectId) {
       createTask(
         {
-          param: { projectId },
           json: {
             title: data.title,
             description: data.description || '',
             columnId,
+            projectId,
           },
         },
         {
@@ -100,7 +100,7 @@ export const ModalForm = ({
       if (confirm('Are you sure you want to delete this task?')) {
         deleteTask(
           {
-            param: { projectId, taskId: card.id },
+            param: { taskId: card.id },
           },
           {
             onSuccess: () => closeModal?.(),

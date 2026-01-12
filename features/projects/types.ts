@@ -13,36 +13,14 @@ export interface Member {
   profiles: Profile;
 }
 
-export interface Task {
-  id: string;
-  title: string;
-  description: string | null;
-  project_id: string;
-  column_id: string;
-  position: number;
-  created_at: string;
-  updated_at: string;
-  // Relations not in core schema but used in UI (mocked/optional for now)
-  card_members?: any[];
-  card_labels?: any[];
-  checklists?: any[];
-  comments?: any[];
-  attachments?: any[];
-  due_date?: string | null;
-  priority?: 'low' | 'medium' | 'high' | null;
-}
+import { Task } from '@/features/tasks/types';
 
-export type Card = Task; // Alias for backward compatibility
+export type { Task };
+export type { Card } from '@/features/tasks/types';
 
-export interface Column {
-  id: string;
-  name: string;
-  project_id: string;
-  position: number;
-  created_at: string;
-  updated_at: string;
-  tasks: Task[];
-}
+import { Column } from '@/features/columns/types';
+
+export type { Column };
 
 export interface Project {
   id: string;

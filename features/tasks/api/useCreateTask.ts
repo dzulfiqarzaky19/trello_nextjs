@@ -3,21 +3,15 @@ import { client } from '@/lib/rpc';
 import { InferRequestType, InferResponseType } from 'hono';
 import { toast } from 'sonner';
 
-type ResponseType = InferResponseType<
-  (typeof client.api.projects)[':projectId']['tasks']['$post'],
-  200
->;
-type RequestType = InferRequestType<
-  (typeof client.api.projects)[':projectId']['tasks']['$post']
->;
+type ResponseType = InferResponseType<(typeof client.api.tasks)['$post'], 200>;
+type RequestType = InferRequestType<(typeof client.api.tasks)['$post']>;
 
 export const useCreateTask = ({ projectId }: { projectId: string }) => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ param, json }) => {
-      const response = await client.api.projects[':projectId']['tasks'].$post({
-        param,
+    mutationFn: async ({ json }) => {
+      const response = await client.api.tasks.$post({
         json,
       });
 

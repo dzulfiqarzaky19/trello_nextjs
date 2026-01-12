@@ -21,9 +21,9 @@ import { Ellipsis, Plus, Loader2, Trash2, Pencil } from 'lucide-react'; // Penci
 import { ModalForm } from './components/ModalForm';
 import { ModalColumnForm } from './components/ModalColumnForm';
 import { useGetProject } from './api/useGetProject';
-import { useUpdateTask } from './api/useUpdateTask';
-import { useUpdateColumn } from './api/useUpdateColumn';
-import { useDeleteColumn } from './api/useDeleteColumn';
+import { useUpdateTask } from '@/features/tasks/api/useUpdateTask';
+import { useUpdateColumn } from '@/features/columns/api/useUpdateColumn';
+import { useDeleteColumn } from '@/features/columns/api/useDeleteColumn';
 import { Project, Column, Task } from './types';
 import {
   DragDropContext,
@@ -83,7 +83,7 @@ export const ProjectsMain = ({ projectId }: ProjectsMainProps) => {
       setOrderedData(newOrderedData);
 
       updateColumn({
-        param: { projectId, columnId: removed.id },
+        param: { columnId: removed.id },
         json: { position: destination.index + 1 },
       });
       return;
@@ -113,7 +113,7 @@ export const ProjectsMain = ({ projectId }: ProjectsMainProps) => {
       setOrderedData(newData);
 
       updateTask({
-        param: { projectId, taskId: movedTask.id },
+        param: { taskId: movedTask.id },
         json: {
           columnId: startCol.id,
           position: destination.index + 1,
@@ -136,7 +136,7 @@ export const ProjectsMain = ({ projectId }: ProjectsMainProps) => {
       setOrderedData(newData);
 
       updateTask({
-        param: { projectId, taskId: movedTask.id },
+        param: { taskId: movedTask.id },
         json: {
           columnId: finishCol.id,
           position: destination.index + 1,
@@ -151,7 +151,7 @@ export const ProjectsMain = ({ projectId }: ProjectsMainProps) => {
         'Are you sure you want to delete this list? All tasks in it will be deleted.'
       )
     ) {
-      deleteColumn({ param: { projectId, columnId } });
+      deleteColumn({ param: { columnId } });
     }
   };
 
@@ -159,7 +159,7 @@ export const ProjectsMain = ({ projectId }: ProjectsMainProps) => {
     const newName = prompt('Enter new list name:', currentName);
     if (newName && newName !== currentName) {
       updateColumn({
-        param: { projectId, columnId },
+        param: { columnId },
         json: { title: newName },
       });
     }
