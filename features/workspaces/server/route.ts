@@ -45,7 +45,6 @@ const app = new Hono()
         `
       );
 
-      // Support both UUID and slug lookup
       const isUuid =
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
           workspaceId

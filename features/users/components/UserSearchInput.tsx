@@ -95,7 +95,6 @@ export const UserSearchInput = ({
         </div>
       )}
 
-      {/* Backdrop to close dropdown */}
       {isOpen && (
         <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
       )}

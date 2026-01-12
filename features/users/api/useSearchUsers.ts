@@ -3,6 +3,7 @@ import { client } from '@/lib/rpc';
 import { IUserSearchResponse } from '../schema';
 
 const FIVE_MINS_CACHE_TIME = 1000 * 60 * 5;
+
 export const useSearchUsers = (query: string) => {
   return useQuery({
     queryKey: ['users', 'search', query],
