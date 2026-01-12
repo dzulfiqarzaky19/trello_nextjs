@@ -1,22 +1,22 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { client } from '@/lib/rpc';
 import { toast } from 'sonner';
+import { useWorkspaceSlug } from '@/features/workspaces/hooks/useWorkspaceSlug';
 
 interface AddMemberParams {
     workspaceId: string;
-    workspaceSlug: string;
     userId: string;
     role?: 'ADMIN' | 'MEMBER';
 }
 
 export const useAddMember = () => {
     const queryClient = useQueryClient();
+    const workspaceSlug = useWorkspaceSlug();
 
     return useMutation({
         mutationFn: async ({ workspaceId, userId, role = 'MEMBER' }: AddMemberParams) => {
-            const response = await client.api.workspaces[':workspaceId'].members.$post({
-                param: { workspaceId },
-                json: { userId, role },
+            const response = await client.api.members.$post({
+                json: { workspaceId, userId, role },
             });
 
             if (!response.ok) {
@@ -26,9 +26,9 @@ export const useAddMember = () => {
 
             return response.json();
         },
-        onSuccess: (_, { workspaceSlug }) => {
+        onSuccess: () => {
             toast.success('Member added successfully');
-            queryClient.invalidateQueries({ queryKey: ['workspaceDetail', workspaceSlug] });
+            queryClient.invalidateQueries({ queryKey: ['workspace', workspaceSlug] });
         },
         onError: (error: Error) => {
             toast.error(error.message);

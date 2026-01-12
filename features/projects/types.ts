@@ -52,5 +52,5 @@ export interface Project {
   status: 'ACTIVE' | 'COMPLETED' | 'ARCHIVED';
   created_at: string;
   updated_at: string;
-  columns: Column[];
+  columns?: Column[];
 }

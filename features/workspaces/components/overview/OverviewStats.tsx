@@ -1,18 +1,19 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle2, FolderKanban, Users } from 'lucide-react';
-import { IWorkspaceDetail } from '../schema';
+import { IWorkspace } from '../../schema';
 import { useMemo } from 'react';
 
 interface OverviewStatsProps {
-    workspace: IWorkspaceDetail;
+    workspace: IWorkspace;
 }
 
 export const OverviewStats = ({ workspace }: OverviewStatsProps) => {
-    const completedProjects = workspace.projects.filter(
+    const projects = workspace.projects || [];
+    const completedProjects = projects.filter(
         (project) => project.status === 'COMPLETED'
     ).length;
 
-    const totalProjects = workspace.projects.length;
+    const totalProjects = projects.length;
     const totalMembers = workspace.members.length;
 
     const workspaceProjects = useMemo(() => [
@@ -36,7 +37,6 @@ export const OverviewStats = ({ workspace }: OverviewStatsProps) => {
         },
     ], [totalProjects, totalMembers, completedProjects]);
 
-
     return (
         <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6 w-full">
             {workspaceProjects.map((project, index) => (
@@ -57,7 +57,6 @@ export const OverviewStats = ({ workspace }: OverviewStatsProps) => {
                     </CardContent>
                 </Card>
             ))}
-
         </div>
     );
-}
+};

@@ -2,8 +2,8 @@ import { Hono } from 'hono';
 import { handle } from 'hono/vercel';
 import auth from '@/features/auth/server/route';
 import settings from '@/features/settings/server/route';
-import workspaceDetail from '@/features/workspaceDetail/server/route';
 import workspaces from '@/features/workspaces/server/route';
+import members from '@/features/members/server/route';
 import projects from '@/features/projects/server/route';
 import users from '@/features/users/server/route';
 
@@ -13,7 +13,7 @@ const routes = app
   .route('/auth', auth)
   .route('/settings', settings)
   .route('/workspaces', workspaces)
-  .route('/workspaces', workspaceDetail)
+  .route('/members', members)
   .route('/projects', projects)
   .route('/users', users);
 

@@ -1,22 +1,23 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { client } from '@/lib/rpc';
 import { toast } from 'sonner';
+import { useWorkspaceSlug } from '@/features/workspaces/hooks/useWorkspaceSlug';
 
 interface UpdateMemberRoleParams {
     workspaceId: string;
-    workspaceSlug: string;
     userId: string;
     role: 'ADMIN' | 'MEMBER';
 }
 
 export const useUpdateMemberRole = () => {
     const queryClient = useQueryClient();
+    const workspaceSlug = useWorkspaceSlug();
 
     return useMutation({
         mutationFn: async ({ workspaceId, userId, role }: UpdateMemberRoleParams) => {
-            const response = await client.api.workspaces[':workspaceId'].members[':userId'].$patch({
-                param: { workspaceId, userId },
-                json: { role },
+            const response = await client.api.members[':userId'].$patch({
+                param: { userId },
+                json: { workspaceId, role },
             });
 
             if (!response.ok) {
@@ -26,13 +27,12 @@ export const useUpdateMemberRole = () => {
 
             return response.json();
         },
-        onSuccess: (_, { workspaceSlug, role }) => {
+        onSuccess: (_, { role }) => {
             toast.success(`Member ${role === 'ADMIN' ? 'promoted to admin' : 'demoted to member'}`);
-            queryClient.invalidateQueries({ queryKey: ['workspaceDetail', workspaceSlug] });
+            queryClient.invalidateQueries({ queryKey: ['workspace', workspaceSlug] });
         },
         onError: (error: Error) => {
             toast.error(error.message);
         },
     });
 };
-

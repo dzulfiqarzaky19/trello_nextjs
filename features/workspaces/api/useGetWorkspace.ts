@@ -1,24 +1,30 @@
 import { useQuery } from '@tanstack/react-query';
 import { client } from '@/lib/rpc';
 import { InferResponseType } from 'hono';
+import { useWorkspaceSlug } from '../hooks/useWorkspaceSlug';
 
-type GetWorkspacesResponse = InferResponseType<
-  typeof client.api.workspaces.$get,
-  200
+type ResponseType = InferResponseType<
+    (typeof client.api.workspaces)[':workspaceId']['$get'],
+    200
 >;
 
-type WorkspacesList = GetWorkspacesResponse['workspaces'];
-
 export const useGetWorkspace = () => {
-  return useQuery<WorkspacesList, Error>({
-    queryKey: ['workspaces'],
-    queryFn: async () => {
-      const response = await client.api.workspaces.$get();
-      if (!response.ok) throw new Error('Failed to fetch');
+    const workspaceSlug = useWorkspaceSlug();
 
-      const data = await response.json();
+    const query = useQuery<ResponseType, Error>({
+        queryKey: ['workspace', workspaceSlug],
+        queryFn: async () => {
+            const response = await client.api.workspaces[':workspaceId'].$get({
+                param: { workspaceId: workspaceSlug },
+            });
 
-      return data.workspaces;
-    },
-  });
+            if (!response.ok) {
+                throw new Error('Failed to fetch workspace details');
+            }
+
+            return await response.json();
+        },
+    });
+
+    return query;
 };

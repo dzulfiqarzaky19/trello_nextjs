@@ -1,20 +1,22 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { client } from '@/lib/rpc';
 import { toast } from 'sonner';
+import { useWorkspaceSlug } from '@/features/workspaces/hooks/useWorkspaceSlug';
 
 interface RemoveMemberParams {
     workspaceId: string;
-    workspaceSlug: string;
     userId: string;
 }
 
 export const useRemoveMember = () => {
     const queryClient = useQueryClient();
+    const workspaceSlug = useWorkspaceSlug();
 
     return useMutation({
         mutationFn: async ({ workspaceId, userId }: RemoveMemberParams) => {
-            const response = await client.api.workspaces[':workspaceId'].members[':userId'].$delete({
-                param: { workspaceId, userId },
+            const response = await client.api.members[':userId'].$delete({
+                param: { userId },
+                json: { workspaceId },
             });
 
             if (!response.ok) {
@@ -24,13 +26,12 @@ export const useRemoveMember = () => {
 
             return response.json();
         },
-        onSuccess: (_, { workspaceSlug }) => {
+        onSuccess: () => {
             toast.success('Member removed from workspace');
-            queryClient.invalidateQueries({ queryKey: ['workspaceDetail', workspaceSlug] });
+            queryClient.invalidateQueries({ queryKey: ['workspace', workspaceSlug] });
         },
         onError: (error: Error) => {
             toast.error(error.message);
         },
     });
 };
-

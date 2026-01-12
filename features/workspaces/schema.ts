@@ -22,6 +22,16 @@ export const createWorkspaceSchema = z.object({
   description: z.string().optional(),
 });
 
+export const projectSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  image_url: z.string().nullable(),
+  workspace_id: z.string(),
+  status: z.enum(['ACTIVE', 'COMPLETED', 'ARCHIVED']),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+
 export const workspaceSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -51,6 +61,9 @@ export const workspaceSchema = z.object({
     })
   ),
   invite_code: z.string(),
+  projects: z.array(projectSchema).optional(),
+  isAdmin: z.boolean().optional(),
+  currentUserId: z.string().optional(),
 });
 
 export const workspacesListSchema = z.array(workspaceSchema);
@@ -60,3 +73,6 @@ export const updateWorkspaceSchema = createWorkspaceSchema.partial();
 export type ICreateWorkspace = z.infer<typeof createWorkspaceSchema>;
 export type IUpdateWorkspace = z.infer<typeof updateWorkspaceSchema>;
 export type IGetWorkspace = z.infer<typeof workspacesListSchema>;
+export type IWorkspace = z.infer<typeof workspaceSchema>;
+export type IProject = z.infer<typeof projectSchema>;
+

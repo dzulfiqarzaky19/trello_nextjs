@@ -1,16 +1,14 @@
-'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Plus, Users } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { Modal } from '@/components/Modal';
 import { CreateBoardForm } from './CreateBoardForm';
 import { Project } from '../types';
 
 interface BoardListProps {
-  boards: Project[]; // Renamed from boards to projects conceptually but keeping prop name or changing it? Let's keep it to minimize shift or change to projects
-  workspaceId?: string; // Optional context for creation
+  boards: Project[];
+  workspaceId?: string;
 }
 
 export const BoardList = ({ boards, workspaceId }: BoardListProps) => {
@@ -33,7 +31,7 @@ export const BoardList = ({ boards, workspaceId }: BoardListProps) => {
               </CardHeader>
               <CardContent className="relative z-10">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  {/* Status badge? */}
+
                   <span className="text-xs px-2 py-1 rounded bg-secondary">
                     {board.status}
                   </span>
@@ -43,7 +41,6 @@ export const BoardList = ({ boards, workspaceId }: BoardListProps) => {
           </Link>
         ))}
 
-        {/* Create New Board Card */}
         <Modal
           trigger={
             <Card className="hover:shadow-lg transition-shadow cursor-pointer h-32 flex items-center justify-center bg-muted/50 hover:bg-muted border-dashed">
