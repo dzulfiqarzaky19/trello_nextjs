@@ -13,10 +13,21 @@ export const OverviewStats = () => {
 
     const workspace = data.data;
     const projects = workspace.projects || [];
-    const completedProjects = projects.filter(
-      (project) => project.status === 'COMPLETED'
-    ).length;
-    const totalProjects = projects.length;
+
+    const { completedProjects, totalProjects } = projects.reduce(
+      (acc, project) => {
+        if (project.status === 'COMPLETED') {
+          acc.completedProjects += 1;
+        }
+        if (project.status !== 'ARCHIVED') {
+          acc.totalProjects += 1;
+        }
+        return acc;
+      },
+      { completedProjects: 0, totalProjects: 0 }
+    );
+
+    const taskCompletion = totalProjects === 0 ? 0 : `${completedProjects}/${totalProjects}`;
     const totalMembers = workspace.members.length;
 
     return [
@@ -34,7 +45,7 @@ export const OverviewStats = () => {
       },
       {
         label: 'Task Completion',
-        value: `${completedProjects}/${totalProjects}`,
+        value: taskCompletion,
         icon: CheckCircle2,
         iconClass: 'text-emerald-600 bg-emerald-100 p-3 rounded-xl',
       },
