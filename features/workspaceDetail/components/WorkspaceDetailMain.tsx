@@ -37,7 +37,7 @@ export const WorkspaceDetailMain = () => {
   const workspace = data.data;
 
   return (
-    <div className="flex flex-col gap-y-6">
+    <div className="flex flex-col gap-y-6 p-8">
       <div>
         <h1 className="text-2xl font-bold">{workspace.name}</h1>
         <p className="text-muted-foreground">

@@ -1,9 +1,10 @@
 import { format } from 'date-fns';
-import { Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 import { IWorkspaceDetail } from '../schema';
+import { Copy } from 'lucide-react';
+import { OverviewStats } from './OverviewStats';
 
 interface OverviewProps {
   workspace: IWorkspaceDetail;
@@ -81,6 +82,8 @@ export const Overview = ({ workspace }: OverviewProps) => {
             </div>
           </div>
 
+          <div className="border-b border-gray-200 dark:border-gray-700 my-4" />
+
           {workspace.description && (
             <div className="flex flex-col gap-y-1 mt-2">
               <span className="text-sm font-medium text-muted-foreground">
@@ -93,6 +96,8 @@ export const Overview = ({ workspace }: OverviewProps) => {
           )}
         </div>
       </div>
+
+      <OverviewStats workspace={workspace} />
     </div>
   );
 };

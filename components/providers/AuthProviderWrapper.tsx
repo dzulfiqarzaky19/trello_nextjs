@@ -1,11 +1,14 @@
 import { AuthProvider } from '@/context/AuthContext';
 import { createSupabaseServer } from '@/lib/supabase/server';
+import React from 'react';
 
+
+interface IAuthProviderWrapper {
+  children: React.ReactNode
+}
 export const AuthProviderWrapper = async ({
   children,
-}: {
-  children: React.ReactNode;
-}) => {
+}: IAuthProviderWrapper) => {
   const supabase = await createSupabaseServer();
 
   const {
@@ -14,6 +17,7 @@ export const AuthProviderWrapper = async ({
   const user = session?.user || null;
 
   let profile = null;
+
   if (user) {
     const { data } = await supabase
       .from('profiles')

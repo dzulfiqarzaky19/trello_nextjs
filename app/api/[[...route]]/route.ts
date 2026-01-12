@@ -5,6 +5,7 @@ import settings from '@/features/settings/server/route';
 import workspaceDetail from '@/features/workspaceDetail/server/route';
 import workspaces from '@/features/workspaces/server/route';
 import projects from '@/features/projects/server/route';
+import users from '@/features/users/server/route';
 
 const app = new Hono().basePath('/api');
 
@@ -12,8 +13,9 @@ const routes = app
   .route('/auth', auth)
   .route('/settings', settings)
   .route('/workspaces', workspaces)
-  .route('/workspaces', workspaceDetail) // workspaceDetail route is /:workspaceId, so we mount it under /workspaces to resolve as /api/workspaces/:workspaceId
-  .route('/projects', projects);
+  .route('/workspaces', workspaceDetail)
+  .route('/projects', projects)
+  .route('/users', users);
 
 export const GET = handle(routes);
 export const POST = handle(routes);
