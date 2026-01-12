@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { client } from '@/lib/rpc';
 import { InferRequestType, InferResponseType } from 'hono';
 import { toast } from 'sonner';
+import { useProjectId } from '@/features/projects/hooks/useProjectId';
 
 type ResponseType = InferResponseType<
   (typeof client.api.columns)['$post'],
@@ -9,8 +10,9 @@ type ResponseType = InferResponseType<
 >;
 type RequestType = InferRequestType<(typeof client.api.columns)['$post']>;
 
-export const useCreateColumn = ({ projectId }: { projectId: string }) => {
+export const useCreateColumn = () => {
   const queryClient = useQueryClient();
+  const projectId = useProjectId();
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ json }) => {

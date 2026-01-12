@@ -27,7 +27,8 @@ export const OverviewStats = () => {
       { completedProjects: 0, totalProjects: 0 }
     );
 
-    const taskCompletion = totalProjects === 0 ? 0 : `${completedProjects}/${totalProjects}`;
+    const taskCompletion =
+      totalProjects === 0 ? 0 : `${completedProjects}/${totalProjects}`;
     const totalMembers = workspace.members.length;
 
     return [

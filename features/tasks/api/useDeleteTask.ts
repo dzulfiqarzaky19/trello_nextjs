@@ -2,14 +2,16 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { client } from '@/lib/rpc';
 import { InferRequestType, InferResponseType } from 'hono';
 import { toast } from 'sonner';
+import { useProjectId } from '@/features/projects/hooks/useProjectId';
 
 type ResponseType = InferResponseType<
   (typeof client.api.tasks)[':taskId']['$delete'],
   200
 >;
 
-export const useDeleteTask = ({ projectId }: { projectId: string }) => {
+export const useDeleteTask = () => {
   const queryClient = useQueryClient();
+  const projectId = useProjectId();
 
   const mutation = useMutation<
     ResponseType,

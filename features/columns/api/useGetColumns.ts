@@ -1,7 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { client } from '@/lib/rpc';
+import { useProjectId } from '@/features/projects/hooks/useProjectId';
 
-export const useGetColumns = ({ projectId }: { projectId: string }) => {
+export const useGetColumns = () => {
+  const projectId = useProjectId();
+
   const query = useQuery({
     queryKey: ['columns', projectId],
     queryFn: async () => {

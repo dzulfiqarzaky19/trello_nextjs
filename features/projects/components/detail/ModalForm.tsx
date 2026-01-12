@@ -16,6 +16,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useUpdateTask } from '@/features/tasks/api/useUpdateTask';
 import { useDeleteTask } from '@/features/tasks/api/useDeleteTask';
 import { useCreateTask } from '@/features/tasks/api/useCreateTask';
+import { useProjectId } from '../../hooks/useProjectId';
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -27,7 +28,6 @@ type FormValues = z.infer<typeof formSchema>;
 interface ModalFormProps {
   card?: CardType;
   listTitle: string;
-  boardId?: string;
   columnId?: string;
   closeModal?: () => void;
 }
@@ -35,22 +35,15 @@ interface ModalFormProps {
 export const ModalForm = ({
   card,
   listTitle,
-  boardId,
   columnId,
   closeModal,
 }: ModalFormProps) => {
   const isEditing = !!card;
-  const projectId = boardId || '';
+  const projectId = useProjectId();
 
-  const { mutate: updateTask, isPending: isUpdating } = useUpdateTask({
-    projectId,
-  });
-  const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask({
-    projectId,
-  });
-  const { mutate: createTask, isPending: isCreating } = useCreateTask({
-    projectId,
-  });
+  const { mutate: updateTask, isPending: isUpdating } = useUpdateTask();
+  const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask();
+  const { mutate: createTask, isPending: isCreating } = useCreateTask();
 
   const {
     register,
@@ -169,8 +162,7 @@ export const ModalForm = ({
           </Button>
         ) : (
           <div />
-        )}{' '}
-        {/* Spacer */}
+        )}
         <div className="flex gap-2">
           <Button
             type="button"
