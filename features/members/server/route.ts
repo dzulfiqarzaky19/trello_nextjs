@@ -5,6 +5,74 @@ import { sessionMiddleware } from '@/lib/session-middleware';
 import { createSupabaseServer } from '@/lib/supabase/server';
 
 const app = new Hono()
+    .get(
+        '/',
+        sessionMiddleware,
+        zValidator('query', z.object({ workspaceId: z.string() })),
+        async (c) => {
+            const supabase = await createSupabaseServer();
+            const currentUser = c.get('user');
+            const { workspaceId } = c.req.valid('query');
+
+            const isUuid =
+                /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+                    workspaceId
+                );
+
+            let workspaceUuid = workspaceId;
+
+            if (!isUuid) {
+                const { data: workspace } = await supabase
+                    .from('workspaces')
+                    .select('id')
+                    .eq('slug', workspaceId)
+                    .single();
+
+                if (!workspace) {
+                    return c.json({ error: 'Workspace not found' }, 404);
+                }
+                workspaceUuid = workspace.id;
+            }
+
+            const { data: currentMember } = await supabase
+                .from('members')
+                .select('role')
+                .eq('workspace_id', workspaceUuid)
+                .eq('user_id', currentUser.id)
+                .single();
+
+            if (!currentMember) {
+                return c.json({ error: 'Unauthorized' }, 401);
+            }
+
+            const { data: members, error } = await supabase
+                .from('members')
+                .select(`
+                    user_id,
+                    role,
+                    profiles:user_id (
+                        id,
+                        full_name,
+                        avatar_url,
+                        email
+                    )
+                `)
+                .eq('workspace_id', workspaceUuid);
+
+            if (error) {
+                return c.json({ error: error.message }, 500);
+            }
+
+            return c.json({
+                data: {
+                    members: members || [],
+                    isAdmin: currentMember.role === 'ADMIN',
+                    currentUserId: currentUser.id,
+                    workspaceId: workspaceUuid,
+                },
+            });
+        }
+    )
     .post(
         '/',
         sessionMiddleware,
@@ -21,7 +89,6 @@ const app = new Hono()
             const currentUser = c.get('user');
             const { workspaceId, userId, role } = c.req.valid('json');
 
-            // Check if current user is admin
             const { data: currentMember } = await supabase
                 .from('members')
                 .select('role')
@@ -33,7 +100,6 @@ const app = new Hono()
                 return c.json({ error: 'Only admins can add members' }, 403);
             }
 
-            // Check if user exists
             const { data: userToAdd } = await supabase
                 .from('profiles')
                 .select('id')
@@ -44,7 +110,6 @@ const app = new Hono()
                 return c.json({ error: 'User not found' }, 404);
             }
 
-            // Check if already a member
             const { data: existingMember } = await supabase
                 .from('members')
                 .select('user_id')
@@ -56,7 +121,6 @@ const app = new Hono()
                 return c.json({ error: 'User is already a member' }, 400);
             }
 
-            // Add member
             const { error } = await supabase.from('members').insert({
                 workspace_id: workspaceId,
                 user_id: userId,
@@ -87,7 +151,6 @@ const app = new Hono()
             const { userId } = c.req.valid('param');
             const { workspaceId, role } = c.req.valid('json');
 
-            // Check if current user is admin
             const { data: currentMember } = await supabase
                 .from('members')
                 .select('role')
@@ -99,12 +162,10 @@ const app = new Hono()
                 return c.json({ error: 'Only admins can update member roles' }, 403);
             }
 
-            // Prevent changing own role
             if (userId === currentUser.id) {
                 return c.json({ error: 'Cannot change your own role' }, 400);
             }
 
-            // Update role
             const { error } = await supabase
                 .from('members')
                 .update({ role })
@@ -129,7 +190,6 @@ const app = new Hono()
             const { userId } = c.req.valid('param');
             const { workspaceId } = c.req.valid('json');
 
-            // Check if current user is admin
             const { data: currentMember } = await supabase
                 .from('members')
                 .select('role')
@@ -141,12 +201,10 @@ const app = new Hono()
                 return c.json({ error: 'Only admins can remove members' }, 403);
             }
 
-            // Prevent removing self
             if (userId === currentUser.id) {
                 return c.json({ error: 'Cannot remove yourself' }, 400);
             }
 
-            // Remove member
             const { error } = await supabase
                 .from('members')
                 .delete()

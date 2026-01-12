@@ -28,7 +28,7 @@ export const useAddMember = () => {
         },
         onSuccess: () => {
             toast.success('Member added successfully');
-            queryClient.invalidateQueries({ queryKey: ['workspace', workspaceSlug] });
+            queryClient.invalidateQueries({ queryKey: ['members', workspaceSlug] });
         },
         onError: (error: Error) => {
             toast.error(error.message);

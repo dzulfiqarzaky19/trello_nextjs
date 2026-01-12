@@ -3,16 +3,32 @@
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Loader2 } from 'lucide-react';
 import { AddMemberDialog } from './AddMemberDialog';
 import { MemberActions } from './MemberActions';
-import { IWorkspace } from '@/features/workspaces/schema';
+import { useGetMembers } from '../api/useGetMembers';
 
-interface MembersListProps {
-    workspace: IWorkspace;
-}
+export const MembersList = () => {
+    const { data, isLoading, error } = useGetMembers();
 
-export const MembersList = ({ workspace }: MembersListProps) => {
-    const existingMemberIds = workspace.members.map((m) => m.user_id);
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-[200px]">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+        );
+    }
+
+    if (error || !data) {
+        return (
+            <div className="text-center text-muted-foreground py-8">
+                Failed to load members
+            </div>
+        );
+    }
+
+    const { members, isAdmin, currentUserId, workspaceId } = data.data;
+    const existingMemberIds = members.map((m) => m.user_id);
 
     return (
         <div className="flex flex-col gap-y-4">
@@ -24,16 +40,16 @@ export const MembersList = ({ workspace }: MembersListProps) => {
                     </p>
                 </div>
 
-                {workspace.isAdmin && (
+                {isAdmin && (
                     <AddMemberDialog
-                        workspaceId={workspace.id}
+                        workspaceId={workspaceId}
                         existingMemberIds={existingMemberIds}
                     />
                 )}
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700">
-                {workspace.members.map((member) => (
+                {members.map((member) => (
                     <div
                         key={member.user_id}
                         className="flex items-center justify-between p-4"
@@ -50,7 +66,7 @@ export const MembersList = ({ workspace }: MembersListProps) => {
                                     <p className="text-sm font-medium">
                                         {member.profiles?.full_name || 'Unknown Member'}
                                     </p>
-                                    {workspace.currentUserId === member.user_id && (
+                                    {currentUserId === member.user_id && (
                                         <span className="text-xs text-muted-foreground">(You)</span>
                                     )}
                                 </div>
@@ -72,9 +88,9 @@ export const MembersList = ({ workspace }: MembersListProps) => {
                                     MEMBER
                                 </Badge>
                             )}
-                            {workspace.isAdmin && workspace.currentUserId !== member.user_id && (
+                            {isAdmin && currentUserId !== member.user_id && (
                                 <MemberActions
-                                    workspaceId={workspace.id}
+                                    workspaceId={workspaceId}
                                     userId={member.user_id}
                                     memberName={member.profiles?.full_name || 'this member'}
                                     currentRole={member.role}
@@ -84,10 +100,10 @@ export const MembersList = ({ workspace }: MembersListProps) => {
                     </div>
                 ))}
 
-                {workspace.members.length > 5 && (
+                {members.length > 5 && (
                     <div className="p-4 text-center">
                         <Button variant="link" size="sm" className="text-muted-foreground">
-                            View all {workspace.members.length} members
+                            View all {members.length} members
                         </Button>
                     </div>
                 )}

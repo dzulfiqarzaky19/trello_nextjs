@@ -5,10 +5,10 @@ import { Loader2, Plus } from 'lucide-react';
 import { BoardList } from './BoardList';
 import { Modal } from '@/components/Modal';
 import { CreateBoardForm } from './CreateBoardForm';
-import { useWorkspace } from '@/features/workspaces/api/useGetWorkspace';
+import { useGetWorkspace } from '@/features/workspaces/api/useGetWorkspace';
 
 export const ProjectsGrid = () => {
-    const { data, isLoading, error } = useWorkspace();
+    const { data, isLoading, error } = useGetWorkspace();
 
     if (isLoading) {
         return (

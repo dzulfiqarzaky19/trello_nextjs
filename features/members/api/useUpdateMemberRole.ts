@@ -29,7 +29,7 @@ export const useUpdateMemberRole = () => {
         },
         onSuccess: (_, { role }) => {
             toast.success(`Member ${role === 'ADMIN' ? 'promoted to admin' : 'demoted to member'}`);
-            queryClient.invalidateQueries({ queryKey: ['workspace', workspaceSlug] });
+            queryClient.invalidateQueries({ queryKey: ['members', workspaceSlug] });
         },
         onError: (error: Error) => {
             toast.error(error.message);

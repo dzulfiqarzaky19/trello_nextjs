@@ -1,16 +1,34 @@
+'use client';
+
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
-import { IWorkspace } from '../../schema';
-import { Copy } from 'lucide-react';
+import { Copy, Loader2 } from 'lucide-react';
 import { OverviewStats } from './OverviewStats';
+import { useGetWorkspace } from '../../api/useGetWorkspace';
 
-interface OverviewProps {
-    workspace: IWorkspace;
-}
+export const Overview = () => {
+    const { data, isLoading, error } = useGetWorkspace();
 
-export const Overview = ({ workspace }: OverviewProps) => {
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-[200px]">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+        );
+    }
+
+    if (error || !data) {
+        return (
+            <div className="text-center text-muted-foreground py-8">
+                Failed to load overview
+            </div>
+        );
+    }
+
+    const workspace = data.data;
+
     const copyInviteCode = () => {
         navigator.clipboard.writeText(workspace.invite_code);
         toast.success('Invite code copied to clipboard');
@@ -97,7 +115,7 @@ export const Overview = ({ workspace }: OverviewProps) => {
                 </div>
             </div>
 
-            <OverviewStats workspace={workspace} />
+            <OverviewStats />
         </div>
     );
 };

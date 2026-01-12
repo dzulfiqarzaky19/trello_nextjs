@@ -28,7 +28,7 @@ export const useRemoveMember = () => {
         },
         onSuccess: () => {
             toast.success('Member removed from workspace');
-            queryClient.invalidateQueries({ queryKey: ['workspace', workspaceSlug] });
+            queryClient.invalidateQueries({ queryKey: ['members', workspaceSlug] });
         },
         onError: (error: Error) => {
             toast.error(error.message);
