@@ -9,9 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useUpdateMemberRole } from '../api/useUpdateMemberRole';
-import { useRemoveMember } from '../api/useRemoveMember';
-import { useModal } from '@/components/providers/ModalProvider';
+import { useMemberActionModals } from '../hooks/useMemberActionModals';
 
 interface MemberActionsProps {
   workspaceId: string;
@@ -26,67 +24,11 @@ export const MemberActions = ({
   memberName,
   currentRole,
 }: MemberActionsProps) => {
-  const updateRole = useUpdateMemberRole();
-  const removeMember = useRemoveMember();
-  const { openModal, closeWithBack } = useModal('member-action');
+  const { openPromote, openDemote, openRemove } = useMemberActionModals();
 
-  const handlePromote = () => {
-    openModal({
-      title: 'Promote to Admin',
-      description: `Are you sure you want to promote ${memberName} to admin? They will have full control over this workspace.`,
-      children: null,
-      config: {
-        showFooter: true,
-        confirmLabel: 'Promote',
-        isConfirming: updateRole.isPending,
-        onConfirm: () => {
-          updateRole.mutate(
-            { workspaceId, userId, role: 'ADMIN' },
-            { onSuccess: () => closeWithBack() }
-          );
-        },
-      },
-    });
-  };
-
-  const handleDemote = () => {
-    openModal({
-      title: 'Demote to Member',
-      description: `Are you sure you want to demote ${memberName} to member? They will lose admin privileges.`,
-      children: null,
-      config: {
-        showFooter: true,
-        confirmLabel: 'Demote',
-        isConfirming: updateRole.isPending,
-        onConfirm: () => {
-          updateRole.mutate(
-            { workspaceId, userId, role: 'MEMBER' },
-            { onSuccess: () => closeWithBack() }
-          );
-        },
-      },
-    });
-  };
-
-  const handleRemove = () => {
-    openModal({
-      title: 'Remove Member',
-      description: `Are you sure you want to remove ${memberName} from this workspace? They will lose access to all projects.`,
-      children: null,
-      config: {
-        showFooter: true,
-        confirmLabel: 'Remove',
-        confirmVariant: 'destructive',
-        isConfirming: removeMember.isPending,
-        onConfirm: () => {
-          removeMember.mutate(
-            { workspaceId, userId },
-            { onSuccess: () => closeWithBack() }
-          );
-        },
-      },
-    });
-  };
+  const handlePromote = () => openPromote({ workspaceId, userId, memberName });
+  const handleDemote = () => openDemote({ workspaceId, userId, memberName });
+  const handleRemove = () => openRemove({ workspaceId, userId, memberName });
 
   return (
     <DropdownMenu>

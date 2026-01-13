@@ -4,7 +4,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Plus } from 'lucide-react';
 import { useCreateProjectModal } from '../../hooks/useCreateProjectModal';
 
-
 export const ProjectCreate = () => {
   const { open } = useCreateProjectModal();
 

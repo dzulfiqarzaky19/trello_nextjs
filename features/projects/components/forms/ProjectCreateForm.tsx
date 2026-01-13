@@ -14,16 +14,13 @@ import { FormImageInput } from '@/components/form/FormImageInput';
 import { DialogFooter } from '@/components/ui/dialog';
 import { useGetProjects } from '../../api/useGetProjects';
 
-
 interface ProjectCreateFormProps {
   closeModal?: () => void;
 }
 
 type FormValues = z.infer<typeof createProjectSchema>;
 
-export const ProjectCreateForm = ({
-  closeModal,
-}: ProjectCreateFormProps) => {
+export const ProjectCreateForm = ({ closeModal }: ProjectCreateFormProps) => {
   const { mutate, isPending } = useCreateProject();
   const { data } = useGetProjects();
 

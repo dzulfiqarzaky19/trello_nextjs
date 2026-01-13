@@ -8,17 +8,21 @@ import { UserSearchInput } from '@/features/users/components/UserSearchInput';
 import { IUserSearchResult } from '@/features/users/schema';
 import { useAddMember } from '../api/useAddMember';
 
+import { useGetMembers } from '../api/useGetMembers';
+
 interface AddMemberFormProps {
-  workspaceId: string;
-  existingMemberIds: string[];
   closeModal?: () => void;
 }
 
-export const AddMemberForm = ({
-  workspaceId,
-  existingMemberIds,
-  closeModal,
-}: AddMemberFormProps) => {
+export const AddMemberForm = ({ closeModal }: AddMemberFormProps) => {
+  const { data: membersData } = useGetMembers();
+  const existingMemberIds = membersData?.data?.members.map((m) => m.user_id);
+  const workspaceId = membersData?.data.workspaceId;
+
+  if (!workspaceId) {
+    console.warn('AddMemberForm: No workspaceId available');
+    return null;
+  }
   const [selectedUser, setSelectedUser] = useState<IUserSearchResult | null>(
     null
   );

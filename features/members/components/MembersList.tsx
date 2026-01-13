@@ -1,12 +1,10 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { MembersListSkeleton } from './MembersListSkeleton';
 import { AddMemberDialog } from './AddMemberDialog';
-import { MemberActions } from './MemberActions';
 import { useGetMembers } from '../api/useGetMembers';
+import { MemberItem } from './MemberItem';
 
 export const MembersList = () => {
   const { data, isLoading, error } = useGetMembers();
@@ -24,7 +22,6 @@ export const MembersList = () => {
   }
 
   const { members, isAdmin, currentUserId, workspaceId } = data.data;
-  const existingMemberIds = members.map((m) => m.user_id);
 
   return (
     <div className="flex flex-col gap-y-4">
@@ -36,64 +33,17 @@ export const MembersList = () => {
           </p>
         </div>
 
-        {isAdmin && (
-          <AddMemberDialog
-            workspaceId={workspaceId}
-            existingMemberIds={existingMemberIds}
-          />
-        )}
+        {isAdmin && <AddMemberDialog />}
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700">
         {members.map((member) => (
-          <div
-            key={member.user_id}
-            className="flex items-center justify-between p-4"
-          >
-            <div className="flex items-center gap-x-4">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src={member.profiles?.avatar_url || ''} />
-                <AvatarFallback>
-                  {member.profiles?.full_name?.charAt(0) || 'M'}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <div className="flex items-center gap-x-2">
-                  <p className="text-sm font-medium">
-                    {member.profiles?.full_name || 'Unknown Member'}
-                  </p>
-                  {currentUserId === member.user_id && (
-                    <span className="text-xs text-muted-foreground">(You)</span>
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {member.profiles?.email || 'No email'}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-x-2">
-              {member.role === 'ADMIN' && (
-                <Badge variant="secondary">WORKSPACE ADMIN</Badge>
-              )}
-              {member.role === 'MEMBER' && (
-                <Badge
-                  variant="outline"
-                  className="text-blue-500 bg-blue-50 border-blue-200"
-                >
-                  MEMBER
-                </Badge>
-              )}
-              {isAdmin && currentUserId !== member.user_id && (
-                <MemberActions
-                  workspaceId={workspaceId}
-                  userId={member.user_id}
-                  memberName={member.profiles?.full_name || 'this member'}
-                  currentRole={member.role}
-                />
-              )}
-            </div>
-          </div>
+          <MemberItem
+            member={member}
+            isAdmin={isAdmin}
+            currentUserId={currentUserId}
+            workspaceId={workspaceId}
+          />
         ))}
 
         {members.length > 5 && (

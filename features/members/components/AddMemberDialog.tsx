@@ -2,40 +2,13 @@
 
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { useModal } from '@/components/providers/ModalProvider';
-import { AddMemberForm } from './AddMemberForm';
+import { useAddMemberModal } from '../hooks/useAddMemberModal';
 
-interface AddMemberDialogProps {
-  workspaceId: string;
-  existingMemberIds: string[];
-}
-
-export const AddMemberDialog = ({
-  workspaceId,
-  existingMemberIds,
-}: AddMemberDialogProps) => {
-  const { openModal, closeWithReplace } = useModal('add-member');
-
-  const handleClick = () => {
-    openModal({
-      title: 'Add Member',
-      description:
-        'Search for a user by email or name to add them to this workspace.',
-      children: (
-        <AddMemberForm
-          workspaceId={workspaceId}
-          existingMemberIds={existingMemberIds}
-          closeModal={closeWithReplace}
-        />
-      ),
-      config: {
-        showFooter: false,
-      },
-    });
-  };
+export const AddMemberDialog = () => {
+  const { open } = useAddMemberModal();
 
   return (
-    <Button onClick={handleClick}>
+    <Button onClick={open}>
       <Plus className="h-4 w-4 mr-2" />
       Add Member
     </Button>
