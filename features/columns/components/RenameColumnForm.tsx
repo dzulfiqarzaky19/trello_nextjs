@@ -4,15 +4,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { DialogFooter } from '@/components/ui/dialog';
 import { useUpdateColumn } from '@/features/columns/api/useUpdateColumn';
-import { Loader2 } from 'lucide-react';
 import { useGlobalModal } from '@/components/providers/ModalProvider';
+import { FormInput } from '@/components/form/FormInput';
+import { FormSubmit } from '@/components/form/FormSubmit';
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -35,7 +31,7 @@ export const RenameColumnForm = ({
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -60,14 +56,12 @@ export const RenameColumnForm = ({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-2">
-        <Input
+        <FormInput
+          label="Title"
           {...register('title')}
           placeholder="List title"
-          disabled={isPending}
+          error={errors.title?.message}
         />
-        {errors.title && (
-          <p className="text-sm text-red-500">{errors.title.message}</p>
-        )}
       </div>
       <DialogFooter>
         <Button
@@ -78,10 +72,11 @@ export const RenameColumnForm = ({
         >
           Cancel
         </Button>
-        <Button type="submit" disabled={isPending}>
-          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Save
-        </Button>
+        <FormSubmit
+          label="Save"
+          isSubmitting={isSubmitting || isPending}
+          isDisabled={isPending}
+        />
       </DialogFooter>
     </form>
   );

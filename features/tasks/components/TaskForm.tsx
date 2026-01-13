@@ -7,9 +7,11 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Card as CardType } from '../../projects/types';
 import { AlignLeft, Laptop, Trash2, Loader2 } from 'lucide-react';
+import { FormInput } from '@/components/form/FormInput';
+import { FormTextarea } from '@/components/form/FormTextarea';
+import { FormSubmit } from '@/components/form/FormSubmit';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -105,16 +107,14 @@ export const TaskForm = ({
             <Laptop className="mt-1 size-5 text-muted-foreground" />
             <div className="flex-1 space-y-1">
               <DialogTitle className="flex items-center gap-2">
-                <Input
+                <FormInput
                   {...register('title')}
                   placeholder="Task Title"
                   className="font-semibold text-xl border-none shadow-none focus-visible:ring-0 px-0 h-auto p-0 bg-transparent placeholder:text-muted-foreground/50"
                   disabled={isLoading}
+                  error={errors.title?.message}
                 />
               </DialogTitle>
-              {errors.title && (
-                <p className="text-red-500 text-sm">{errors.title.message}</p>
-              )}
               <div className="text-sm text-muted-foreground">
                 in list{' '}
                 <span className="font-medium text-foreground">{listTitle}</span>
@@ -127,11 +127,13 @@ export const TaskForm = ({
           <AlignLeft className="mt-1 size-5 text-muted-foreground" />
           <div className="space-y-2">
             <h3 className="font-semibold text-base">Description</h3>
-            <Textarea
+            <FormTextarea
+              label="Description"
               {...register('description')}
               placeholder="Add a more detailed description..."
-              className="min-h-[150px] resize-none"
+              className="resize-none"
               disabled={isLoading}
+              error={errors.description?.message}
             />
           </div>
         </div>
@@ -166,14 +168,11 @@ export const TaskForm = ({
           >
             Cancel
           </Button>
-          <Button
-            type="submit"
-            disabled={isLoading || (isEditing && !isDirty)}
-            className="bg-blue-600 hover:bg-blue-700 text-white min-w-[100px]"
-          >
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isEditing ? 'Save Changes' : 'Create Task'}
-          </Button>
+          <FormSubmit
+            label={isEditing ? 'Save Changes' : 'Create Task'}
+            isSubmitting={isLoading}
+            isDisabled={isLoading || (isEditing && !isDirty)}
+          />
         </div>
       </DialogFooter>
     </form>
