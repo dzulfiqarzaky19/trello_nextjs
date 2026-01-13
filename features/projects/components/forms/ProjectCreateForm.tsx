@@ -5,8 +5,6 @@ import { Input } from '@/components/ui/input';
 import { useCreateProject } from '../../api/useCreateProject';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createProjectSchema } from '../../schema';
@@ -14,22 +12,22 @@ import { z } from 'zod';
 import { FormInput } from '@/components/form/FormInput'; // Assuming these exist from workspace form
 import { FormImageInput } from '@/components/form/FormImageInput';
 import { DialogFooter } from '@/components/ui/dialog';
+import { useGetProjects } from '../../api/useGetProjects';
+
 
 interface ProjectCreateFormProps {
-  workspaceId?: string;
   closeModal?: () => void;
 }
 
 type FormValues = z.infer<typeof createProjectSchema>;
 
 export const ProjectCreateForm = ({
-  workspaceId: propWorkspaceId,
   closeModal,
 }: ProjectCreateFormProps) => {
   const { mutate, isPending } = useCreateProject();
-  const params = useParams();
+  const { data } = useGetProjects();
 
-  const workspaceId = propWorkspaceId || (params.workspaceId as string);
+  const workspaceId = data?.workspaceId;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(createProjectSchema),

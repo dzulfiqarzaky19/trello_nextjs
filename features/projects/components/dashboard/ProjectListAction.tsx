@@ -8,67 +8,17 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { MoreVertical, Pencil, Trash } from 'lucide-react';
-import { useModal } from '@/components/providers/ModalProvider';
 import { Project } from '../../types';
-import { useDeleteProject } from '../../api/useDeleteProject';
-import { ProjectEditForm } from '../forms/ProjectEditForm';
+import { useDeleteProjectModal } from '../../hooks/useDeleteProjectModal';
+import { useEditProjectModal } from '../../hooks/useEditProjectModal';
 
 interface IProjectListActionProps {
   project: Project;
 }
 
 export const ProjectListAction = ({ project }: IProjectListActionProps) => {
-  const { openModal: openEditModal, closeWithReplace: closeEditModal } =
-    useModal('edit-project');
-
-  const { openModal: openDeleteModal, closeWithBack: closeDeleteModal } =
-    useModal('delete-project');
-
-  const { mutate: deleteProject, isPending: isDeleting } = useDeleteProject();
-
-  const handleEdit = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    openEditModal({
-      title: 'Edit Project',
-      description: 'Update your project details.',
-      children: (
-        <ProjectEditForm project={project} closeModal={closeEditModal} />
-      ),
-      config: {
-        showFooter: false,
-      },
-    });
-  };
-
-  const handleDelete = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    openDeleteModal({
-      title: 'Delete Project',
-      description:
-        'Are you sure you want to delete this project? This action cannot be undone.',
-      children: null,
-      config: {
-        showFooter: true,
-        confirmLabel: 'Delete',
-        confirmVariant: 'destructive',
-        isConfirming: isDeleting,
-        onConfirm: () => {
-          deleteProject(
-            { param: { projectId: project.id } },
-            {
-              onSuccess: () => {
-                closeDeleteModal();
-              },
-            }
-          );
-        },
-      },
-    });
-  };
+  const handleEdit = useEditProjectModal({ project });
+  const handleDelete = useDeleteProjectModal({ projectId: project.id });
 
   return (
     <DropdownMenu>

@@ -34,7 +34,7 @@ export const ProjectEditForm = ({
     resolver: zodResolver(updateProjectSchema),
     defaultValues: {
       name: project.name,
-      status: project.status,
+      status: project.status || 'ACTIVE',
       image: project.image_url || undefined,
     },
   });

@@ -32,13 +32,25 @@ const app = new Hono()
             .single();
 
           if (!workspace) {
-            return c.json({ data: [] });
+            return c.json({
+              data: {
+                projects: [],
+                isAdmin: false,
+                workspaceId: null,
+              },
+            });
           }
           workspaceUuid = workspace.id;
         }
 
         if (!workspaceUuid) {
-          return c.json({ data: [] });
+          return c.json({
+            data: {
+              projects: [],
+              isAdmin: false,
+              workspaceId: null,
+            },
+          });
         }
         query = query.eq('workspace_id', workspaceUuid);
       } else {
@@ -51,19 +63,44 @@ const app = new Hono()
           userMemberWorkspaces?.map((m) => m.workspace_id) || [];
 
         if (workspaceIds.length === 0) {
-          return c.json({ data: [] });
+          return c.json({
+            data: {
+              projects: [],
+              isAdmin: false,
+              workspaceId: null,
+            },
+          });
         }
 
         query = query.in('workspace_id', workspaceIds);
       }
 
-      const { data, error } = await query;
+      const { data: projects, error } = await query;
 
       if (error) {
         return c.json({ error: error.message }, 500);
       }
 
-      return c.json({ data });
+      // If we are scoped to a specific workspace (via ID or slug), check permissions
+      let isAdmin = false;
+      if (workspaceUuid) {
+        const { data: member } = await supabase
+          .from('members')
+          .select('role')
+          .eq('workspace_id', workspaceUuid)
+          .eq('user_id', user.id)
+          .single();
+
+        isAdmin = member?.role === 'ADMIN';
+      }
+
+      return c.json({
+        data: {
+          projects,
+          isAdmin,
+          workspaceId: workspaceUuid,
+        },
+      });
     }
   )
   .post(

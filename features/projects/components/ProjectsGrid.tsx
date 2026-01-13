@@ -2,40 +2,23 @@
 
 import { ProjectCreate } from './dashboard/ProjectCreate';
 import { ProjectCard } from './dashboard/ProjectCard';
-import { useGetWorkspace } from '@/features/workspaces/api/useGetWorkspace';
 import { ProjectsGridSkeleton } from './ProjectsGridSkeleton';
 import { Project } from '../types';
 import { useGetProjects } from '@/features/projects/api/useGetProjects';
 
 export const ProjectsGrid = () => {
   const {
-    data: workspaceData,
-    isLoading: isLoadingWorkspace,
-    error: workspaceError,
-  } = useGetWorkspace();
-  const workspace = workspaceData?.data;
-
-  const {
-    data: projects,
+    data,
     isLoading: isLoadingProjects,
     error: projectsError,
   } = useGetProjects();
 
-  if (isLoadingWorkspace || (workspace?.id && isLoadingProjects)) {
-    return <ProjectsGridSkeleton />;
-  }
+  const projects = data?.projects || [];
+  const isAdmin = data?.isAdmin || false;
+  const workspaceId = data?.workspaceId;
 
-  if (workspaceError || !workspace) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-y-2">
-        <h2 className="text-lg font-semibold text-destructive">
-          Error loading workspace
-        </h2>
-        <p className="text-muted-foreground">
-          {workspaceError?.message || 'Workspace not found'}
-        </p>
-      </div>
-    );
+  if (isLoadingProjects) {
+    return <ProjectsGridSkeleton />;
   }
 
   if (projectsError) {
@@ -49,8 +32,6 @@ export const ProjectsGrid = () => {
     );
   }
 
-  const projectList = projects || [];
-
   return (
     <div className="flex flex-col gap-y-4">
       <div className="flex items-center justify-between">
@@ -58,13 +39,14 @@ export const ProjectsGrid = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {projectList.map((project: Project) => (
+        {projects.map((project: Project) => (
           <ProjectCard key={project.id} project={project} />
         ))}
-        {workspace.isAdmin && <ProjectCreate workspaceId={workspace.id} />}
+
+        {isAdmin && workspaceId && <ProjectCreate />}
       </div>
 
-      {projectList.length === 0 && !workspace.isAdmin && (
+      {projects.length === 0 && !isAdmin && (
         <div className="text-center py-12">
           <p className="text-muted-foreground mb-4">
             No projects found in this workspace.
