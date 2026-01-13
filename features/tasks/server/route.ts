@@ -13,7 +13,7 @@ const app = new Hono()
     async (c) => {
       const supabase = await createSupabaseServer();
       const user = c.get('user');
-      const { title, description, columnId, projectId, position } =
+      const { title, description, columnId, projectId, position, assignedTo } =
         c.req.valid('json');
 
       const { data: member } = await supabase
@@ -44,6 +44,9 @@ const app = new Hono()
           project_id: projectId,
           column_id: columnId,
           position,
+          assigned_to: assignedTo,
+          created_by: user.id,
+          updated_by: user.id,
         })
         .select()
         .single();
@@ -60,8 +63,9 @@ const app = new Hono()
     zValidator('json', updateTaskSchema),
     async (c) => {
       const supabase = await createSupabaseServer();
+      const user = c.get('user');
       const { taskId } = c.req.valid('param');
-      const { title, description, columnId, position } = c.req.valid('json');
+      const { title, description, columnId, position, assignedTo } = c.req.valid('json');
 
       const { data: currentTask } = await supabase
         .from('tasks')
@@ -71,9 +75,13 @@ const app = new Hono()
 
       if (!currentTask) return c.json({ error: 'Task not found' }, 404);
 
-      const updates: any = { updated_at: new Date().toISOString() };
+      const updates: any = {
+        updated_at: new Date().toISOString(),
+        updated_by: user.id,
+      };
       if (title) updates.title = title;
       if (description) updates.description = description;
+      if (assignedTo !== undefined) updates.assigned_to = assignedTo;
 
       if (position !== undefined && columnId !== undefined) {
         const oldColumnId = currentTask.column_id;

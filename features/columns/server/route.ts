@@ -40,6 +40,7 @@ const app = new Hono()
     zValidator('json', createColumnSchema),
     async (c) => {
       const supabase = await createSupabaseServer();
+      const user = c.get('user');
       const { title, projectId } = c.req.valid('json');
 
       const { data: project } = await supabase
@@ -65,6 +66,8 @@ const app = new Hono()
           name: title,
           project_id: projectId,
           position: newPosition,
+          created_by: user.id,
+          updated_by: user.id,
         })
         .select()
         .single();
@@ -81,6 +84,7 @@ const app = new Hono()
     zValidator('json', updateColumnSchema),
     async (c) => {
       const supabase = await createSupabaseServer();
+      const user = c.get('user');
       const { columnId } = c.req.valid('param');
       const { title, position } = c.req.valid('json');
 
@@ -92,7 +96,10 @@ const app = new Hono()
 
       if (!currentCol) return c.json({ error: 'Column not found' }, 404);
 
-      const updates: any = { updated_at: new Date().toISOString() };
+      const updates: any = {
+        updated_at: new Date().toISOString(),
+        updated_by: user.id,
+      };
       if (title) updates.name = title;
 
       if (position !== undefined && position !== currentCol.position) {

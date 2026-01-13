@@ -16,6 +16,8 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useUpdateTask } from '@/features/tasks/api/useUpdateTask';
+import { FormSelect } from '@/components/form/FormSelect';
+import { useGetMembers } from '@/features/members/api/useGetMembers';
 
 import { useCreateTask } from '@/features/tasks/api/useCreateTask';
 import { useProjectId } from '../../projects/hooks/useProjectId';
@@ -24,6 +26,7 @@ import { useDeleteTaskModal } from '@/features/tasks/hooks/useDeleteTaskModal';
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
+  assignedTo: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -48,15 +51,24 @@ export const TaskForm = ({
   const { mutate: updateTask, isPending: isUpdating } = useUpdateTask();
   const { mutate: createTask, isPending: isCreating } = useCreateTask();
 
+  const { data: members } = useGetMembers();
+  const memberOptions =
+    members?.data.members.map((member) => ({
+      label: member.profiles.full_name || member.profiles.email || 'Unknown',
+      value: member.user_id,
+    })) || [];
+
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isDirty },
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: card?.title || '',
       description: card?.description || '',
+      assignedTo: card?.assigned_to || '',
     },
   });
 
@@ -68,6 +80,7 @@ export const TaskForm = ({
           json: {
             title: data.title,
             description: data.description,
+            assignedTo: data.assignedTo,
           },
         },
         {
@@ -80,6 +93,7 @@ export const TaskForm = ({
           json: {
             title: data.title,
             description: data.description || '',
+            assignedTo: data.assignedTo,
             columnId,
             projectId,
           },
@@ -137,7 +151,22 @@ export const TaskForm = ({
             />
           </div>
         </div>
-      </div>
+
+
+        <div className="grid grid-cols-[24px_1fr] gap-4">
+          <div className="mt-1 size-5" />
+          <div className="space-y-2">
+            <FormSelect
+              control={control}
+              name="assignedTo"
+              label="Assign To"
+              placeholder="Select assignee..."
+              options={memberOptions}
+              className="w-full"
+            />
+          </div>
+        </div>
+      </div >
 
       <DialogFooter className="px-6 py-4 border-t flex justify-between items-center bg-muted/20">
         {isEditing ? (
@@ -175,6 +204,6 @@ export const TaskForm = ({
           />
         </div>
       </DialogFooter>
-    </form>
+    </form >
   );
 };

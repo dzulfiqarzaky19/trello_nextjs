@@ -4,7 +4,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { RECENT_ACTIVITY } from '@/lib/const/DashboardPage';
 import { FileIcon, MessageSquare } from 'lucide-react';
 
-export const RecentActivity = () => {
+interface RecentActivityProps {
+  activities: any[];
+}
+
+export const RecentActivity = ({ activities }: RecentActivityProps) => {
   return (
     <Card className="border-none shadow-sm">
       <CardContent className="p-6 space-y-6">
@@ -16,7 +20,7 @@ export const RecentActivity = () => {
         </div>
 
         <div className="space-y-6">
-          {RECENT_ACTIVITY.map((activity: any, index: number) => (
+          {activities.map((activity: any, index: number) => (
             <div key={index} className="flex gap-4">
               <div className="relative">
                 <Avatar className="w-10 h-10">

@@ -5,7 +5,11 @@ import { TEAM_WORKLOAD } from '@/lib/const/DashboardPage';
 import { cn } from '@/lib/utils';
 import { MoreHorizontal } from 'lucide-react';
 
-export const TeamWorkload = () => {
+interface TeamWorkloadProps {
+  data: any[];
+}
+
+export const TeamWorkload = ({ data }: TeamWorkloadProps) => {
   return (
     <Card className="border-none shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -19,7 +23,7 @@ export const TeamWorkload = () => {
         </div>
 
         <div className="space-y-6">
-          {TEAM_WORKLOAD.map((member: any) => (
+          {data.map((member: any) => (
             <div key={member.name} className="flex items-center gap-4">
               <Avatar className="w-8 h-8">
                 <AvatarImage src={member.image} />

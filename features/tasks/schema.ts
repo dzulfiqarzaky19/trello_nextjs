@@ -6,6 +6,7 @@ export const createTaskSchema = z.object({
   columnId: z.string(),
   projectId: z.string(),
   position: z.number().default(0),
+  assignedTo: z.string().optional(),
 });
 
 export const updateTaskSchema = z.object({
@@ -13,4 +14,5 @@ export const updateTaskSchema = z.object({
   description: z.string().optional(),
   columnId: z.string().optional(),
   position: z.number().optional(),
+  assignedTo: z.string().optional(),
 });

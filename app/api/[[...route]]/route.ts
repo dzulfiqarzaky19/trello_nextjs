@@ -10,6 +10,7 @@ import users from '@/features/users/server/route';
 import tasks from '@/features/tasks/server/route';
 
 import columns from '@/features/columns/server/route';
+import dashboard from '@/features/dashboard/server/route';
 
 const app = new Hono().basePath('/api');
 
@@ -21,7 +22,8 @@ const routes = app
   .route('/projects', projects)
   .route('/users', users)
   .route('/tasks', tasks)
-  .route('/columns', columns);
+  .route('/columns', columns)
+  .route('/dashboard', dashboard);
 
 export const GET = handle(routes);
 export const POST = handle(routes);

@@ -28,7 +28,11 @@ const chartConfig = {
   ),
 } satisfies ChartConfig;
 
-export const TaskDistributionChart = () => {
+interface TaskDistributionChartProps {
+  data: any[];
+}
+
+export const TaskDistributionChart = ({ data }: TaskDistributionChartProps) => {
   const totalPercentage = React.useMemo(() => {
     return '100%';
   }, []);
@@ -51,7 +55,7 @@ export const TaskDistributionChart = () => {
             />
 
             <Pie
-              data={CHART_DATA}
+              data={data}
               dataKey="value"
               nameKey="name"
               innerRadius={80}
@@ -59,7 +63,7 @@ export const TaskDistributionChart = () => {
               strokeWidth={0}
               paddingAngle={0}
             >
-              {CHART_DATA.map((entry: any, index: number) => (
+              {data.map((entry: any, index: number) => (
                 <Cell key={`cell-${index}`} fill={entry.fill} />
               ))}
               <Label
@@ -96,7 +100,7 @@ export const TaskDistributionChart = () => {
         </ChartContainer>
 
         <div className="grid grid-cols-2 gap-x-8 gap-y-4 mt-4 w-full px-4">
-          {CHART_DATA.map((entry: any) => (
+          {data.map((entry: any) => (
             <div key={entry.name} className="flex items-center gap-2">
               <div
                 className="w-3 h-3 rounded-full"

@@ -13,6 +13,7 @@ export interface Task {
   comments?: any[];
   attachments?: any[];
   due_date?: string | null;
+  assigned_to: string | null;
   priority?: 'low' | 'medium' | 'high' | null;
 }
 

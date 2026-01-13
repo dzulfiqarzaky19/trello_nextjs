@@ -148,6 +148,8 @@ const app = new Hono()
           workspace_id,
           image_url: imageUrl,
           status: status || 'ACTIVE',
+          created_by: user.id,
+          updated_by: user.id,
         })
         .select()
         .single();
@@ -232,6 +234,7 @@ const app = new Hono()
           name,
           status,
           ...(imageUrl && { image_url: imageUrl }),
+          updated_by: user.id,
         })
         .eq('id', projectId)
         .select()
