@@ -2,26 +2,14 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus } from 'lucide-react';
-import { useModal } from '@/components/providers/ModalProvider';
-import { WorkspaceCreateForm } from './forms/WorkspaceCreateForm';
+import { useCreateWorkspaceModal } from '../hooks/useCreateWorkspaceModal';
 
 export const WorkspaceCreate = () => {
-  const { openModal, closeWithReplace } = useModal('create-workspace');
-
-  const handleClick = () => {
-    openModal({
-      title: 'Create New Board',
-      description: 'Start organizing your tasks in a new project board.',
-      children: <WorkspaceCreateForm closeModal={closeWithReplace} />,
-      config: {
-        showFooter: false,
-      },
-    });
-  };
+  const openCreateWorkspaceModal = useCreateWorkspaceModal();
 
   return (
     <Card
-      onClick={handleClick}
+      onClick={openCreateWorkspaceModal}
       className="group hover:shadow-lg transition-shadow cursor-pointer h-full min-h-[250px] flex items-center justify-center bg-transparent hover:bg-muted border-dashed border-2"
     >
       <CardContent className="flex flex-col items-center gap-2 p-6 text-center">
