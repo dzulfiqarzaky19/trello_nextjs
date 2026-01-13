@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { DialogFooter } from '@/components/ui/dialog';
 import { useUpdateColumn } from '@/features/columns/api/useUpdateColumn';
-import { useGlobalModal } from '@/components/providers/ModalProvider';
+
 import { FormInput } from '@/components/form/FormInput';
 import { FormSubmit } from '@/components/form/FormSubmit';
 
@@ -19,13 +19,14 @@ type FormValues = z.infer<typeof formSchema>;
 interface RenameColumnFormProps {
   columnId: string;
   currentTitle: string;
+  closeModal?: () => void;
 }
 
 export const RenameColumnForm = ({
   columnId,
   currentTitle,
+  closeModal,
 }: RenameColumnFormProps) => {
-  const { closeWithBack } = useGlobalModal();
   const { mutate: updateColumn, isPending } = useUpdateColumn();
 
   const {
@@ -47,7 +48,7 @@ export const RenameColumnForm = ({
       },
       {
         onSuccess: () => {
-          closeWithBack();
+          closeModal?.();
         },
       }
     );
@@ -67,7 +68,7 @@ export const RenameColumnForm = ({
         <Button
           type="button"
           variant="outline"
-          onClick={closeWithBack}
+          onClick={() => closeModal?.()}
           disabled={isPending}
         >
           Cancel
