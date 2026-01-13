@@ -12,8 +12,8 @@ import { useGlobalModal } from '@/components/providers/ModalProvider';
 export const ProjectDetail = () => {
   const { orderedData, isLoading, error, onDragEnd } = useProjectBoard();
   const { openModal, closeWithBack } = useGlobalModal();
-  const projectId = useProjectId();
-  useProjectRealtime(projectId);
+
+  useProjectRealtime();
 
   if (isLoading) {
     return (
