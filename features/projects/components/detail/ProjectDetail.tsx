@@ -5,12 +5,11 @@ import { ProjectColumn } from '../../../columns/components/ProjectColumn';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import { useProjectBoard } from '../../hooks/useProjectBoard';
 import { useProjectRealtime } from '../../hooks/useProjectRealtime';
-import { ColumnForm } from '@/features/columns/components/ColumnForm';
-import { useGlobalModal } from '@/components/providers/ModalProvider';
+import { useCreateColumnModal } from '@/features/columns/hooks/useCreateColumnModal';
 
 export const ProjectDetail = () => {
   const { orderedData, isLoading, error, onDragEnd } = useProjectBoard();
-  const { openModal, closeWithBack } = useGlobalModal();
+  const openCreateColumnModal = useCreateColumnModal();
 
   useProjectRealtime();
 
@@ -49,12 +48,7 @@ export const ProjectDetail = () => {
               <Button
                 variant="ghost"
                 className="w-full justify-start bg-white/50 hover:bg-white/80 dark:bg-black/20 dark:hover:bg-black/40 h-12"
-                onClick={() =>
-                  openModal('create-column', {
-                    title: 'Create New Column',
-                    children: <ColumnForm closeModal={closeWithBack} />,
-                  })
-                }
+                onClick={openCreateColumnModal}
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Add List

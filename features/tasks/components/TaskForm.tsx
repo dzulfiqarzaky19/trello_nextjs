@@ -14,10 +14,10 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useUpdateTask } from '@/features/tasks/api/useUpdateTask';
-import { useDeleteTask } from '@/features/tasks/api/useDeleteTask';
+
 import { useCreateTask } from '@/features/tasks/api/useCreateTask';
 import { useProjectId } from '../../projects/hooks/useProjectId';
-import { useGlobalModal } from '@/components/providers/ModalProvider';
+import { useDeleteTaskModal } from '@/features/tasks/hooks/useDeleteTaskModal';
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -41,10 +41,9 @@ export const TaskForm = ({
 }: ModalFormProps) => {
   const isEditing = !!card;
   const projectId = useProjectId();
-  const { openModal, closeWithBack } = useGlobalModal();
+  const { openDeleteTaskModal, isDeleting } = useDeleteTaskModal();
 
   const { mutate: updateTask, isPending: isUpdating } = useUpdateTask();
-  const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask();
   const { mutate: createTask, isPending: isCreating } = useCreateTask();
 
   const {
@@ -92,26 +91,7 @@ export const TaskForm = ({
 
   const onDelete = () => {
     if (card) {
-      openModal('delete-task', {
-        title: 'Delete Task',
-        description: 'Are you sure you want to delete this task?',
-        children: null,
-        config: {
-          showFooter: true,
-          confirmLabel: 'Delete',
-          confirmVariant: 'destructive',
-          onConfirm: () => {
-            deleteTask(
-              {
-                param: { taskId: card.id },
-              },
-              {
-                onSuccess: () => closeWithBack(),
-              }
-            );
-          },
-        },
-      });
+      openDeleteTaskModal(card);
     }
   };
 

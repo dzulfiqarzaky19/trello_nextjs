@@ -1,8 +1,7 @@
 import { Draggable } from '@hello-pangea/dnd';
 import { CardDemo } from '@/components/Card';
-import { TaskForm } from './TaskForm';
 import { Task } from '@/features/tasks/types';
-import { useGlobalModal } from '@/components/providers/ModalProvider';
+import { useEditTaskModal } from '@/features/tasks/hooks/useEditTaskModal';
 
 interface ProjectTaskProps {
   task: Task;
@@ -11,19 +10,10 @@ interface ProjectTaskProps {
 }
 
 export const ProjectTask = ({ task, index, columnName }: ProjectTaskProps) => {
-  const { openModal, closeWithBack } = useGlobalModal();
+  const openEditTaskModal = useEditTaskModal();
 
   const handleOpenTask = () => {
-    openModal('view-task', {
-      title: 'Edit Task',
-      children: (
-        <TaskForm
-          card={task}
-          listTitle={columnName}
-          closeModal={closeWithBack}
-        />
-      ),
-    });
+    openEditTaskModal(task, columnName);
   };
 
   return (
