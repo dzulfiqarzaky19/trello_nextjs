@@ -39,8 +39,6 @@ export const useProjectBoard = () => {
       const { source, destination } = result;
       if (!destination) return;
 
-      // We need to look up the ID of the moved column
-      // We use the 'data' (which is orderedData) to find the column at the source index
       const movedColumn = data[source.index];
 
       if (!movedColumn) return;
@@ -63,12 +61,10 @@ export const useProjectBoard = () => {
 
       if (!startCol || !finishCol) return;
 
-      // Find the task being moved using the source index within the source column
       const movedTask = startCol.tasks?.[source.index];
 
       if (!movedTask) return;
 
-      // If same column and same position, do nothing (handled in onDragEnd check usually but safe to keep)
       if (
         source.droppableId === destination.droppableId &&
         source.index === destination.index

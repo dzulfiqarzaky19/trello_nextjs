@@ -81,7 +81,6 @@ const app = new Hono()
         return c.json({ error: error.message }, 500);
       }
 
-      // If we are scoped to a specific workspace (via ID or slug), check permissions
       let isAdmin = false;
       if (workspaceUuid) {
         const { data: member } = await supabase

@@ -67,6 +67,7 @@ export const ModalForm = ({ card, listTitle }: ModalFormProps) => {
               <div className="text-xs font-semibold text-muted-foreground uppercase mb-2">
                 Members
               </div>
+
               <CardAvatar
                 assignees={[
                   {
