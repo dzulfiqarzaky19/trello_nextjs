@@ -39,6 +39,7 @@ export const MembersList = () => {
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700">
         {members.map((member) => (
           <MemberItem
+            key={member.user_id}
             member={member}
             isAdmin={isAdmin}
             currentUserId={currentUserId}
