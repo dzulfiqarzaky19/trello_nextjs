@@ -5,7 +5,6 @@ import { ProjectColumn } from '../../../columns/components/ProjectColumn';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import { useProjectBoard } from '../../hooks/useProjectBoard';
 import { useProjectRealtime } from '../../hooks/useProjectRealtime';
-import { useProjectId } from '../../hooks/useProjectId';
 import { ColumnForm } from '@/features/columns/components/ColumnForm';
 import { useGlobalModal } from '@/components/providers/ModalProvider';
 
