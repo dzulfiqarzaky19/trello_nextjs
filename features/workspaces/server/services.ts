@@ -1,13 +1,14 @@
 import { createSupabaseServer } from '@/lib/supabase/server';
 import { TablesUpdate } from '@/lib/supabase/database.types';
 import { WORKSPACE_STORAGE_BUCKET } from '../constants';
-import {
-  getErrorMessage,
-  isAppError,
-  getWorkspaceImageUrl,
-} from '@/lib/supabase/types';
+import { getErrorMessage, isAppError } from '@/lib/supabase/types';
 import { workspaceSchema, workspacesListSchema } from '../schema';
 import { z } from 'zod';
+import { isUuid } from '@/lib/utils/checkUuid';
+import { MemberGuard } from '@/features/members/server/guard';
+import { StorageService } from '@/lib/storage-service';
+
+import { MemberService } from '@/features/members/server/services';
 
 type HttpErrorStatus = 400 | 401 | 404 | 500;
 
@@ -40,12 +41,10 @@ interface UpdateWorkspaceInput {
 }
 
 export class WorkspaceService {
-  static async getById(
-    workspaceIdOrSlug: string,
-    userId: string
-  ): Promise<ServiceResult<z.infer<typeof workspaceSchema>>> {
-    const supabase = await createSupabaseServer();
-
+  static async getWorkspace(
+    supabase: Awaited<ReturnType<typeof createSupabaseServer>>,
+    idOrSlug: string
+  ) {
     let query = supabase.from('workspaces').select(
       `
         *,
@@ -70,22 +69,133 @@ export class WorkspaceService {
       `
     );
 
-    const isUuid =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-        workspaceIdOrSlug
-      );
-
-    if (isUuid) {
-      query = query.eq('id', workspaceIdOrSlug);
+    if (isUuid(idOrSlug)) {
+      query = query.eq('id', idOrSlug);
     } else {
-      query = query.eq('slug', workspaceIdOrSlug);
+      query = query.eq('slug', idOrSlug);
     }
 
     const { data, error } = await query.single();
 
-    if (error) {
-      return { ok: false, error: error.message, status: 500 };
+    if (error) throw error;
+    return data;
+  }
+
+  static async listWorkspaces(
+    supabase: Awaited<ReturnType<typeof createSupabaseServer>>,
+    userId: string
+  ) {
+    const { data, error } = await supabase
+      .from('workspaces')
+      .select(
+        `
+          *,
+          user:user_id ( 
+            id,
+            full_name,
+            avatar_url,
+            role,
+            email
+          ),
+          members (
+            user_id,
+            role,
+            profiles:user_id ( 
+              id,
+              full_name,
+              avatar_url,
+              email
+            )
+          )
+        `
+      )
+      .eq('members.user_id', userId);
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async createWorkspace(
+    supabase: Awaited<ReturnType<typeof createSupabaseServer>>,
+    input: {
+      name: string;
+      slug: string;
+      image_url: string | null;
+      user_id: string;
+      description?: string;
     }
+  ) {
+    const { data, error } = await supabase
+      .from('workspaces')
+      .insert({
+        name: input.name,
+        slug: input.slug,
+        image_url: input.image_url,
+        user_id: input.user_id,
+        description: input.description,
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async updateWorkspace(
+    supabase: Awaited<ReturnType<typeof createSupabaseServer>>,
+    workspaceId: string,
+    updateData: TablesUpdate<'workspaces'>
+  ) {
+    const { data, error } = await supabase
+      .from('workspaces')
+      .update(updateData)
+      .eq('id', workspaceId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async deleteWorkspace(
+    supabase: Awaited<ReturnType<typeof createSupabaseServer>>,
+    workspaceId: string
+  ): Promise<void> {
+    const { error } = await supabase
+      .from('workspaces')
+      .delete()
+      .eq('id', workspaceId);
+
+    if (error) throw error;
+  }
+
+  static async uploadImage(
+    userId: string,
+    file: File
+  ): Promise<ServiceResult<{ url: string }>> {
+    const supabase = await createSupabaseServer();
+
+    try {
+      const fileName = `${userId}/${Date.now()}-${file.name}`;
+      const url = await StorageService.upload(
+        supabase,
+        file,
+        WORKSPACE_STORAGE_BUCKET,
+        fileName
+      );
+      return { ok: true, data: { url } };
+    } catch (error) {
+      return { ok: false, error: getErrorMessage(error), status: 500 };
+    }
+  }
+
+  static async getById(
+    workspaceIdOrSlug: string,
+    userId: string
+  ): Promise<ServiceResult<z.infer<typeof workspaceSchema>>> {
+    const supabase = await createSupabaseServer();
+
+    const data = await this.getWorkspace(supabase, workspaceIdOrSlug);
 
     if (!data) {
       return { ok: false, error: 'Workspace not found', status: 404 };
@@ -121,33 +231,7 @@ export class WorkspaceService {
     const supabase = await createSupabaseServer();
 
     try {
-      const { data, error } = await supabase
-        .from('workspaces')
-        .select(
-          `
-          *,
-          user:user_id ( 
-            id,
-            full_name,
-            avatar_url,
-            role,
-            email
-          ),
-          members (
-            user_id,
-            role,
-            profiles:user_id ( 
-              id,
-              full_name,
-              avatar_url,
-              email
-            )
-          )
-        `
-        )
-        .eq('members.user_id', userId);
-
-      if (error) throw error;
+      const data = await this.listWorkspaces(supabase, userId);
 
       const result = workspacesListSchema.safeParse(data);
 
@@ -168,42 +252,34 @@ export class WorkspaceService {
     const supabase = await createSupabaseServer();
 
     try {
-      // Step 1: Upload image if provided
       let imageUrl: string | null = null;
       if (input.image instanceof File) {
-        imageUrl = await this.uploadImageInternal(
+        const fileName = `${input.userId}/${Date.now()}-${input.image.name}`;
+        imageUrl = await StorageService.upload(
           supabase,
-          input.userId,
-          input.image
+          input.image,
+          WORKSPACE_STORAGE_BUCKET,
+          fileName
         );
       }
 
-      // Step 2: Create workspace
-      const { data: workspace, error: createError } = await supabase
-        .from('workspaces')
-        .insert({
-          name: input.name,
-          slug: input.slug,
-          image_url: imageUrl,
-          user_id: input.userId,
-          description: input.description,
-        })
-        .select()
-        .single();
+      const workspace = await this.createWorkspace(supabase, {
+        name: input.name,
+        slug: input.slug,
+        image_url: imageUrl,
+        user_id: input.userId,
+        description: input.description,
+      });
 
-      if (createError) throw createError;
-
-      // Step 3: Add creator as admin member (with rollback on failure)
       try {
-        const { error: memberError } = await supabase.from('members').insert({
-          workspace_id: workspace.id,
-          user_id: input.userId,
-          role: 'ADMIN',
-        });
-
-        if (memberError) throw memberError;
+        await MemberService.createMember(
+          supabase,
+          workspace.id,
+          input.userId,
+          'ADMIN'
+        );
       } catch (memberError) {
-        await supabase.from('workspaces').delete().eq('id', workspace.id);
+        await this.deleteWorkspace(supabase, workspace.id);
         throw memberError;
       }
 
@@ -227,21 +303,29 @@ export class WorkspaceService {
   ): Promise<ServiceResult<{ id: string; name: string; slug: string }>> {
     const supabase = await createSupabaseServer();
 
-    const member = await this.getMemberInternal(supabase, workspaceId, userId);
+    const adminCheck = await MemberGuard.validateAdmin(
+      supabase,
+      workspaceId,
+      userId
+    );
 
-    if (!member || member.role !== 'ADMIN') {
+    if (!adminCheck) {
       return { ok: false, error: 'Unauthorized', status: 401 };
     }
 
-    const existingImageUrl = getWorkspaceImageUrl(member);
+    const currentWorkspace = await this.getWorkspace(supabase, workspaceId);
+
+    const existingImageUrl = currentWorkspace?.image_url;
 
     try {
       let imageUrl: string | undefined | null = undefined;
       if (input.image instanceof File) {
-        imageUrl = await this.uploadImageInternal(
+        const fileName = `${userId}/${Date.now()}-${input.image.name}`;
+        imageUrl = await StorageService.upload(
           supabase,
-          userId,
-          input.image
+          input.image,
+          WORKSPACE_STORAGE_BUCKET,
+          fileName
         );
       } else if (typeof input.image === 'string') {
         imageUrl = input.image;
@@ -256,21 +340,22 @@ export class WorkspaceService {
         updateData.description = input.description;
       if (imageUrl !== undefined) updateData.image_url = imageUrl;
 
-      const { data: updatedWorkspace, error } = await supabase
-        .from('workspaces')
-        .update(updateData)
-        .eq('id', workspaceId)
-        .select()
-        .single();
-
-      if (error) throw error;
+      const updatedWorkspace = await this.updateWorkspace(
+        supabase,
+        workspaceId,
+        updateData
+      );
 
       if (
         imageUrl !== undefined &&
         existingImageUrl &&
         existingImageUrl !== imageUrl
       ) {
-        await this.deleteImageInternal(supabase, existingImageUrl);
+        await StorageService.delete(
+          supabase,
+          existingImageUrl,
+          WORKSPACE_STORAGE_BUCKET
+        );
       }
 
       return { ok: true, data: updatedWorkspace };
@@ -292,92 +377,34 @@ export class WorkspaceService {
   ): Promise<ServiceResult<{ id: string }>> {
     const supabase = await createSupabaseServer();
 
-    const member = await this.getMemberInternal(supabase, workspaceId, userId);
+    const adminCheck = await MemberGuard.validateAdmin(
+      supabase,
+      workspaceId,
+      userId
+    );
 
-    if (!member || member.role !== 'ADMIN') {
+    if (!adminCheck) {
       return { ok: false, error: 'Unauthorized', status: 401 };
     }
 
-    const imageUrl = getWorkspaceImageUrl(member);
+    const currentWorkspace = await this.getWorkspace(supabase, workspaceId);
+
+    const imageUrl = currentWorkspace?.image_url;
 
     try {
       if (imageUrl) {
-        await this.deleteImageInternal(supabase, imageUrl);
+        await StorageService.delete(
+          supabase,
+          imageUrl,
+          WORKSPACE_STORAGE_BUCKET
+        );
       }
 
-      const { error } = await supabase
-        .from('workspaces')
-        .delete()
-        .eq('id', workspaceId);
-
-      if (error) throw error;
+      await this.deleteWorkspace(supabase, workspaceId);
 
       return { ok: true, data: { id: workspaceId } };
     } catch (error) {
       return { ok: false, error: getErrorMessage(error), status: 500 };
     }
-  }
-
-  static async uploadImage(
-    userId: string,
-    file: File
-  ): Promise<ServiceResult<{ url: string }>> {
-    const supabase = await createSupabaseServer();
-
-    try {
-      const url = await this.uploadImageInternal(supabase, userId, file);
-      return { ok: true, data: { url } };
-    } catch (error) {
-      return { ok: false, error: getErrorMessage(error), status: 500 };
-    }
-  }
-
-  private static async uploadImageInternal(
-    supabase: Awaited<ReturnType<typeof createSupabaseServer>>,
-    userId: string,
-    image: File
-  ): Promise<string> {
-    const fileName = `${userId}/${Date.now()}-${image.name}`;
-    const { data, error } = await supabase.storage
-      .from(WORKSPACE_STORAGE_BUCKET)
-      .upload(fileName, image, {
-        cacheControl: '3600',
-        upsert: false,
-      });
-
-    if (error) throw new Error(error.message);
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from(WORKSPACE_STORAGE_BUCKET).getPublicUrl(data.path);
-
-    return publicUrl;
-  }
-
-  private static async deleteImageInternal(
-    supabase: Awaited<ReturnType<typeof createSupabaseServer>>,
-    imageUrl: string
-  ): Promise<void> {
-    const parts = imageUrl.split(`${WORKSPACE_STORAGE_BUCKET}/`);
-    if (parts.length > 1) {
-      const path = parts[parts.length - 1];
-      await supabase.storage.from(WORKSPACE_STORAGE_BUCKET).remove([path]);
-    }
-  }
-
-  private static async getMemberInternal(
-    supabase: Awaited<ReturnType<typeof createSupabaseServer>>,
-    workspaceId: string,
-    userId: string
-  ) {
-    const { data, error } = await supabase
-      .from('members')
-      .select('role, workspaces(image_url)')
-      .eq('workspace_id', workspaceId)
-      .eq('user_id', userId)
-      .single();
-
-    if (error) return null;
-    return data;
   }
 }

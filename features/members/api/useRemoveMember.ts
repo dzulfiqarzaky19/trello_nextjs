@@ -1,22 +1,25 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { client } from '@/lib/rpc';
+import { InferRequestType, InferResponseType } from 'hono';
 import { toast } from 'sonner';
 import { useWorkspaceSlug } from '@/features/workspaces/hooks/useWorkspaceSlug';
 
-interface RemoveMemberParams {
-  workspaceId: string;
-  userId: string;
-}
+type RequestType = InferRequestType<
+  (typeof client.api.members)[':userId']['$delete']
+>;
+type ResponseType = InferResponseType<
+  (typeof client.api.members)[':userId']['$delete']
+>;
 
 export const useRemoveMember = () => {
   const queryClient = useQueryClient();
   const workspaceSlug = useWorkspaceSlug();
 
-  return useMutation({
-    mutationFn: async ({ workspaceId, userId }: RemoveMemberParams) => {
+  return useMutation<ResponseType, Error, RequestType>({
+    mutationFn: async ({ param, json }) => {
       const response = await client.api.members[':userId'].$delete({
-        param: { userId },
-        json: { workspaceId },
+        param,
+        json,
       });
 
       if (!response.ok) {

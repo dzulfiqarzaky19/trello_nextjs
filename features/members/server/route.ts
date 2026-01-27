@@ -2,7 +2,12 @@ import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { sessionMiddleware } from '@/lib/session-middleware';
-import { createSupabaseServer } from '@/lib/supabase/server';
+import { MemberService } from './services';
+import {
+  addMemberSchema,
+  updateMemberRoleSchema,
+  removeMemberSchema,
+} from '../schema';
 
 const app = new Hono()
   .get(
@@ -10,127 +15,33 @@ const app = new Hono()
     sessionMiddleware,
     zValidator('query', z.object({ workspaceId: z.string() })),
     async (c) => {
-      const supabase = await createSupabaseServer();
-      const currentUser = c.get('user');
+      const user = c.get('user');
       const { workspaceId } = c.req.valid('query');
 
-      const isUuid =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-          workspaceId
-        );
+      const result = await MemberService.list(workspaceId, user.id);
 
-      let workspaceUuid = workspaceId;
-
-      if (!isUuid) {
-        const { data: workspace } = await supabase
-          .from('workspaces')
-          .select('id')
-          .eq('slug', workspaceId)
-          .single();
-
-        if (!workspace) {
-          return c.json({ error: 'Workspace not found' }, 404);
-        }
-        workspaceUuid = workspace.id;
+      if (!result.ok) {
+        return c.json({ error: result.error }, result.status);
       }
 
-      const { data: currentMember } = await supabase
-        .from('members')
-        .select('role')
-        .eq('workspace_id', workspaceUuid)
-        .eq('user_id', currentUser.id)
-        .single();
-
-      if (!currentMember) {
-        return c.json({ error: 'Unauthorized' }, 401);
-      }
-
-      const { data: members, error } = await supabase
-        .from('members')
-        .select(
-          `
-                    user_id,
-                    role,
-                    profiles:user_id (
-                        id,
-                        full_name,
-                        avatar_url,
-                        email
-                    )
-                `
-        )
-        .eq('workspace_id', workspaceUuid);
-
-      if (error) {
-        return c.json({ error: error.message }, 500);
-      }
-
-      return c.json({
-        data: {
-          members: members || [],
-          isAdmin: currentMember.role === 'ADMIN',
-          currentUserId: currentUser.id,
-          workspaceId: workspaceUuid,
-        },
-      });
+      return c.json({ data: result.data });
     }
   )
   .post(
     '/',
     sessionMiddleware,
-    zValidator(
-      'json',
-      z.object({
-        workspaceId: z.string(),
-        userId: z.string().uuid(),
-        role: z.enum(['ADMIN', 'MEMBER']).default('MEMBER'),
-      })
-    ),
+    zValidator('json', addMemberSchema),
     async (c) => {
-      const supabase = await createSupabaseServer();
-      const currentUser = c.get('user');
+      const user = c.get('user');
       const { workspaceId, userId, role } = c.req.valid('json');
 
-      const { data: currentMember } = await supabase
-        .from('members')
-        .select('role')
-        .eq('workspace_id', workspaceId)
-        .eq('user_id', currentUser.id)
-        .single();
+      const result = await MemberService.add(
+        { workspaceId, userId, role },
+        user.id
+      );
 
-      if (!currentMember || currentMember.role !== 'ADMIN') {
-        return c.json({ error: 'Only admins can add members' }, 403);
-      }
-
-      const { data: userToAdd } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', userId)
-        .single();
-
-      if (!userToAdd) {
-        return c.json({ error: 'User not found' }, 404);
-      }
-
-      const { data: existingMember } = await supabase
-        .from('members')
-        .select('user_id')
-        .eq('workspace_id', workspaceId)
-        .eq('user_id', userId)
-        .single();
-
-      if (existingMember) {
-        return c.json({ error: 'User is already a member' }, 400);
-      }
-
-      const { error } = await supabase.from('members').insert({
-        workspace_id: workspaceId,
-        user_id: userId,
-        role,
-      });
-
-      if (error) {
-        return c.json({ error: error.message }, 500);
+      if (!result.ok) {
+        return c.json({ error: result.error }, result.status);
       }
 
       return c.json({ success: true });
@@ -140,42 +51,19 @@ const app = new Hono()
     '/:userId',
     sessionMiddleware,
     zValidator('param', z.object({ userId: z.string() })),
-    zValidator(
-      'json',
-      z.object({
-        workspaceId: z.string(),
-        role: z.enum(['ADMIN', 'MEMBER']),
-      })
-    ),
+    zValidator('json', updateMemberRoleSchema),
     async (c) => {
-      const supabase = await createSupabaseServer();
-      const currentUser = c.get('user');
+      const user = c.get('user');
       const { userId } = c.req.valid('param');
       const { workspaceId, role } = c.req.valid('json');
 
-      const { data: currentMember } = await supabase
-        .from('members')
-        .select('role')
-        .eq('workspace_id', workspaceId)
-        .eq('user_id', currentUser.id)
-        .single();
+      const result = await MemberService.updateRole(
+        { workspaceId, targetUserId: userId, role },
+        user.id
+      );
 
-      if (!currentMember || currentMember.role !== 'ADMIN') {
-        return c.json({ error: 'Only admins can update member roles' }, 403);
-      }
-
-      if (userId === currentUser.id) {
-        return c.json({ error: 'Cannot change your own role' }, 400);
-      }
-
-      const { error } = await supabase
-        .from('members')
-        .update({ role })
-        .eq('workspace_id', workspaceId)
-        .eq('user_id', userId);
-
-      if (error) {
-        return c.json({ error: error.message }, 500);
+      if (!result.ok) {
+        return c.json({ error: result.error }, result.status);
       }
 
       return c.json({ success: true });
@@ -185,36 +73,19 @@ const app = new Hono()
     '/:userId',
     sessionMiddleware,
     zValidator('param', z.object({ userId: z.string() })),
-    zValidator('json', z.object({ workspaceId: z.string() })),
+    zValidator('json', removeMemberSchema),
     async (c) => {
-      const supabase = await createSupabaseServer();
-      const currentUser = c.get('user');
+      const user = c.get('user');
       const { userId } = c.req.valid('param');
       const { workspaceId } = c.req.valid('json');
 
-      const { data: currentMember } = await supabase
-        .from('members')
-        .select('role')
-        .eq('workspace_id', workspaceId)
-        .eq('user_id', currentUser.id)
-        .single();
+      const result = await MemberService.remove(
+        { workspaceId, targetUserId: userId },
+        user.id
+      );
 
-      if (!currentMember || currentMember.role !== 'ADMIN') {
-        return c.json({ error: 'Only admins can remove members' }, 403);
-      }
-
-      if (userId === currentUser.id) {
-        return c.json({ error: 'Cannot remove yourself' }, 400);
-      }
-
-      const { error } = await supabase
-        .from('members')
-        .delete()
-        .eq('workspace_id', workspaceId)
-        .eq('user_id', userId);
-
-      if (error) {
-        return c.json({ error: error.message }, 500);
+      if (!result.ok) {
+        return c.json({ error: result.error }, result.status);
       }
 
       return c.json({ success: true });

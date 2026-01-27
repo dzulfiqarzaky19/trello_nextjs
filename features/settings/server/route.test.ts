@@ -152,4 +152,3 @@ describe('Settings Hono Routes', () => {
     });
   });
 });
-

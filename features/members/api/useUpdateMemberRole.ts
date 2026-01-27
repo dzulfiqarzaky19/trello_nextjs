@@ -1,27 +1,25 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { client } from '@/lib/rpc';
+import { InferRequestType, InferResponseType } from 'hono';
 import { toast } from 'sonner';
 import { useWorkspaceSlug } from '@/features/workspaces/hooks/useWorkspaceSlug';
 
-interface UpdateMemberRoleParams {
-  workspaceId: string;
-  userId: string;
-  role: 'ADMIN' | 'MEMBER';
-}
+type RequestType = InferRequestType<
+  (typeof client.api.members)[':userId']['$patch']
+>;
+type ResponseType = InferResponseType<
+  (typeof client.api.members)[':userId']['$patch']
+>;
 
 export const useUpdateMemberRole = () => {
   const queryClient = useQueryClient();
   const workspaceSlug = useWorkspaceSlug();
 
-  return useMutation({
-    mutationFn: async ({
-      workspaceId,
-      userId,
-      role,
-    }: UpdateMemberRoleParams) => {
+  return useMutation<ResponseType, Error, RequestType>({
+    mutationFn: async ({ param, json }) => {
       const response = await client.api.members[':userId'].$patch({
-        param: { userId },
-        json: { workspaceId, role },
+        param,
+        json,
       });
 
       if (!response.ok) {
@@ -33,9 +31,11 @@ export const useUpdateMemberRole = () => {
 
       return response.json();
     },
-    onSuccess: (_, { role }) => {
+    onSuccess: (_, { json }) => {
       toast.success(
-        `Member ${role === 'ADMIN' ? 'promoted to admin' : 'demoted to member'}`
+        `Member ${
+          json.role === 'ADMIN' ? 'promoted to admin' : 'demoted to member'
+        }`
       );
       queryClient.invalidateQueries({ queryKey: ['members', workspaceSlug] });
     },

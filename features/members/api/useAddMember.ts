@@ -1,27 +1,19 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { client } from '@/lib/rpc';
+import { InferRequestType, InferResponseType } from 'hono';
 import { toast } from 'sonner';
 import { useWorkspaceSlug } from '@/features/workspaces/hooks/useWorkspaceSlug';
 
-interface AddMemberParams {
-  workspaceId: string;
-  userId: string;
-  role?: 'ADMIN' | 'MEMBER';
-}
+type RequestType = InferRequestType<typeof client.api.members.$post>;
+type ResponseType = InferResponseType<typeof client.api.members.$post>;
 
 export const useAddMember = () => {
   const queryClient = useQueryClient();
   const workspaceSlug = useWorkspaceSlug();
 
-  return useMutation({
-    mutationFn: async ({
-      workspaceId,
-      userId,
-      role = 'MEMBER',
-    }: AddMemberParams) => {
-      const response = await client.api.members.$post({
-        json: { workspaceId, userId, role },
-      });
+  return useMutation<ResponseType, Error, RequestType>({
+    mutationFn: async ({ json }) => {
+      const response = await client.api.members.$post({ json });
 
       if (!response.ok) {
         const error = await response.json();
