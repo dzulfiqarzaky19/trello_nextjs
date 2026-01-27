@@ -17,7 +17,10 @@ const chartConfig = {
     label: 'Visitors',
   },
   ...CHART_DATA.reduce(
-    (acc: any, curr: any) => ({
+    (
+      acc: Record<string, { label: string; color: string }>,
+      curr: { name: string; fill: string }
+    ) => ({
       ...acc,
       [curr.name.toLowerCase()]: {
         label: curr.name,
@@ -28,8 +31,14 @@ const chartConfig = {
   ),
 } satisfies ChartConfig;
 
+interface TaskDistributionData {
+  name: string;
+  value: number;
+  fill: string;
+}
+
 interface TaskDistributionChartProps {
-  data: any[];
+  data: TaskDistributionData[];
 }
 
 export const TaskDistributionChart = ({ data }: TaskDistributionChartProps) => {
@@ -63,7 +72,7 @@ export const TaskDistributionChart = ({ data }: TaskDistributionChartProps) => {
               strokeWidth={0}
               paddingAngle={0}
             >
-              {data.map((entry: any, index: number) => (
+              {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.fill} />
               ))}
               <Label
@@ -100,7 +109,7 @@ export const TaskDistributionChart = ({ data }: TaskDistributionChartProps) => {
         </ChartContainer>
 
         <div className="grid grid-cols-2 gap-x-8 gap-y-4 mt-4 w-full px-4">
-          {data.map((entry: any) => (
+          {data.map((entry) => (
             <div key={entry.name} className="flex items-center gap-2">
               <div
                 className="w-3 h-3 rounded-full"

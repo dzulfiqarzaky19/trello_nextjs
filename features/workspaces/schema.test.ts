@@ -132,7 +132,7 @@ describe('Workspace Schemas', () => {
           user_id: 'u1',
           created_at: null,
           updated_at: null,
-          members: { user_id: 'u1' }, // Error: Should be array
+          members: { user_id: 'u1' },
         },
       ];
       const result = workspacesListSchema.safeParse(invalidData);

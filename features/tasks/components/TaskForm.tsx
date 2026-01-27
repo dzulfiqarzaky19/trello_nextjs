@@ -152,7 +152,6 @@ export const TaskForm = ({
           </div>
         </div>
 
-
         <div className="grid grid-cols-[24px_1fr] gap-4">
           <div className="mt-1 size-5" />
           <div className="space-y-2">
@@ -166,7 +165,7 @@ export const TaskForm = ({
             />
           </div>
         </div>
-      </div >
+      </div>
 
       <DialogFooter className="px-6 py-4 border-t flex justify-between items-center bg-muted/20">
         {isEditing ? (
@@ -204,6 +203,6 @@ export const TaskForm = ({
           />
         </div>
       </DialogFooter>
-    </form >
+    </form>
   );
 };

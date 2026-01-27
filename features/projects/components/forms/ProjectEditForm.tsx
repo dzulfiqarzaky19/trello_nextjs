@@ -48,9 +48,7 @@ export const ProjectEditForm = ({
         form: data,
       });
       closeModal?.();
-    } catch {
-      // Error handled by useMutation.onError
-    }
+    } catch {}
   };
 
   return (

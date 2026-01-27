@@ -16,8 +16,6 @@ vi.mock('../../api/useCreateWorkspace', () => ({
   }),
 }));
 
-// Removed redundant @tanstack/react-query mock as we use QueryClientProvider
-
 vi.mock('sonner', () => ({
   toast: {
     success: vi.fn(),
@@ -152,7 +150,6 @@ describe('WorkspaceCreateForm', () => {
   });
 
   it('handles unexpected throwing error', async () => {
-    // Use mockImplementationOnce with a controlled rejection
     mockMutateAsync.mockImplementationOnce(() =>
       Promise.reject(new Error('Network error'))
     );
@@ -173,7 +170,6 @@ describe('WorkspaceCreateForm', () => {
       fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
     });
 
-    // Wait for the form to handle the rejection
     await waitFor(() => {
       expect(mockMutateAsync).toHaveBeenCalled();
     });

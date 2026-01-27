@@ -1,7 +1,6 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useCreateProject } from '../../api/useCreateProject';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
@@ -9,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createProjectSchema } from '../../schema';
 import { z } from 'zod';
-import { FormInput } from '@/components/form/FormInput'; // Assuming these exist from workspace form
+import { FormInput } from '@/components/form/FormInput';
 import { FormImageInput } from '@/components/form/FormImageInput';
 import { DialogFooter } from '@/components/ui/dialog';
 import { useGetProjects } from '../../api/useGetProjects';

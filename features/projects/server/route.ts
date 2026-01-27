@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { sessionMiddleware } from '@/lib/session-middleware';
 import { createSupabaseServer } from '@/lib/supabase/server';
 import { createProjectSchema, updateProjectSchema } from '../schema';
+import { logActivity } from '@/lib/audit-logs';
 
 const app = new Hono()
   .get(
@@ -158,6 +159,15 @@ const app = new Hono()
         return c.json({ error: error.message }, 500);
       }
 
+      await logActivity({
+        action: 'CREATE',
+        entityType: 'PROJECT',
+        entityId: data.id,
+        entityTitle: data.name,
+        workspaceId: workspace_id,
+        userId: user.id,
+      });
+
       return c.json({ data });
     }
   )
@@ -195,7 +205,7 @@ const app = new Hono()
 
       const { data: project } = await supabase
         .from('projects')
-        .select('workspace_id')
+        .select('workspace_id, name, status')
         .eq('id', projectId)
         .single();
 
@@ -242,6 +252,28 @@ const app = new Hono()
 
       if (error) return c.json({ error: error.message }, 500);
 
+      if (status && status !== project.status) {
+        await logActivity({
+          action: 'UPDATE_STATUS',
+          entityType: 'PROJECT',
+          entityId: projectId,
+          entityTitle: project.name,
+          workspaceId: project.workspace_id,
+          userId: user.id,
+          metadata: { from: project.status, to: status },
+        });
+      } else if (name && name !== project.name) {
+        await logActivity({
+          action: 'UPDATE_NAME',
+          entityType: 'PROJECT',
+          entityId: projectId,
+          entityTitle: name,
+          workspaceId: project.workspace_id,
+          userId: user.id,
+          metadata: { from: project.name, to: name },
+        });
+      }
+
       return c.json({ data });
     }
   )
@@ -256,7 +288,7 @@ const app = new Hono()
 
       const { data: project } = await supabase
         .from('projects')
-        .select('workspace_id')
+        .select('workspace_id, name')
         .eq('id', projectId)
         .single();
 
@@ -279,6 +311,15 @@ const app = new Hono()
         .eq('id', projectId);
 
       if (error) return c.json({ error: error.message }, 500);
+
+      await logActivity({
+        action: 'DELETE',
+        entityType: 'PROJECT',
+        entityId: projectId,
+        entityTitle: project.name,
+        workspaceId: project.workspace_id,
+        userId: user.id,
+      });
 
       return c.json({ data: { success: true } });
     }

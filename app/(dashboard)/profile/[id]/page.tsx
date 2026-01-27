@@ -13,7 +13,6 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const { id } = await params;
   const supabase = await createSupabaseServer();
 
-  // Fetch the profile of the requested user
   const { data: profile, error } = await supabase
     .from('profiles')
     .select('*')

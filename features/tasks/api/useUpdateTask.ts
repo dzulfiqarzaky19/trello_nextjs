@@ -3,6 +3,8 @@ import { client } from '@/lib/rpc';
 import { InferRequestType, InferResponseType } from 'hono';
 import { toast } from 'sonner';
 import { useProjectId } from '@/features/projects/hooks/useProjectId';
+import { Column } from '@/features/columns/types';
+import { Task } from '../types';
 
 type ResponseType = InferResponseType<
   (typeof client.api.tasks)[':taskId']['$patch'],
@@ -20,7 +22,7 @@ export const useUpdateTask = () => {
     ResponseType,
     Error,
     RequestType,
-    { previousColumns: any }
+    { previousColumns: Column[] | undefined }
   >({
     mutationFn: async ({ param, json }) => {
       const response = await client.api.tasks[':taskId'].$patch({
@@ -38,77 +40,73 @@ export const useUpdateTask = () => {
     onMutate: async ({ param, json }) => {
       await queryClient.cancelQueries({ queryKey: ['columns', projectId] });
 
-      const previousColumns = queryClient.getQueryData(['columns', projectId]);
+      const previousColumns = queryClient.getQueryData<Column[]>([
+        'columns',
+        projectId,
+      ]);
 
-      queryClient.setQueryData(['columns', projectId], (old: any) => {
-        if (!old) return old;
+      queryClient.setQueryData(
+        ['columns', projectId],
+        (old: Column[] | undefined) => {
+          if (!old) return old;
 
-        const newColumns = JSON.parse(JSON.stringify(old));
-        const { taskId } = param;
-        const { columnId, position, description, title } = json;
+          const newColumns: Column[] = JSON.parse(JSON.stringify(old));
+          const { taskId } = param;
+          const { columnId, position, description, title } = json;
 
-        // Verify if this is a move operation
-        if (columnId && position) {
-          let sourceColumn: any;
-          let sourceTaskIndex = -1;
-          let movedTask: any;
+          if (columnId && position) {
+            let sourceColumn: Column | undefined;
+            let sourceTaskIndex = -1;
+            let movedTask: Task | undefined;
 
-          // Find source column and task
-          for (const col of newColumns) {
-            const taskIndex = col.tasks?.findIndex((t: any) => t.id === taskId);
-            if (taskIndex !== -1 && taskIndex !== undefined) {
-              sourceColumn = col;
-              sourceTaskIndex = taskIndex;
-              movedTask = col.tasks[taskIndex];
-              break;
+            for (const col of newColumns) {
+              const taskIndex = col.tasks?.findIndex((t) => t.id === taskId);
+              if (taskIndex !== -1 && taskIndex !== undefined) {
+                sourceColumn = col;
+                sourceTaskIndex = taskIndex;
+                movedTask = col.tasks[taskIndex];
+                break;
+              }
             }
-          }
 
-          if (sourceColumn && movedTask) {
-            // Remove from source
-            sourceColumn.tasks.splice(sourceTaskIndex, 1);
+            if (sourceColumn && movedTask) {
+              sourceColumn.tasks.splice(sourceTaskIndex, 1);
 
-            // Add to destination
-            const destColumn = newColumns.find((c: any) => c.id === columnId);
-            if (destColumn) {
-              if (!destColumn.tasks) destColumn.tasks = [];
-              // position is 1-indexed from backend/dnd logic usually, so subtract 1
-              // Ensure we don't go out of bounds if position is huge (though dnd handles this)
-              const insertIndex = Math.min(
-                Math.max(0, position - 1),
-                destColumn.tasks.length
-              );
-              destColumn.tasks.splice(insertIndex, 0, movedTask);
+              const destColumn = newColumns.find((c) => c.id === columnId);
+              if (destColumn) {
+                if (!destColumn.tasks) destColumn.tasks = [];
+                const insertIndex = Math.min(
+                  Math.max(0, position - 1),
+                  destColumn.tasks.length
+                );
+                destColumn.tasks.splice(insertIndex, 0, movedTask);
 
-              // Update positions for tasks in destination column
-              destColumn.tasks.forEach((t: any, idx: number) => {
-                t.position = idx + 1;
-              });
-
-              // Optional: Update positions in source column if needed (usually less critical for sorting if empty, but good practice)
-              if (sourceColumn && sourceColumn !== destColumn) {
-                sourceColumn.tasks.forEach((t: any, idx: number) => {
+                destColumn.tasks.forEach((t, idx) => {
                   t.position = idx + 1;
                 });
+                if (sourceColumn && sourceColumn !== destColumn) {
+                  sourceColumn.tasks.forEach((t, idx) => {
+                    t.position = idx + 1;
+                  });
+                }
               }
             }
           }
-        }
 
-        // Handle direct property updates (title, description)
-        if (title || description) {
-          for (const col of newColumns) {
-            const task = col.tasks?.find((t: any) => t.id === taskId);
-            if (task) {
-              if (title) task.title = title;
-              if (description) task.description = description;
-              break;
+          if (title || description) {
+            for (const col of newColumns) {
+              const task = col.tasks?.find((t) => t.id === taskId);
+              if (task) {
+                if (title) task.title = title;
+                if (description) task.description = description;
+                break;
+              }
             }
           }
-        }
 
-        return newColumns;
-      });
+          return newColumns;
+        }
+      );
 
       return { previousColumns };
     },

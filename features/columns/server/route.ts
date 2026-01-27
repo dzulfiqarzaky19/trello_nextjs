@@ -4,6 +4,9 @@ import { z } from 'zod';
 import { sessionMiddleware } from '@/lib/session-middleware';
 import { createSupabaseServer } from '@/lib/supabase/server';
 import { createColumnSchema, updateColumnSchema } from '../schema';
+import { TablesUpdate } from '@/lib/supabase/database.types';
+import { hasProjectData } from '@/lib/supabase/types';
+import { logActivity } from '@/lib/audit-logs';
 
 const app = new Hono()
   .get(
@@ -45,7 +48,7 @@ const app = new Hono()
 
       const { data: project } = await supabase
         .from('projects')
-        .select('id')
+        .select('id, workspace_id, name')
         .eq('id', projectId)
         .single();
       if (!project) return c.json({ error: 'Project not found' }, 404);
@@ -90,15 +93,21 @@ const app = new Hono()
 
       const { data: currentCol } = await supabase
         .from('columns')
-        .select('*')
+        .select('*, projects(workspace_id, name)')
         .eq('id', columnId)
         .single();
 
       if (!currentCol) return c.json({ error: 'Column not found' }, 404);
 
-      const updates: any = {
+      let workspaceId = '';
+      let projectName = '';
+      if (hasProjectData(currentCol) && currentCol.projects) {
+        workspaceId = currentCol.projects.workspace_id;
+        projectName = currentCol.projects.name;
+      }
+
+      const updates: TablesUpdate<'columns'> = {
         updated_at: new Date().toISOString(),
-        updated_by: user.id,
       };
       if (title) updates.name = title;
 
@@ -139,6 +148,29 @@ const app = new Hono()
         .single();
 
       if (error) return c.json({ error: error.message }, 500);
+
+      if (position !== undefined && position !== currentCol.position) {
+        await logActivity({
+          action: 'MOVE',
+          entityType: 'COLUMN',
+          entityId: columnId,
+          entityTitle: currentCol.name,
+          workspaceId: workspaceId,
+          userId: user.id,
+          metadata: { from: currentCol.position, to: position, projectName },
+        });
+      } else if (title && title !== currentCol.name) {
+        await logActivity({
+          action: 'UPDATE_NAME',
+          entityType: 'COLUMN',
+          entityId: columnId,
+          entityTitle: title,
+          workspaceId: workspaceId,
+          userId: user.id,
+          metadata: { from: currentCol.name, to: title, projectName },
+        });
+      }
+
       return c.json({ data });
     }
   )
@@ -148,7 +180,23 @@ const app = new Hono()
     zValidator('param', z.object({ columnId: z.string() })),
     async (c) => {
       const supabase = await createSupabaseServer();
+      const user = c.get('user');
       const { columnId } = c.req.valid('param');
+
+      const { data: column } = await supabase
+        .from('columns')
+        .select('name, projects(workspace_id, name)')
+        .eq('id', columnId)
+        .single();
+
+      if (!column) return c.json({ error: 'Column not found' }, 404);
+
+      let workspaceId = '';
+      let projectName = '';
+      if (hasProjectData(column) && column.projects) {
+        workspaceId = column.projects.workspace_id;
+        projectName = column.projects.name;
+      }
 
       const { data, error } = await supabase
         .from('columns')
@@ -158,6 +206,7 @@ const app = new Hono()
         .single();
 
       if (error) return c.json({ error: error.message }, 500);
+
       return c.json({ data });
     }
   );

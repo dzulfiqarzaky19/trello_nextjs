@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { useGetDashboard } from '@/features/dashboard/api/useGetDashboard';
 import { DASHBOARD_STATS } from '@/lib/const/DashboardPage';
 import { Loader2 } from 'lucide-react';

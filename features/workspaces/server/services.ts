@@ -1,4 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
+import { TablesUpdate } from '@/lib/supabase/database.types';
 import { WORKSPACE_STORAGE_BUCKET } from '../constants';
 
 export class WorkspaceService {
@@ -49,7 +50,7 @@ export class WorkspaceService {
     return workspace;
   }
 
-  async updateWorkspace(workspaceId: string, data: any) {
+  async updateWorkspace(workspaceId: string, data: TablesUpdate<'workspaces'>) {
     const { data: updatedWorkspace, error } = await this.supabase
       .from('workspaces')
       .update(data)

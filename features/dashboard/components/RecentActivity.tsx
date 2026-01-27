@@ -1,11 +1,26 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { RECENT_ACTIVITY } from '@/lib/const/DashboardPage';
 import { FileIcon, MessageSquare } from 'lucide-react';
 
+interface ActivityUser {
+  name: string;
+  image: string;
+}
+
+interface Activity {
+  type: string;
+  user: ActivityUser;
+  action: string;
+  target: string;
+  time: string;
+  details?: { from?: string | number; to?: string | number };
+  message?: string;
+  files?: string[];
+}
+
 interface RecentActivityProps {
-  activities: any[];
+  activities: Activity[];
 }
 
 export const RecentActivity = ({ activities }: RecentActivityProps) => {
@@ -20,7 +35,7 @@ export const RecentActivity = ({ activities }: RecentActivityProps) => {
         </div>
 
         <div className="space-y-6">
-          {activities.map((activity: any, index: number) => (
+          {activities.map((activity, index) => (
             <div key={index} className="flex gap-4">
               <div className="relative">
                 <Avatar className="w-10 h-10">
@@ -83,7 +98,7 @@ export const RecentActivity = ({ activities }: RecentActivityProps) => {
 
                 {activity.type === 'upload' && activity.files && (
                   <div className="flex gap-2 mt-2">
-                    {activity.files.map((file: any, i: number) => (
+                    {activity.files?.map((file, i) => (
                       <div
                         key={i}
                         className="flex items-center gap-2 bg-muted px-2 py-1 rounded text-xs text-muted-foreground border"

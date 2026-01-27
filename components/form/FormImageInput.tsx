@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import { Field, FieldError, FieldLabel } from '../ui/field';
 import { Input } from '../ui/input';
 import { ImageIcon, XIcon } from 'lucide-react';
@@ -10,6 +10,8 @@ import {
   Path,
   useWatch,
 } from 'react-hook-form';
+import Image from 'next/image';
+import { isFile } from '@/lib/typeguard/isFile';
 
 interface IFormImageInput<T extends FieldValues> {
   label: string;
@@ -24,7 +26,6 @@ export const FormImageInput = <T extends FieldValues>({
   control,
   name,
 }: IFormImageInput<T>) => {
-  const [preview, setPreview] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const value = useWatch({
@@ -32,17 +33,20 @@ export const FormImageInput = <T extends FieldValues>({
     name,
   });
 
-  useEffect(() => {
-    if ((value as any) instanceof File) {
-      const url = URL.createObjectURL(value as any);
-      setPreview(url);
-      return () => URL.revokeObjectURL(url);
+  const preview = useMemo(() => {
+    if (isFile(value)) {
+      return URL.createObjectURL(value);
     } else if (typeof value === 'string') {
-      setPreview(value);
-    } else {
-      setPreview(null);
+      return value;
     }
+    return null;
   }, [value]);
+
+  useEffect(() => {
+    if (preview && preview.startsWith('blob:')) {
+      return () => URL.revokeObjectURL(preview);
+    }
+  }, [preview]);
 
   return (
     <Controller
@@ -68,7 +72,7 @@ export const FormImageInput = <T extends FieldValues>({
               <div className="flex items-center gap-x-4">
                 <div className="relative flex items-center justify-center size-[72px] bg-neutral-100 border border-dashed border-neutral-300 rounded-full overflow-hidden">
                   {preview ? (
-                    <img
+                    <Image
                       src={preview}
                       alt="Preview"
                       className="object-cover size-full"

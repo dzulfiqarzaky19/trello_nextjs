@@ -52,9 +52,7 @@ export const ProfileForm = () => {
         return;
       }
       reset(data);
-    } catch {
-      // Error handled by useMutation.onError
-    }
+    } catch {}
   };
 
   if (!data) {

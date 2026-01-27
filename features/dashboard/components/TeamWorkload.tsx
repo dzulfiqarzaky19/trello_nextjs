@@ -1,12 +1,18 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { TEAM_WORKLOAD } from '@/lib/const/DashboardPage';
-import { cn } from '@/lib/utils';
+
 import { MoreHorizontal } from 'lucide-react';
 
+interface TeamWorkloadMember {
+  name: string;
+  image: string | null;
+  progress: number;
+  color: string;
+}
+
 interface TeamWorkloadProps {
-  data: any[];
+  data: TeamWorkloadMember[];
 }
 
 export const TeamWorkload = ({ data }: TeamWorkloadProps) => {
@@ -23,10 +29,10 @@ export const TeamWorkload = ({ data }: TeamWorkloadProps) => {
         </div>
 
         <div className="space-y-6">
-          {data.map((member: any) => (
+          {data.map((member) => (
             <div key={member.name} className="flex items-center gap-4">
               <Avatar className="w-8 h-8">
-                <AvatarImage src={member.image} />
+                <AvatarImage src={member.image || undefined} />
                 <AvatarFallback>{member.name[0]}</AvatarFallback>
               </Avatar>
 

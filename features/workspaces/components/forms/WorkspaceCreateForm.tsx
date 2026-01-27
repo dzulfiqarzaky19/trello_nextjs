@@ -54,9 +54,7 @@ export const WorkspaceCreateForm = ({
       });
       reset();
       closeModal?.();
-    } catch {
-      // Error handled by useMutation.onError
-    }
+    } catch {}
   };
 
   return (

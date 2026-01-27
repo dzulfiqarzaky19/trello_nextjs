@@ -10,6 +10,11 @@ import {
 import { sessionMiddleware } from '@/lib/session-middleware';
 import { createSupabaseServer } from '@/lib/supabase/server';
 import { WorkspaceService } from './services';
+import {
+  getErrorMessage,
+  isAppError,
+  getWorkspaceImageUrl,
+} from '@/lib/supabase/types';
 
 const app = new Hono()
   .get(
@@ -67,7 +72,7 @@ const app = new Hono()
       }
 
       const currentMember = data.members.find(
-        (m: any) => m.user_id === user.id
+        (m: { user_id: string }) => m.user_id === user.id
       );
 
       if (!currentMember) {
@@ -104,8 +109,9 @@ const app = new Hono()
       }
 
       return c.json({ workspaces: result.data });
-    } catch (error: any) {
-      return c.json({ error: 'Something went wrong' }, 500);
+    } catch (error) {
+      console.error(error);
+      return c.json({ error: getErrorMessage(error) }, 500);
     }
   })
   .post(
@@ -140,14 +146,17 @@ const app = new Hono()
         }
 
         return c.json({ data: workspace });
-      } catch (error: any) {
-        if (error.code === '23505') {
+      } catch (error) {
+        if (
+          isAppError(error) &&
+          (error as { code?: string }).code === '23505'
+        ) {
           return c.json(
             { error: 'Workspace with this slug already exists' },
             400
           );
         }
-        return c.json({ error: error.message || 'Something went wrong' }, 500);
+        return c.json({ error: getErrorMessage(error) }, 500);
       }
     }
   )
@@ -168,7 +177,7 @@ const app = new Hono()
         return c.json({ error: 'Unauthorized' }, 401);
       }
 
-      const existingImageUrl = (member.workspaces as any)?.image_url;
+      const existingImageUrl = getWorkspaceImageUrl(member);
       let imageUrl: string | undefined | null = undefined;
 
       try {
@@ -180,7 +189,7 @@ const app = new Hono()
           imageUrl = null;
         }
 
-        const updateData: any = {};
+        const updateData: Record<string, unknown> = {};
         if (name !== undefined) updateData.name = name;
         if (slug !== undefined) updateData.slug = slug;
         if (description !== undefined) updateData.description = description;
@@ -197,14 +206,17 @@ const app = new Hono()
         }
 
         return c.json({ data });
-      } catch (error: any) {
-        if (error.code === '23505') {
+      } catch (error) {
+        if (
+          isAppError(error) &&
+          (error as { code?: string }).code === '23505'
+        ) {
           return c.json(
             { error: 'Workspace with this slug already exists' },
             400
           );
         }
-        return c.json({ error: error.message || 'Something went wrong' }, 500);
+        return c.json({ error: getErrorMessage(error) }, 500);
       }
     }
   )
@@ -220,7 +232,7 @@ const app = new Hono()
       return c.json({ error: 'Unauthorized' }, 401);
     }
 
-    const imageUrl = (member.workspaces as any)?.image_url;
+    const imageUrl = getWorkspaceImageUrl(member);
 
     try {
       if (imageUrl) {
@@ -229,8 +241,8 @@ const app = new Hono()
 
       await service.deleteWorkspace(workspaceId);
       return c.json({ data: { id: workspaceId } });
-    } catch (error: any) {
-      return c.json({ error: error.message || 'Something went wrong' }, 500);
+    } catch (error) {
+      return c.json({ error: getErrorMessage(error) }, 500);
     }
   })
   .post('/upload', sessionMiddleware, async (c) => {
@@ -246,8 +258,8 @@ const app = new Hono()
     try {
       const url = await service.uploadImage(user.id, file);
       return c.json({ url });
-    } catch (error: any) {
-      return c.json({ error: error.message }, 500);
+    } catch (error) {
+      return c.json({ error: getErrorMessage(error) }, 500);
     }
   });
 

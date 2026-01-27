@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+
+export const dynamic = 'force-dynamic';
 import { AuthProviderWrapper } from '@/components/providers/AuthProviderWrapper';
 import { QueryProviders } from '@/components/providers/QueryProviders';
 import { Toaster } from '@/components/ui/sonner';
