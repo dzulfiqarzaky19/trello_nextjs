@@ -8,22 +8,8 @@ import { MemberGuard } from '@/features/members/server/guard';
 import { WorkspaceService } from '@/features/workspaces/server/services';
 import { StorageService } from '@/lib/storage-service';
 import { logActivity } from '@/lib/audit-logs';
-import { isUuid } from '@/lib/utils/checkUuid';
 
-type HttpErrorStatus = 400 | 401 | 404 | 500;
-
-interface ServiceSuccess<T> {
-  ok: true;
-  data: T;
-}
-
-interface ServiceError {
-  ok: false;
-  error: string;
-  status: HttpErrorStatus;
-}
-
-type ServiceResult<T> = ServiceSuccess<T> | ServiceError;
+import { ServiceResult } from '@/lib/service-result';
 
 export class ProjectService {
   // --- Internal Basic CRUD Methods ---

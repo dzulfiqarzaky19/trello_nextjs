@@ -10,20 +10,7 @@ import { StorageService } from '@/lib/storage-service';
 
 import { MemberService } from '@/features/members/server/services';
 
-type HttpErrorStatus = 400 | 401 | 404 | 500;
-
-interface ServiceSuccess<T> {
-  ok: true;
-  data: T;
-}
-
-interface ServiceError {
-  ok: false;
-  error: string;
-  status: HttpErrorStatus;
-}
-
-type ServiceResult<T> = ServiceSuccess<T> | ServiceError;
+import { ServiceResult } from '@/lib/service-result';
 
 interface CreateWorkspaceInput {
   name: string;

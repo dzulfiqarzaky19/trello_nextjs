@@ -8,20 +8,7 @@ import { logActivity } from '@/lib/audit-logs';
 import { hasProjectData } from '@/lib/supabase/types';
 import { ProjectService } from '@/features/projects/server/services';
 
-type HttpErrorStatus = 400 | 401 | 404 | 500;
-
-interface ServiceSuccess<T> {
-  ok: true;
-  data: T;
-}
-
-interface ServiceError {
-  ok: false;
-  error: string;
-  status: HttpErrorStatus;
-}
-
-type ServiceResult<T> = ServiceSuccess<T> | ServiceError;
+import { ServiceResult } from '@/lib/service-result';
 
 type ColumnWithTasks = Tables<'columns'> & { tasks: Tables<'tasks'>[] };
 
