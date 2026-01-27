@@ -38,11 +38,8 @@ interface RemoveMemberInput {
 }
 
 export class MemberService {
-  static async getById(
-    supabase: Awaited<ReturnType<typeof createSupabaseServer>>,
-    workspaceId: string,
-    userId: string
-  ) {
+  static async getById(workspaceId: string, userId: string) {
+    const supabase = await createSupabaseServer();
     const { data, error } = await supabase
       .from('members')
       .select('*')
@@ -54,10 +51,8 @@ export class MemberService {
     return data;
   }
 
-  static async listMembers(
-    supabase: Awaited<ReturnType<typeof createSupabaseServer>>,
-    workspaceId: string
-  ) {
+  static async listMembers(workspaceId: string) {
+    const supabase = await createSupabaseServer();
     const { data: members, error } = await supabase
       .from('members')
       .select(
@@ -79,11 +74,11 @@ export class MemberService {
   }
 
   static async createMember(
-    supabase: Awaited<ReturnType<typeof createSupabaseServer>>,
     workspaceId: string,
     userId: string,
     role: 'ADMIN' | 'MEMBER'
   ): Promise<void> {
+    const supabase = await createSupabaseServer();
     const { error } = await supabase.from('members').insert({
       workspace_id: workspaceId,
       user_id: userId,
@@ -94,11 +89,11 @@ export class MemberService {
   }
 
   static async updateMember(
-    supabase: Awaited<ReturnType<typeof createSupabaseServer>>,
     workspaceId: string,
     userId: string,
     role: 'ADMIN' | 'MEMBER'
   ): Promise<void> {
+    const supabase = await createSupabaseServer();
     const { error } = await supabase
       .from('members')
       .update({ role })
@@ -109,10 +104,10 @@ export class MemberService {
   }
 
   static async deleteMember(
-    supabase: Awaited<ReturnType<typeof createSupabaseServer>>,
     workspaceId: string,
     userId: string
   ): Promise<void> {
+    const supabase = await createSupabaseServer();
     const { error } = await supabase
       .from('members')
       .delete()
@@ -122,15 +117,25 @@ export class MemberService {
     if (error) throw error;
   }
 
+  // Helper to fetch profile (as we don't have ProfileService yet)
+  static async getProfile(userId: string) {
+    const supabase = await createSupabaseServer();
+    const { data } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', userId)
+      .single();
+    return data;
+  }
+
   static async list(
     workspaceIdOrSlug: string,
     currentUserId: string
   ): Promise<ServiceResult<z.infer<typeof membersListSchema>>> {
-    const supabase = await createSupabaseServer();
-
     try {
       let workspaceUuid = workspaceIdOrSlug;
-      const resolvedId = await WorkspaceService.getWorkspaceId(workspaceIdOrSlug);
+      const resolvedId =
+        await WorkspaceService.getWorkspaceId(workspaceIdOrSlug);
 
       if (!resolvedId) {
         return { ok: false, error: 'Workspace not found', status: 404 };
@@ -138,7 +143,6 @@ export class MemberService {
       workspaceUuid = resolvedId;
 
       const memberCheck = await MemberGuard.validateMember(
-        supabase,
         workspaceUuid,
         currentUserId
       );
@@ -149,7 +153,7 @@ export class MemberService {
 
       const currentMember = memberCheck.member;
 
-      const members = await this.listMembers(supabase, workspaceUuid);
+      const members = await this.listMembers(workspaceUuid);
 
       const result = membersListSchema.safeParse({
         members: members || [],
@@ -172,11 +176,8 @@ export class MemberService {
     input: AddMemberInput,
     currentUserId: string
   ): Promise<ServiceResult<{ success: true }>> {
-    const supabase = await createSupabaseServer();
-
     try {
       const adminCheck = await MemberGuard.validateAdmin(
-        supabase,
         input.workspaceId,
         currentUserId
       );
@@ -185,19 +186,14 @@ export class MemberService {
         return { ok: false, error: 'Only admins can add members', status: 403 };
       }
 
-      // TODO: Create Profile Service later
-      const { data: userToAdd } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', input.userId)
-        .single();
+      // Using internal helper
+      const userToAdd = await this.getProfile(input.userId);
 
       if (!userToAdd) {
         return { ok: false, error: 'User not found', status: 404 };
       }
 
       const existingMember = await this.getById(
-        supabase,
         input.workspaceId,
         input.userId
       );
@@ -206,12 +202,7 @@ export class MemberService {
         return { ok: false, error: 'User is already a member', status: 400 };
       }
 
-      await this.createMember(
-        supabase,
-        input.workspaceId,
-        input.userId,
-        input.role
-      );
+      await this.createMember(input.workspaceId, input.userId, input.role);
 
       return { ok: true, data: { success: true } };
     } catch (error) {
@@ -223,11 +214,8 @@ export class MemberService {
     input: UpdateMemberRoleInput,
     currentUserId: string
   ): Promise<ServiceResult<{ success: true }>> {
-    const supabase = await createSupabaseServer();
-
     try {
       const adminCheck = await MemberGuard.validateAdmin(
-        supabase,
         input.workspaceId,
         currentUserId
       );
@@ -245,7 +233,6 @@ export class MemberService {
       }
 
       await this.updateMember(
-        supabase,
         input.workspaceId,
         input.targetUserId,
         input.role
@@ -261,11 +248,8 @@ export class MemberService {
     input: RemoveMemberInput,
     currentUserId: string
   ): Promise<ServiceResult<{ success: true }>> {
-    const supabase = await createSupabaseServer();
-
     try {
       const adminCheck = await MemberGuard.validateAdmin(
-        supabase,
         input.workspaceId,
         currentUserId
       );
@@ -282,7 +266,7 @@ export class MemberService {
         return { ok: false, error: 'Cannot remove yourself', status: 400 };
       }
 
-      await this.deleteMember(supabase, input.workspaceId, input.targetUserId);
+      await this.deleteMember(input.workspaceId, input.targetUserId);
 
       return { ok: true, data: { success: true } };
     } catch (error) {

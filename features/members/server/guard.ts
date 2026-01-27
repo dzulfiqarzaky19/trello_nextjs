@@ -3,10 +3,10 @@ import { Member } from '../types';
 
 export class MemberGuard {
   static async validateMember(
-    supabase: Awaited<ReturnType<typeof createSupabaseServer>>,
     workspaceId: string,
     userId: string
   ): Promise<{ member: Member } | null> {
+    const supabase = await createSupabaseServer();
     const { data: member, error } = await supabase
       .from('members')
       .select('*, profiles:user_id(*)')
@@ -22,10 +22,11 @@ export class MemberGuard {
   }
 
   static async validateAdmin(
-    supabase: Awaited<ReturnType<typeof createSupabaseServer>>,
     workspaceId: string,
     userId: string
   ): Promise<{ member: Member } | null> {
+    const supabase = await createSupabaseServer();
+
     const { data: member, error } = await supabase
       .from('members')
       .select('*, profiles:user_id(*)')
