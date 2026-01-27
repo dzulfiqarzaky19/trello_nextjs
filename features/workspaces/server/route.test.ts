@@ -14,7 +14,10 @@ vi.mock('./services', () => ({
 }));
 
 vi.mock('@/lib/session-middleware', () => ({
-  sessionMiddleware: async (c: { set: (key: string, value: { id: string; email: string }) => void }, next: () => Promise<void>) => {
+  sessionMiddleware: async (
+    c: { set: (key: string, value: { id: string; email: string }) => void },
+    next: () => Promise<void>
+  ) => {
     c.set('user', { id: 'test-user-id', email: 'test@example.com' });
     await next();
   },
@@ -101,7 +104,10 @@ describe('Workspaces Hono Routes', () => {
 
       expect(res.status).toBe(200);
       expect(body.data.id).toBe('ws-1');
-      expect(WorkspaceService.getById).toHaveBeenCalledWith('ws-1', 'test-user-id');
+      expect(WorkspaceService.getById).toHaveBeenCalledWith(
+        'ws-1',
+        'test-user-id'
+      );
     });
 
     it('returns 404 when workspace not found', async () => {
@@ -198,7 +204,12 @@ describe('Workspaces Hono Routes', () => {
       expect(WorkspaceService.update).toHaveBeenCalledWith(
         'ws-1',
         'test-user-id',
-        { name: 'Updated', slug: undefined, description: undefined, image: undefined }
+        {
+          name: 'Updated',
+          slug: undefined,
+          description: undefined,
+          image: undefined,
+        }
       );
     });
 
@@ -233,7 +244,10 @@ describe('Workspaces Hono Routes', () => {
       });
 
       expect(res.status).toBe(200);
-      expect(WorkspaceService.delete).toHaveBeenCalledWith('ws-1', 'test-user-id');
+      expect(WorkspaceService.delete).toHaveBeenCalledWith(
+        'ws-1',
+        'test-user-id'
+      );
     });
 
     it('returns 401 if not admin', async () => {

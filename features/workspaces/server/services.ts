@@ -9,7 +9,6 @@ import {
 import { workspaceSchema, workspacesListSchema } from '../schema';
 import { z } from 'zod';
 
-
 type HttpErrorStatus = 400 | 401 | 404 | 500;
 
 interface ServiceSuccess<T> {
@@ -24,7 +23,6 @@ interface ServiceError {
 }
 
 type ServiceResult<T> = ServiceSuccess<T> | ServiceError;
-
 
 interface CreateWorkspaceInput {
   name: string;
@@ -41,9 +39,7 @@ interface UpdateWorkspaceInput {
   image?: File | string | null;
 }
 
-
 export class WorkspaceService {
-
   static async getById(
     workspaceIdOrSlug: string,
     userId: string
@@ -119,9 +115,6 @@ export class WorkspaceService {
     return { ok: true, data: result.data };
   }
 
-  // ----------------------------------------
-  // GET List Workspaces
-  // ----------------------------------------
   static async list(
     userId: string
   ): Promise<ServiceResult<z.infer<typeof workspacesListSchema>>> {
@@ -169,9 +162,6 @@ export class WorkspaceService {
     }
   }
 
-  // ----------------------------------------
-  // POST Create Workspace
-  // ----------------------------------------
   static async create(
     input: CreateWorkspaceInput
   ): Promise<ServiceResult<{ id: string; name: string; slug: string }>> {
@@ -213,24 +203,23 @@ export class WorkspaceService {
 
         if (memberError) throw memberError;
       } catch (memberError) {
-        // Rollback: delete the workspace we just created
         await supabase.from('workspaces').delete().eq('id', workspace.id);
         throw memberError;
       }
 
       return { ok: true, data: workspace };
     } catch (error) {
-      // Handle unique constraint violation
       if (isAppError(error) && error.code === '23505') {
-        return { ok: false, error: 'Workspace with this slug already exists', status: 400 };
+        return {
+          ok: false,
+          error: 'Workspace with this slug already exists',
+          status: 400,
+        };
       }
       return { ok: false, error: getErrorMessage(error), status: 500 };
     }
   }
 
-  // ----------------------------------------
-  // PATCH Update Workspace
-  // ----------------------------------------
   static async update(
     workspaceId: string,
     userId: string,
@@ -238,7 +227,6 @@ export class WorkspaceService {
   ): Promise<ServiceResult<{ id: string; name: string; slug: string }>> {
     const supabase = await createSupabaseServer();
 
-    // Authorization check
     const member = await this.getMemberInternal(supabase, workspaceId, userId);
 
     if (!member || member.role !== 'ADMIN') {
@@ -248,17 +236,19 @@ export class WorkspaceService {
     const existingImageUrl = getWorkspaceImageUrl(member);
 
     try {
-      // Handle image upload/update
       let imageUrl: string | undefined | null = undefined;
       if (input.image instanceof File) {
-        imageUrl = await this.uploadImageInternal(supabase, userId, input.image);
+        imageUrl = await this.uploadImageInternal(
+          supabase,
+          userId,
+          input.image
+        );
       } else if (typeof input.image === 'string') {
         imageUrl = input.image;
       } else if (input.image === null) {
         imageUrl = null;
       }
 
-      // Build update object
       const updateData: TablesUpdate<'workspaces'> = {};
       if (input.name !== undefined) updateData.name = input.name;
       if (input.slug !== undefined) updateData.slug = input.slug;
@@ -266,7 +256,6 @@ export class WorkspaceService {
         updateData.description = input.description;
       if (imageUrl !== undefined) updateData.image_url = imageUrl;
 
-      // Update workspace
       const { data: updatedWorkspace, error } = await supabase
         .from('workspaces')
         .update(updateData)
@@ -276,7 +265,6 @@ export class WorkspaceService {
 
       if (error) throw error;
 
-      // Cleanup old image if replaced
       if (
         imageUrl !== undefined &&
         existingImageUrl &&
@@ -288,22 +276,22 @@ export class WorkspaceService {
       return { ok: true, data: updatedWorkspace };
     } catch (error) {
       if (isAppError(error) && error.code === '23505') {
-        return { ok: false, error: 'Workspace with this slug already exists', status: 400 };
+        return {
+          ok: false,
+          error: 'Workspace with this slug already exists',
+          status: 400,
+        };
       }
       return { ok: false, error: getErrorMessage(error), status: 500 };
     }
   }
 
-  // ----------------------------------------
-  // DELETE Workspace
-  // ----------------------------------------
   static async delete(
     workspaceId: string,
     userId: string
   ): Promise<ServiceResult<{ id: string }>> {
     const supabase = await createSupabaseServer();
 
-    // Authorization check
     const member = await this.getMemberInternal(supabase, workspaceId, userId);
 
     if (!member || member.role !== 'ADMIN') {
@@ -313,12 +301,10 @@ export class WorkspaceService {
     const imageUrl = getWorkspaceImageUrl(member);
 
     try {
-      // Delete image from storage
       if (imageUrl) {
         await this.deleteImageInternal(supabase, imageUrl);
       }
 
-      // Delete workspace
       const { error } = await supabase
         .from('workspaces')
         .delete()
@@ -332,9 +318,6 @@ export class WorkspaceService {
     }
   }
 
-  // ----------------------------------------
-  // Upload Image (Public API)
-  // ----------------------------------------
   static async uploadImage(
     userId: string,
     file: File
@@ -348,10 +331,6 @@ export class WorkspaceService {
       return { ok: false, error: getErrorMessage(error), status: 500 };
     }
   }
-
-  // ============================================
-  // Internal Helper Methods
-  // ============================================
 
   private static async uploadImageInternal(
     supabase: Awaited<ReturnType<typeof createSupabaseServer>>,
