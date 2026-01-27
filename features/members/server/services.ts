@@ -2,8 +2,8 @@ import { createSupabaseServer } from '@/lib/supabase/server';
 import { getErrorMessage } from '@/lib/supabase/types';
 import { membersListSchema } from '../schema';
 import { z } from 'zod';
-import { isUuid } from '@/lib/utils/checkUuid';
 import { MemberGuard } from './guard';
+import { WorkspaceService } from '@/features/workspaces/server/services';
 
 type HttpErrorStatus = 400 | 401 | 403 | 404 | 500;
 
@@ -130,19 +130,12 @@ export class MemberService {
 
     try {
       let workspaceUuid = workspaceIdOrSlug;
+      const resolvedId = await WorkspaceService.getWorkspaceId(workspaceIdOrSlug);
 
-      if (!isUuid(workspaceIdOrSlug)) {
-        const { data: workspace } = await supabase
-          .from('workspaces')
-          .select('id')
-          .eq('slug', workspaceIdOrSlug)
-          .single();
-
-        if (!workspace) {
-          return { ok: false, error: 'Workspace not found', status: 404 };
-        }
-        workspaceUuid = workspace.id;
+      if (!resolvedId) {
+        return { ok: false, error: 'Workspace not found', status: 404 };
       }
+      workspaceUuid = resolvedId;
 
       const memberCheck = await MemberGuard.validateMember(
         supabase,

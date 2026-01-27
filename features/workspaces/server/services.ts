@@ -189,6 +189,22 @@ export class WorkspaceService {
     }
   }
 
+  static async getWorkspaceId(workspaceIdOrSlug: string): Promise<string | null> {
+    const supabase = await createSupabaseServer();
+
+    if (isUuid(workspaceIdOrSlug)) {
+      return workspaceIdOrSlug;
+    }
+
+    const { data } = await supabase
+      .from('workspaces')
+      .select('id')
+      .eq('slug', workspaceIdOrSlug)
+      .single();
+
+    return data ? data.id : null;
+  }
+
   static async getById(
     workspaceIdOrSlug: string,
     userId: string
