@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { profileSchema, securitySchema } from '../schema';
 import { zValidator } from '@hono/zod-validator';
 import { sessionMiddleware } from '@/lib/session-middleware';
-import { createSupabaseServer } from '@/lib/supabase/server';
+import { SettingsService } from './services';
 
 const app = new Hono()
   .post(
@@ -12,26 +12,18 @@ const app = new Hono()
     async (c) => {
       const { currentPassword, newPassword } = c.req.valid('json');
       const user = c.get('user');
-      const supabase = await createSupabaseServer();
 
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const result = await SettingsService.changePassword({
         email: user.email!,
-        password: currentPassword,
+        currentPassword,
+        newPassword,
       });
 
-      if (signInError) {
-        return c.json({ error: 'Incorrect current password' }, 401);
+      if (!result.ok) {
+        return c.json({ error: result.error }, result.status);
       }
 
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: newPassword,
-      });
-
-      if (updateError) {
-        return c.json({ error: updateError.message }, 401);
-      }
-
-      return c.json({ response: 'Password updated successfully' });
+      return c.json({ response: result.data.message });
     }
   )
   .put(
@@ -41,23 +33,21 @@ const app = new Hono()
     async (c) => {
       const { fullName, role, bio } = c.req.valid('json');
       const user = c.get('user');
-      const supabase = await createSupabaseServer();
 
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({
-          full_name: fullName,
-          role,
-          bio,
-        })
-        .eq('id', user.id);
+      const result = await SettingsService.updateProfile({
+        userId: user.id,
+        fullName,
+        role,
+        bio,
+      });
 
-      if (updateError) {
-        return c.json({ error: updateError.message }, 401);
+      if (!result.ok) {
+        return c.json({ error: result.error }, result.status);
       }
 
-      return c.json({ response: 'Profile updated successfully' });
+      return c.json({ response: result.data.message });
     }
   );
 
 export default app;
+
