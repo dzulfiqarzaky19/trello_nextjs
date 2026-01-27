@@ -25,7 +25,7 @@ export const WorkspaceMain = () => {
         (workspaces.length === 0 && (
           <div className="text-center py-12">
             <p className="text-muted-foreground mb-4">
-              You don't have any boards yet. Create one to get started!
+              You don&apos;t have any boards yet. Create one to get started!
             </p>
           </div>
         ))}

@@ -65,6 +65,7 @@ export const FormImageInput = <T extends FieldValues>({
           if (inputRef.current) inputRef.current.value = '';
         };
 
+
         return (
           <Field className={className}>
             <FieldLabel htmlFor={name}>{label}</FieldLabel>
@@ -75,7 +76,10 @@ export const FormImageInput = <T extends FieldValues>({
                     <Image
                       src={preview}
                       alt="Preview"
+                      width={40}
+                      height={40}
                       className="object-cover size-full"
+                      unoptimized={process.env.NODE_ENV === 'development'}
                     />
                   ) : (
                     <ImageIcon className="size-8 text-neutral-400" />
