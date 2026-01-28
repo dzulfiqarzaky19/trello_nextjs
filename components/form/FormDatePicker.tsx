@@ -24,7 +24,10 @@ export const FormDatePicker = <T extends FieldValues>({
     <Controller
       control={control}
       name={name}
-      render={({ field: { value, onChange, ...field }, fieldState: { error } }) => (
+      render={({
+        field: { value, onChange, ...field },
+        fieldState: { error },
+      }) => (
         <Field className={cn(className)}>
           <FieldLabel htmlFor={name}>
             {label || name.charAt(0).toUpperCase() + name.slice(1)}
@@ -36,7 +39,9 @@ export const FormDatePicker = <T extends FieldValues>({
             placeholder={placeholder}
             value={value ? new Date(value).toISOString().split('T')[0] : ''}
             onChange={(e) => {
-              onChange(e.target.value ? new Date(e.target.value).toISOString() : null);
+              onChange(
+                e.target.value ? new Date(e.target.value).toISOString() : null
+              );
             }}
             disabled={disabled}
             className="w-full justify-start text-left font-normal"
