@@ -75,7 +75,7 @@ export const RecentActivity = () => {
                   </div>
                 )}
 
-                {activity.type === 'comment' && activity.message && (
+                {/* {activity.type === 'comment' && activity.message && (
                   <div className="text-sm text-muted-foreground italic">
                     {activity.message}
                   </div>
@@ -93,7 +93,7 @@ export const RecentActivity = () => {
                       </div>
                     ))}
                   </div>
-                )}
+                )} */}
               </div>
             </div>
           ))}
