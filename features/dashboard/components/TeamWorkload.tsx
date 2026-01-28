@@ -1,27 +1,22 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { useGetTeamWorkload } from '../api/useGetTeamWorkload';
+import { TeamWorkloadSkeleton } from './TeamWorkloadSkeleton';
 
-interface TeamWorkloadMember {
-  name: string;
-  image: string | null;
-  progress: number;
-  color: string;
-}
+export const TeamWorkload = () => {
+  const { data, isLoading } = useGetTeamWorkload();
 
-interface TeamWorkloadProps {
-  data: TeamWorkloadMember[];
-}
+  if (isLoading || !data) {
+    return <TeamWorkloadSkeleton />;
+  }
 
-export const TeamWorkload = ({ data }: TeamWorkloadProps) => {
   return (
-    <Card className="border-none shadow-sm">
+    <Card className="border-none shadow-sm h-full">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-lg font-bold">Team Workload</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
- 
-
         <div className="space-y-6">
           {data.map((member) => (
             <div key={member.name} className="flex items-center gap-4">

@@ -2,14 +2,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { client } from '@/lib/rpc';
 
-export const useGetDashboard = () => {
+export const useGetTeamWorkload = () => {
   return useQuery({
-    queryKey: ['dashboard'],
+    queryKey: ['dashboard', 'team-workload'],
     queryFn: async () => {
-      const response = await client.api.dashboard.$get();
+      const response = await client.api.dashboard['team-workload'].$get();
 
       if (!response.ok) {
-        throw new Error('Failed to fetch dashboard data');
+        throw new Error('Failed to fetch team workload');
       }
 
       return await response.json();

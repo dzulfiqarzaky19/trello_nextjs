@@ -2,28 +2,16 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 import { Card, CardContent } from '@/components/ui/card';
 import { FileIcon, MessageSquare } from 'lucide-react';
+import { useGetRecentActivity } from '../api/useGetRecentActivity';
+import { RecentActivitySkeleton } from './RecentActivitySkeleton';
 
-interface ActivityUser {
-  name: string;
-  image: string;
-}
+export const RecentActivity = () => {
+  const { data: activities, isLoading } = useGetRecentActivity();
 
-interface Activity {
-  type: string;
-  user: ActivityUser;
-  action: string;
-  target: string;
-  time: string;
-  details?: { from?: string | number; to?: string | number };
-  message?: string;
-  files?: string[];
-}
+  if (isLoading || !activities) {
+    return <RecentActivitySkeleton />;
+  }
 
-interface RecentActivityProps {
-  activities: Activity[];
-}
-
-export const RecentActivity = ({ activities }: RecentActivityProps) => {
   return (
     <Card className="border-none shadow-sm">
       <CardContent className="p-6 space-y-6">
