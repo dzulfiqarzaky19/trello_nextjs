@@ -15,7 +15,6 @@ export const TopHeader = ({ label, description }: ITopHeaderProps) => {
       </div>
 
       <div className="flex items-center gap-2">
-
         <Button variant="default">
           <Bell />
         </Button>

@@ -40,7 +40,7 @@ export const AddMemberForm = ({ closeModal }: AddMemberFormProps) => {
   const handleConfirmAdd = () => {
     if (!selectedUser) return;
     addMember.mutate(
-      { workspaceId, userId: selectedUser.id },
+      { json: { workspaceId, userId: selectedUser.id } },
       {
         onSuccess: () => {
           setSelectedUser(null);
