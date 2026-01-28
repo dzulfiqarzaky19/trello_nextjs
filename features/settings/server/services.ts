@@ -36,7 +36,6 @@ export class SettingsService {
     const supabase = await createSupabaseServer();
 
     try {
-      // Step 1: Verify current password
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: input.email,
         password: input.currentPassword,
@@ -46,7 +45,6 @@ export class SettingsService {
         return { ok: false, error: 'Incorrect current password', status: 401 };
       }
 
-      // Step 2: Update to new password
       const { error: updateError } = await supabase.auth.updateUser({
         password: input.newPassword,
       });
