@@ -27,6 +27,7 @@ export const useCreateProject = () => {
       queryClient.invalidateQueries({ queryKey: ['workspaces'] });
       queryClient.invalidateQueries({ queryKey: ['workspace'] });
       queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['team', 'stats'] });
     },
     onError: () => {
       toast.error('Failed to create project');

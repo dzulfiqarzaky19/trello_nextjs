@@ -38,6 +38,7 @@ export const useUpdateMemberRole = () => {
         }`
       );
       queryClient.invalidateQueries({ queryKey: ['members', workspaceSlug] });
+      queryClient.invalidateQueries({ queryKey: ['team', 'stats'] });
     },
     onError: (error: Error) => {
       toast.error(error.message);

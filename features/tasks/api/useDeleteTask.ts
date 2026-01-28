@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { client } from '@/lib/rpc';
-import { InferRequestType, InferResponseType } from 'hono';
+import { InferResponseType } from 'hono';
 import { toast } from 'sonner';
 import { useProjectId } from '@/features/projects/hooks/useProjectId';
 
@@ -33,6 +33,7 @@ export const useDeleteTask = () => {
     onSuccess: () => {
       toast.success('Task deleted');
       queryClient.invalidateQueries({ queryKey: ['project', projectId] });
+      queryClient.invalidateQueries({ queryKey: ['team', 'stats'] });
     },
     onError: (e) => {
       toast.error(e.message);

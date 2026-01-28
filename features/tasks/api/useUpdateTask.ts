@@ -120,6 +120,7 @@ export const useUpdateTask = () => {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['columns', projectId] });
       queryClient.invalidateQueries({ queryKey: ['project', projectId] });
+      queryClient.invalidateQueries({ queryKey: ['team', 'stats'] });
     },
   });
 
