@@ -7,6 +7,7 @@ import { IUserSearchResult } from '@/features/users/schema';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
+import { useModal } from '@/components/providers/ModalProvider';
 
 interface DirectInviteSectionProps {
   workspaceId: string;
@@ -19,6 +20,8 @@ export const DirectInviteSection = ({
   workspaceName,
   existingMemberIds,
 }: DirectInviteSectionProps) => {
+  const { closeWithReplace } = useModal('invite-team-member');
+
   const [selectedUser, setSelectedUser] = useState<IUserSearchResult | null>(
     null
   );
@@ -37,6 +40,8 @@ export const DirectInviteSection = ({
       },
       {
         onSuccess: () => {
+          closeWithReplace();
+
           setSelectedUser(null);
           toast.success(
             `Added ${selectedUser.full_name || selectedUser.email} to ${workspaceName}`
