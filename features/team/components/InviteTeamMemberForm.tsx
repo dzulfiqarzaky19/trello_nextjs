@@ -2,20 +2,23 @@
 
 import { useGetWorkspaces } from '@/features/workspaces/api/useGetWorkspaces';
 import { useGetMembers } from '@/features/members/api/useGetMembers';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { FormSelect } from '@/components/form/FormSelect';
 
 import { DirectInviteSection } from './invite/DirectInviteSection';
 import { InviteCodeSection } from './invite/InviteCodeSection';
 
 export const InviteTeamMemberForm = () => {
-  const { control, watch } = useForm({
+  const { control } = useForm({
     defaultValues: {
       workspaceId: '',
     },
   });
 
-  const selectedWorkspaceId = watch('workspaceId');
+  const selectedWorkspaceId = useWatch({
+    control,
+    name: 'workspaceId',
+  });
 
   const { data: workspaces, isLoading: isLoadingWorkspaces } =
     useGetWorkspaces();
