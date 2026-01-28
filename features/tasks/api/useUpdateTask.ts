@@ -110,7 +110,7 @@ export const useUpdateTask = () => {
 
       return { previousColumns };
     },
-    onError: (err, newTodo, context) => {
+    onError: (err, _, context) => {
       toast.error(err.message);
       queryClient.setQueryData(
         ['columns', projectId],

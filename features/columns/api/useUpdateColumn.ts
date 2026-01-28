@@ -82,7 +82,7 @@ export const useUpdateColumn = () => {
 
       return { previousColumns };
     },
-    onError: (err, newCol, context) => {
+    onError: (err, _, context) => {
       toast.error(err.message);
       queryClient.setQueryData(
         ['columns', projectId],

@@ -18,13 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-interface InviteTeamMemberFormProps {
-  closeModal?: () => void;
-}
-
-export const InviteTeamMemberForm = ({
-  closeModal,
-}: InviteTeamMemberFormProps) => {
+export const InviteTeamMemberForm = () => {
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(
     null
   );
