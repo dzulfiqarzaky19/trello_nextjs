@@ -15,18 +15,23 @@ interface AddMemberFormProps {
 }
 
 export const AddMemberForm = ({ closeModal }: AddMemberFormProps) => {
+  const [selectedUser, setSelectedUser] = useState<IUserSearchResult | null>(
+    null
+  );
+  const addMember = useAddMember();
   const { data: membersData } = useGetMembers();
-  const existingMemberIds = membersData?.data?.members.map((m) => m.user_id);
-  const workspaceId = membersData?.data.workspaceId;
+
+  if (!membersData?.data) {
+    return null;
+  }
+
+  const existingMemberIds = membersData.data.members.map((m) => m.user_id);
+  const workspaceId = membersData.data.workspaceId;
 
   if (!workspaceId) {
     console.warn('AddMemberForm: No workspaceId available');
     return null;
   }
-  const [selectedUser, setSelectedUser] = useState<IUserSearchResult | null>(
-    null
-  );
-  const addMember = useAddMember();
 
   const handleSelectUser = (user: IUserSearchResult) => {
     setSelectedUser(user);

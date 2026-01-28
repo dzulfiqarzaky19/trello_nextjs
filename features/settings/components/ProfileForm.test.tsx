@@ -7,7 +7,6 @@ import {
 } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ProfileForm } from './ProfileForm';
-import { toast } from 'sonner';
 
 vi.mock('sonner', () => ({
   toast: {

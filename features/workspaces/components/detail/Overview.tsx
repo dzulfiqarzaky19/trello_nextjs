@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
-import { Copy, Loader2 } from 'lucide-react';
+import { Copy } from 'lucide-react';
 import { OverviewStats } from './OverviewStats';
 import { OverviewSkeleton } from './OverviewSkeleton';
 import { useGetWorkspace } from '../../api/useGetWorkspace';

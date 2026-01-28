@@ -78,7 +78,7 @@ const app = new Hono()
         return c.json({ error: 'User not found' });
       }
 
-      const { data: profile, error: profileError } = await supabase
+      const { data: profile } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)

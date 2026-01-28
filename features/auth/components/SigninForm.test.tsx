@@ -7,7 +7,6 @@ import {
 } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SigninForm } from './SigninForm';
-import { toast } from 'sonner';
 
 const mockPush = vi.fn();
 const mockRefresh = vi.fn();

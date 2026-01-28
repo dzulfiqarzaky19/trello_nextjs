@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 import { toast } from 'sonner';
 
 type FormWrapperProps = {
@@ -30,7 +30,7 @@ export const FormWrapper = ({
       }
 
       if (closeModal) closeModal();
-    } catch (err) {
+    } catch {
       toast.error('Something went wrong.');
     }
   };
