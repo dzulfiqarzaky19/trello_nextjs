@@ -2,8 +2,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 
-import { MoreHorizontal } from 'lucide-react';
-
 interface TeamWorkloadMember {
   name: string;
   image: string | null;
@@ -20,13 +18,9 @@ export const TeamWorkload = ({ data }: TeamWorkloadProps) => {
     <Card className="border-none shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-lg font-bold">Team Workload</CardTitle>
-        <MoreHorizontal className="text-muted-foreground cursor-pointer w-5 h-5" />
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div></div>
-          <MoreHorizontal className="text-muted-foreground cursor-pointer" />
-        </div>
+ 
 
         <div className="space-y-6">
           {data.map((member) => (

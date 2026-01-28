@@ -1,46 +1,4 @@
-import { CheckCircle, Clock, List, Calendar } from 'lucide-react';
 
-export const DASHBOARD_STATS = [
-  {
-    label: 'Total Tasks',
-    value: '148',
-    icon: List,
-    trend: '+12%',
-    trendUp: true,
-    color: 'bg-blue-50 text-blue-600',
-    iconColor: 'text-blue-600',
-  },
-  {
-    label: 'Completed',
-    value: '86',
-    icon: CheckCircle,
-    trend: '+8%',
-    trendUp: true,
-    color: 'bg-green-50 text-green-600',
-    iconColor: 'text-green-600',
-  },
-  {
-    label: 'In Progress',
-    value: '42',
-    icon: Clock,
-    trend: '0%',
-    trendUp: false,
-    color: 'bg-orange-50 text-orange-600',
-    iconColor: 'text-orange-600',
-  },
-  {
-    label: 'Upcoming Deadlines',
-    value: '12',
-    icon: Calendar,
-    trend: '! 5',
-    trendUp: false,
-    isAlert: true,
-    color: 'bg-red-50 text-red-600',
-    iconColor: 'text-red-600',
-  },
-];
-
-export type DashboardStatsType = (typeof DASHBOARD_STATS)[number];
 
 export const CHART_DATA = [
   { name: 'Design', value: 35, fill: '#3B82F6' },

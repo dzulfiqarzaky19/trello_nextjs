@@ -1,7 +1,6 @@
 'use client';
 import { useGetDashboard } from '@/features/dashboard/api/useGetDashboard';
-import { DASHBOARD_STATS } from '@/lib/const/DashboardPage';
-import { Loader2 } from 'lucide-react';
+import { Clock, File, Folder, List, Loader2 } from 'lucide-react';
 import { TaskDistributionChart } from './components/TaskDistributionChart';
 import { RecentActivity } from './components/RecentActivity';
 import { TeamWorkload } from './components/TeamWorkload';
@@ -9,6 +8,7 @@ import { DashboardStats } from './components/DashboardStats';
 
 export const DashboardMain = () => {
   const { data, isLoading } = useGetDashboard();
+
 
   if (isLoading || !data) {
     return (
@@ -20,20 +20,32 @@ export const DashboardMain = () => {
 
   const stats = [
     {
-      ...DASHBOARD_STATS[0],
+      label: 'Workspaces',
       value: data.stats.workspaces.toString(),
+      icon: Folder,
+      color: 'bg-blue-50 text-blue-600',
+      iconColor: 'text-blue-600',
     },
     {
-      ...DASHBOARD_STATS[1],
+      label: 'Total Tasks',
       value: data.stats.tasks.toString(),
+      icon: File,
+      color: 'bg-green-50 text-green-600',
+      iconColor: 'text-green-600',
     },
     {
-      ...DASHBOARD_STATS[2],
+      label: 'Assigned to Me',
       value: data.stats.assignedTasks.toString(),
+      icon: Clock,
+      color: 'bg-orange-50 text-orange-600',
+      iconColor: 'text-orange-600',
     },
     {
-      ...DASHBOARD_STATS[3],
+      label: 'Total Projects',
       value: data.stats.projects.toString(),
+      icon: List,
+      color: 'bg-red-50 text-red-600',
+      iconColor: 'text-red-600',
     },
   ];
 

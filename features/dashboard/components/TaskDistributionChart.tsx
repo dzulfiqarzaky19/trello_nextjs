@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { Label, Pie, PieChart, Cell } from 'recharts';
 
-import { CHART_DATA } from '@/lib/const/DashboardPage';
+
 import {
   ChartContainer,
   ChartTooltip,
@@ -12,24 +12,7 @@ import {
 } from '@/components/ui/chart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-const chartConfig = {
-  visitors: {
-    label: 'Visitors',
-  },
-  ...CHART_DATA.reduce(
-    (
-      acc: Record<string, { label: string; color: string }>,
-      curr: { name: string; fill: string }
-    ) => ({
-      ...acc,
-      [curr.name.toLowerCase()]: {
-        label: curr.name,
-        color: curr.fill,
-      },
-    }),
-    {}
-  ),
-} satisfies ChartConfig;
+
 
 interface TaskDistributionData {
   name: string;
@@ -42,9 +25,22 @@ interface TaskDistributionChartProps {
 }
 
 export const TaskDistributionChart = ({ data }: TaskDistributionChartProps) => {
-  const totalPercentage = React.useMemo(() => {
-    return '100%';
-  }, []);
+  const totalTasks = React.useMemo(() => {
+    return data.reduce((acc, curr) => acc + curr.value, 0);
+  }, [data]);
+
+  const chartConfig = React.useMemo(() => {
+      const config: ChartConfig = {
+          visitors: { label: 'Tasks' }
+      };
+      data.forEach(item => {
+          config[item.name.toLowerCase()] = {
+              label: item.name,
+              color: item.fill
+          };
+      });
+      return config;
+  }, [data]);
 
   return (
     <Card className="border-none shadow-sm">
@@ -90,14 +86,14 @@ export const TaskDistributionChart = ({ data }: TaskDistributionChartProps) => {
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {totalPercentage}
+                          {totalTasks}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground text-sm"
                         >
-                          Capacity
+                          Total Tasks
                         </tspan>
                       </text>
                     );
@@ -109,17 +105,21 @@ export const TaskDistributionChart = ({ data }: TaskDistributionChartProps) => {
         </ChartContainer>
 
         <div className="grid grid-cols-2 gap-x-8 gap-y-4 mt-4 w-full px-4">
-          {data.map((entry) => (
-            <div key={entry.name} className="flex items-center gap-2">
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: entry.fill }}
-              />
-              <span className="text-sm text-muted-foreground">
-                {entry.name} ({entry.value}%)
-              </span>
-            </div>
-          ))}
+          {data.map((entry) => {
+             const percentage = totalTasks > 0 ? Math.round((entry.value / totalTasks) * 100) : 0;
+             
+             return (
+                <div key={entry.name} className="flex items-center gap-2">
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: entry.fill }}
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    {entry.name} ({percentage}%)
+                  </span>
+                </div>
+             );
+          })}
         </div>
       </CardContent>
     </Card>
