@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { FileIcon, MessageSquare } from 'lucide-react';
 
@@ -29,12 +29,9 @@ export const RecentActivity = ({ activities }: RecentActivityProps) => {
       <CardContent className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <h3 className="font-bold text-lg">Recent Activity</h3>
-          <Button variant="link" className="text-red-500 font-semibold">
-            View All
-          </Button>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-6 max-h-[380px] overflow-y-auto pr-2">
           {activities.map((activity, index) => (
             <div key={index} className="flex gap-4">
               <div className="relative">
