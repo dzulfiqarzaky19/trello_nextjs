@@ -6,12 +6,13 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+
 import { Card as CardType } from '../../projects/types';
-import { AlignLeft, Laptop, Trash2, Loader2 } from 'lucide-react';
+import { AlignLeft, Laptop, Trash2, Loader2, Calendar } from 'lucide-react';
 import { FormInput } from '@/components/form/FormInput';
 import { FormTextarea } from '@/components/form/FormTextarea';
 import { FormSubmit } from '@/components/form/FormSubmit';
+import { FormDatePicker } from '@/components/form/FormDatePicker';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,11 +23,13 @@ import { useGetMembers } from '@/features/members/api/useGetMembers';
 import { useCreateTask } from '@/features/tasks/api/useCreateTask';
 import { useProjectId } from '../../projects/hooks/useProjectId';
 import { useDeleteTaskModal } from '@/features/tasks/hooks/useDeleteTaskModal';
+import { useGetProject } from '@/features/projects/api/useGetProject';
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
   assignedTo: z.string().optional(),
+  deadlines: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -48,10 +51,12 @@ export const TaskForm = ({
   const projectId = useProjectId();
   const { openDeleteTaskModal, isDeleting } = useDeleteTaskModal();
 
+  const { data: project } = useGetProject();
+
   const { mutate: updateTask, isPending: isUpdating } = useUpdateTask();
   const { mutate: createTask, isPending: isCreating } = useCreateTask();
 
-  const { data: members } = useGetMembers();
+  const { data: members } = useGetMembers(project?.workspace_id);
   const memberOptions =
     members?.data.members.map((member) => ({
       label: member.profiles.full_name || member.profiles.email || 'Unknown',
@@ -69,10 +74,15 @@ export const TaskForm = ({
       title: card?.title || '',
       description: card?.description || '',
       assignedTo: card?.assigned_to || '',
+      deadlines: card?.deadlines || '',
     },
   });
 
   const onSubmit = (data: FormValues) => {
+    const deadlinesISO = data.deadlines
+      ? new Date(data.deadlines).toISOString()
+      : null;
+
     if (isEditing && card) {
       updateTask(
         {
@@ -81,6 +91,7 @@ export const TaskForm = ({
             title: data.title,
             description: data.description,
             assignedTo: data.assignedTo,
+            deadlines: deadlinesISO,
           },
         },
         {
@@ -94,6 +105,7 @@ export const TaskForm = ({
             title: data.title,
             description: data.description || '',
             assignedTo: data.assignedTo,
+            deadlines: deadlinesISO,
             columnId,
             projectId,
           },
@@ -153,6 +165,19 @@ export const TaskForm = ({
         </div>
 
         <div className="grid grid-cols-[24px_1fr] gap-4">
+          <Calendar className="mt-1 size-5 text-muted-foreground" />
+          <div className="space-y-2">
+            <FormDatePicker
+              control={control}
+              name="deadlines"
+              label="Deadlines"
+              className="w-full"
+              disabled={isLoading}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-[24px_1fr] gap-4">
           <div className="mt-1 size-5" />
           <div className="space-y-2">
             <FormSelect
@@ -162,6 +187,7 @@ export const TaskForm = ({
               placeholder="Select assignee..."
               options={memberOptions}
               className="w-full"
+              disabled={isLoading}
             />
           </div>
         </div>

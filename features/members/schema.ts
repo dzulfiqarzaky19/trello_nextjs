@@ -26,7 +26,7 @@ export const membersListSchema = z.object({
         id: z.string(),
         full_name: z.string().nullable(),
         avatar_url: z.string().nullable(),
-        email: z.string(),
+        email: z.string().nullable(),
       }),
     })
   ),

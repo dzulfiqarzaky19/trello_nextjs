@@ -45,8 +45,8 @@ export const workspaceSchema = z.object({
     id: z.string(),
     full_name: z.string().nullable(),
     avatar_url: z.string().nullable(),
-    role: z.enum(['ADMIN', 'MEMBER']),
-    email: z.string(),
+    role: z.string().nullable(),
+    email: z.string().nullable(),
   }),
   members: z.array(
     z.object({
@@ -56,7 +56,7 @@ export const workspaceSchema = z.object({
         id: z.string(),
         full_name: z.string().nullable(),
         avatar_url: z.string().nullable(),
-        email: z.string(),
+        email: z.string().nullable(),
       }),
     })
   ),

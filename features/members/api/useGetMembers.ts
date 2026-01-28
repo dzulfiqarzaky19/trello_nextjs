@@ -5,14 +5,15 @@ import { useWorkspaceSlug } from '@/features/workspaces/hooks/useWorkspaceSlug';
 
 type ResponseType = InferResponseType<typeof client.api.members.$get, 200>;
 
-export const useGetMembers = () => {
+export const useGetMembers = (workspaceId?: string) => {
   const workspaceSlug = useWorkspaceSlug();
+  const idToUse = workspaceId || workspaceSlug;
 
   return useQuery<ResponseType, Error>({
-    queryKey: ['members', workspaceSlug],
+    queryKey: ['members', idToUse],
     queryFn: async () => {
       const response = await client.api.members.$get({
-        query: { workspaceId: workspaceSlug },
+        query: { workspaceId: idToUse },
       });
 
       if (!response.ok) {
@@ -21,6 +22,6 @@ export const useGetMembers = () => {
 
       return await response.json();
     },
-    enabled: !!workspaceSlug,
+    enabled: !!idToUse,
   });
 };

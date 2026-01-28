@@ -11,6 +11,7 @@ export const createTaskSchema = z.object({
     .optional()
     .nullable()
     .transform((val) => (val === '' ? null : val)),
+  deadlines: z.string().optional().nullable(),
 });
 
 export const updateTaskSchema = z.object({
@@ -23,4 +24,5 @@ export const updateTaskSchema = z.object({
     .optional()
     .nullable()
     .transform((val) => (val === '' ? null : val)),
+  deadlines: z.string().optional().nullable(),
 });

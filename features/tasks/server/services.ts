@@ -37,6 +37,7 @@ export class TaskService {
         column_id: input.columnId,
         position: input.position,
         assigned_to: input.assignedTo,
+        deadlines: input.deadlines,
         created_by: userId,
         updated_by: userId,
       })
@@ -251,6 +252,7 @@ export class TaskService {
       if (input.description) updates.description = input.description;
       if (input.assignedTo !== undefined)
         updates.assigned_to = input.assignedTo;
+      if (input.deadlines !== undefined) updates.deadlines = input.deadlines;
 
       if (input.position !== undefined && input.columnId !== undefined) {
         await this.updateTaskPosition(
