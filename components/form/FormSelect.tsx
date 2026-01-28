@@ -16,6 +16,7 @@ interface IFormSelect<T extends FieldValues> {
   placeholder?: string;
   options: { label: string; value: string }[];
   className?: string;
+  disabled?: boolean;
 }
 
 export const FormSelect = <T extends FieldValues>({
@@ -25,6 +26,7 @@ export const FormSelect = <T extends FieldValues>({
   placeholder,
   options,
   className,
+  disabled,
 }: IFormSelect<T>) => {
   return (
     <Controller
@@ -35,7 +37,7 @@ export const FormSelect = <T extends FieldValues>({
           <FieldLabel htmlFor={name}>
             {label || name.charAt(0).toUpperCase() + name.slice(1)}
           </FieldLabel>
-          <Select onValueChange={onChange} value={value}>
+          <Select onValueChange={onChange} value={value} disabled={disabled}>
             <SelectTrigger>
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
