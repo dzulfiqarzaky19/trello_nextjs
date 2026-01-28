@@ -68,7 +68,7 @@ export const AppSidebarMenu = () => {
               <Link
                 href={
                   item.title === 'Calendar'
-                    ? `${item.url}?month=${format(new Date(), 'yyyy-MM')}`
+                    ? `${item.url}?view=month&date=${format(new Date(), 'yyyy-MM-dd')}`
                     : item.url
                 }
               >

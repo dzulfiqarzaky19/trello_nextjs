@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCalendarNavigation } from '../hooks/useCalendarNavigation';
 
 export const CalendarHeader = () => {
-  const { currentDate, handlePrevMonth, handleNextMonth, view, setView } =
+  const { currentDate, handlePrev, handleNext, view, setView } =
     useCalendarNavigation();
 
   return (
@@ -15,7 +15,7 @@ export const CalendarHeader = () => {
           variant="outline"
           size="icon"
           className="h-8 w-8"
-          onClick={handlePrevMonth}
+          onClick={handlePrev}
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -24,7 +24,7 @@ export const CalendarHeader = () => {
           variant="outline"
           size="icon"
           className="h-8 w-8"
-          onClick={handleNextMonth}
+          onClick={handleNext}
         >
           <ChevronRight className="h-4 w-4" />
         </Button>

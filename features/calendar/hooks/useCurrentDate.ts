@@ -3,11 +3,12 @@ import { parse, isValid } from 'date-fns';
 
 export const useCurrentDate = () => {
   const searchParams = useSearchParams();
-  const monthParam = searchParams.get('month');
+  const dateParam = searchParams.get('date');
 
-  const parsedDate = monthParam
-    ? parse(monthParam, 'yyyy-MM', new Date())
-    : new Date();
+  if (dateParam) {
+    const parsedDate = parse(dateParam, 'yyyy-MM-dd', new Date());
+    return isValid(parsedDate) ? parsedDate : new Date();
+  }
 
-  return isValid(parsedDate) ? parsedDate : new Date();
+  return new Date();
 };

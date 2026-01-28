@@ -7,7 +7,7 @@ import { format, isSameDay, isSameMonth, isToday, isValid } from 'date-fns';
 
 import { useCalendarWeeks } from '../hooks/useCalendarWeeks';
 
-export const CalendarGrid = () => {
+export const CalendarMonthly = () => {
   const { data: tasks } = useGetMyTasks();
   const { weeks, monthStart } = useCalendarWeeks();
 
