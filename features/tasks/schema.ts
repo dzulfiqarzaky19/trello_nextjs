@@ -11,7 +11,7 @@ export const createTaskSchema = z.object({
     .optional()
     .nullable()
     .transform((val) => (val === '' ? null : val)),
-  deadlines: z.string().optional().nullable(),
+  deadlines: z.string().min(1, 'Deadline is required'),
 });
 
 export const updateTaskSchema = z.object({
@@ -24,5 +24,5 @@ export const updateTaskSchema = z.object({
     .optional()
     .nullable()
     .transform((val) => (val === '' ? null : val)),
-  deadlines: z.string().optional().nullable(),
+  deadlines: z.string().min(1, 'Deadline is required'),
 });

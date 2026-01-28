@@ -15,7 +15,7 @@ export interface Task {
   comments?: unknown[];
   attachments?: unknown[];
   due_date?: string | null;
-  deadlines: string | null;
+  deadlines: string;
   assigned_to: string | null;
   priority?: 'low' | 'medium' | 'high' | null;
 }

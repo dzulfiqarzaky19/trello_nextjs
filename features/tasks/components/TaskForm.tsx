@@ -29,7 +29,7 @@ const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
   assignedTo: z.string().optional(),
-  deadlines: z.string().optional(),
+  deadlines: z.string().min(1, 'Deadline is required'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -79,9 +79,7 @@ export const TaskForm = ({
   });
 
   const onSubmit = (data: FormValues) => {
-    const deadlinesISO = data.deadlines
-      ? new Date(data.deadlines).toISOString()
-      : null;
+    const deadlinesISO = new Date(data.deadlines).toISOString();
 
     if (isEditing && card) {
       updateTask(
@@ -187,7 +185,6 @@ export const TaskForm = ({
               placeholder="Select assignee..."
               options={memberOptions}
               className="w-full"
-              disabled={isLoading}
             />
           </div>
         </div>
