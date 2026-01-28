@@ -113,9 +113,9 @@ export class DashboardService {
     const [totalTasksResult, assignedTasksResult] = await Promise.all([
       projectIds.length > 0
         ? supabase
-            .from('tasks')
-            .select('*', { count: 'exact', head: true })
-            .in('project_id', projectIds)
+          .from('tasks')
+          .select('*', { count: 'exact', head: true })
+          .in('project_id', projectIds)
         : { count: 0 },
       supabase
         .from('tasks')
@@ -215,6 +215,6 @@ export class DashboardService {
       .order('created_at', { ascending: false })
       .limit(10);
 
-    return auditLogs?.map(this.formatAuditLog) || [];
+    return auditLogs?.map((log) => this.formatAuditLog(log)) || [];
   }
 }
