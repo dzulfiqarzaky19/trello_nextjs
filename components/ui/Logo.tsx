@@ -22,7 +22,7 @@ export const Logo = ({
       >
         <LayoutDashboard className="w-6 h-6 text-red-600" />
         {showText && (
-          <h1 className="font-bold text-xl tracking-tight">TaskMaster</h1>
+          <h1 className="font-bold text-xl tracking-tight">Trello Clone</h1>
         )}
       </div>
     );
@@ -35,7 +35,7 @@ export const Logo = ({
       </div>
       {showText && (
         <h1 className="font-bold text-xl tracking-tight text-red-600">
-          TaskMaster
+          Trello Clone
         </h1>
       )}
     </div>
