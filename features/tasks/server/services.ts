@@ -23,6 +23,24 @@ export class TaskService {
     return data;
   }
 
+  static async getTasksByUser(
+    userId: string
+  ): Promise<ServiceResult<Tables<'tasks'>[]>> {
+    try {
+      const supabase = await createSupabaseServer();
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*, projects(name, workspace_id)')
+        .eq('assigned_to', userId);
+
+      if (error) throw error;
+
+      return { ok: true, data };
+    } catch (error) {
+      return { ok: false, error: getErrorMessage(error), status: 500 };
+    }
+  }
+
   static async createTask(
     input: z.infer<typeof createTaskSchema>,
     userId: string

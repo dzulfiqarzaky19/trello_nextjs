@@ -1,4 +1,3 @@
-import { Modal } from '@/components/Modal';
 import { Button } from '@/components/ui/button';
 import {
   ChevronLeft,
@@ -154,13 +153,6 @@ export const BottomHeader = ({
               Day
             </Button>
           </div>
-
-          <Button
-            variant="default"
-            className="bg-red-500 hover:bg-red-600 text-white border-none shadow-sm gap-2"
-          >
-            <PlusIcon className="w-4 h-4" /> New Event
-          </Button>
         </div>
       </div>
     );

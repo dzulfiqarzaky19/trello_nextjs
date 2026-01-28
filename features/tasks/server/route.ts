@@ -6,6 +6,42 @@ import { createTaskSchema, updateTaskSchema } from '../schema';
 import { TaskService } from './services';
 
 const app = new Hono()
+  .get('/user-tasks', sessionMiddleware, async (c) => {
+    const user = c.get('user');
+    const result = await TaskService.getTasksByUser(user.id);
+
+    if (!result.ok) {
+      return c.json({ error: result.error }, result.status);
+    }
+
+    return c.json({ data: result.data });
+  })
+  .get(
+    '/',
+    sessionMiddleware,
+    zValidator(
+      'query',
+      z.object({
+        workspaceId: z.string(),
+        projectId: z.string().optional(),
+      })
+    ),
+    async (c) => {
+      const user = c.get('user');
+      const query = c.req.valid('query');
+
+      const result = await TaskService.listTasks(user.id, {
+        workspaceId: query.workspaceId,
+        projectId: query.projectId,
+      });
+
+      if (!result.ok) {
+        return c.json({ error: result.error }, result.status);
+      }
+
+      return c.json({ data: result.data });
+    }
+  )
   .post(
     '/',
     sessionMiddleware,

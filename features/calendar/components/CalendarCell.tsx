@@ -1,22 +1,26 @@
-import { CALENDAR_EVENTS } from '@/lib/const/calendarPage';
 import { cn } from '@/lib/utils';
 import { CalendarEvent } from './CalendarEvent';
+
+interface Event {
+  id: string;
+  title: string;
+  time: string;
+  color: string;
+}
 
 interface ICalendarCellProps {
   day: number;
   isCurrentMonth: boolean;
   isToday?: boolean;
+  events: Event[];
 }
 
 export const CalendarCell = ({
   day,
   isCurrentMonth,
   isToday,
+  events,
 }: ICalendarCellProps) => {
-  const events = isCurrentMonth
-    ? CALENDAR_EVENTS.filter((e) => e.date === day)
-    : [];
-
   return (
     <td
       className={cn(
