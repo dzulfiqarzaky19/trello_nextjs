@@ -1,16 +1,16 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardFooter } from '@/components/ui/card';
 import { MoreVertical } from 'lucide-react';
 
 export interface IMemberCardProps {
   name: string;
   role: string;
-  image: string;
+  image?: string | null;
   isOnline?: boolean;
-  tags: { label: string; className: string }[];
-  stats: {
+  tags?: { label: string; className: string }[];
+  stats?: {
     activeTasks: number;
     projects: number;
   };
@@ -34,7 +34,7 @@ export const MemberCard = ({
 
       <div className="relative mb-4">
         <Avatar className="w-20 h-20 border-4 border-white shadow-sm">
-          <AvatarImage src={image} alt={name} />
+          <AvatarImage src={image || undefined} alt={name} />
           <AvatarFallback>{name[0]}</AvatarFallback>
         </Avatar>
         {isOnline && (
@@ -48,7 +48,7 @@ export const MemberCard = ({
       </div>
 
       <div className="flex gap-2 mb-6">
-        {tags.map((tag, index) => (
+        {tags?.map((tag, index) => (
           <Badge
             key={index}
             variant="secondary"
@@ -61,11 +61,11 @@ export const MemberCard = ({
 
       <div className="flex w-full px-6 mb-6 justify-between text-center divide-x">
         <div className="flex-1">
-          <div className="font-bold text-lg">{stats.activeTasks}</div>
+          <div className="font-bold text-lg">{stats?.activeTasks || 0}</div>
           <div className="text-xs text-muted-foreground">Active Tasks</div>
         </div>
         <div className="flex-1">
-          <div className="font-bold text-lg">{stats.projects}</div>
+          <div className="font-bold text-lg">{stats?.projects || 0}</div>
           <div className="text-xs text-muted-foreground">Projects</div>
         </div>
       </div>
