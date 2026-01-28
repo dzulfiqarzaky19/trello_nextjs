@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { format } from 'date-fns';
 
 const data = {
   navMain: [
@@ -64,7 +65,13 @@ export const AppSidebarMenu = () => {
                   : 'hover:bg-red-50 hover:text-red-700'
               }
             >
-              <Link href={item.url}>
+              <Link
+                href={
+                  item.title === 'Calendar'
+                    ? `${item.url}?month=${format(new Date(), 'yyyy-MM')}`
+                    : item.url
+                }
+              >
                 <item.icon className={isActive ? 'text-red-600' : ''} />
                 <span>{item.title}</span>
               </Link>

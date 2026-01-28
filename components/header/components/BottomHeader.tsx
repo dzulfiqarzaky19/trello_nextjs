@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
+import { CalendarHeader } from '@/features/calendar/components/CalendarHeader';
 import {
-  ChevronLeft,
-  ChevronRight,
   Code,
   Filter,
   List,
@@ -22,7 +21,6 @@ export const BottomHeader = ({
   isProjectsPage?: boolean;
   isTeamPage?: boolean;
   isCalendarPage?: boolean;
-  boardId?: string;
 }) => {
   if (isProjectsPage) {
     return (
@@ -41,27 +39,6 @@ export const BottomHeader = ({
             <Filter /> Filters
           </Button>
         </div>
-
-        {/* <div className="flex items-center gap-2">
-          <Modal
-            trigger={
-              <Button variant="default" className="cursor-pointer">
-                <PlusIcon /> New Column
-              </Button>
-            }
-            modalClass="sm:max-w-xl"
-          >
-            {boardId && (
-              <ColumnForm
-                closeModal={() => {
-                  document.dispatchEvent(
-                    new KeyboardEvent('keydown', { key: 'Escape' })
-                  );
-                }}
-              />
-            )}
-          </Modal>
-        </div> */}
       </div>
     );
   }
@@ -117,45 +94,7 @@ export const BottomHeader = ({
   }
 
   if (isCalendarPage) {
-    return (
-      <div className="flex items-center justify-between px-6">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="icon" className="h-8 w-8">
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="font-bold text-lg">November 2023</span>
-          <Button variant="outline" size="icon" className="h-8 w-8">
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <div className="flex items-center bg-muted/50 p-1 rounded-lg border">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-3 bg-white text-foreground shadow-sm rounded-md"
-            >
-              Month
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-3 hover:bg-white/50 text-muted-foreground"
-            >
-              Week
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-3 hover:bg-white/50 text-muted-foreground"
-            >
-              Day
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
+    return <CalendarHeader />;
   }
 
   return null;

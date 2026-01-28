@@ -42,7 +42,7 @@ export const useOverviewStats = () => {
         iconClass: 'text-blue-600 bg-blue-100 p-3 rounded-xl',
       },
       {
-        label: 'Task Completion',
+        label: 'Project Completion',
         value: taskCompletion,
         icon: CheckCircle2,
         iconClass: 'text-emerald-600 bg-emerald-100 p-3 rounded-xl',
