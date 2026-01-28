@@ -28,7 +28,7 @@ export const useMemberActionModals = () => {
         isConfirming: updateRole.isPending,
         onConfirm: () => {
           updateRole.mutate(
-            { workspaceId, userId, role: 'ADMIN' },
+            { param: { userId }, json: { workspaceId, role: 'ADMIN' } },
             { onSuccess: () => closeWithBack() }
           );
         },
@@ -51,7 +51,7 @@ export const useMemberActionModals = () => {
         isConfirming: updateRole.isPending,
         onConfirm: () => {
           updateRole.mutate(
-            { workspaceId, userId, role: 'MEMBER' },
+            { param: { userId }, json: { workspaceId, role: 'MEMBER' } },
             { onSuccess: () => closeWithBack() }
           );
         },
@@ -75,7 +75,7 @@ export const useMemberActionModals = () => {
         isConfirming: removeMember.isPending,
         onConfirm: () => {
           removeMember.mutate(
-            { workspaceId, userId },
+            { param: { userId }, json: { workspaceId } },
             { onSuccess: () => closeWithBack() }
           );
         },

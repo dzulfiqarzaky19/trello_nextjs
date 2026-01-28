@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { client } from '@/lib/rpc';
 import { InferRequestType, InferResponseType } from 'hono';
 import { toast } from 'sonner';
-import { useWorkspaceSlug } from '@/features/workspaces/hooks/useWorkspaceSlug';
 
 type RequestType = InferRequestType<
   (typeof client.api.members)[':userId']['$patch']
@@ -13,7 +12,6 @@ type ResponseType = InferResponseType<
 
 export const useUpdateMemberRole = () => {
   const queryClient = useQueryClient();
-  const workspaceSlug = useWorkspaceSlug();
 
   return useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ param, json }) => {
@@ -31,13 +29,15 @@ export const useUpdateMemberRole = () => {
 
       return response.json();
     },
-    onSuccess: (_, { json }) => {
+    onSuccess: (_, variables) => {
       toast.success(
         `Member ${
-          json.role === 'ADMIN' ? 'promoted to admin' : 'demoted to member'
+          variables.json.role === 'ADMIN'
+            ? 'promoted to admin'
+            : 'demoted to member'
         }`
       );
-      queryClient.invalidateQueries({ queryKey: ['members', workspaceSlug] });
+      queryClient.invalidateQueries({ queryKey: ['members'] });
       queryClient.invalidateQueries({ queryKey: ['team', 'stats'] });
     },
     onError: (error: Error) => {

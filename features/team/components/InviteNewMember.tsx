@@ -1,9 +1,15 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { UserPlus } from 'lucide-react';
+import { useInviteTeamMemberModal } from '../hooks/useInviteTeamMemberModal';
 
 export const InviteNewMember = () => {
+  const { open } = useInviteTeamMemberModal();
+
   return (
-    <Card className="flex flex-col items-center justify-center p-6 border-dashed border-2 border-muted-foreground/20 shadow-none bg-transparent hover:bg-muted/50 transition-colors cursor-pointer group">
+    <Card
+      onClick={open}
+      className="flex flex-col items-center justify-center p-6 border-dashed border-2 border-muted-foreground/20 shadow-none bg-transparent hover:bg-muted/50 transition-colors cursor-pointer group"
+    >
       <CardContent className="flex flex-col items-center text-center p-6 space-y-4">
         <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center group-hover:scale-110 transition-transform">
           <UserPlus className="w-8 h-8 text-muted-foreground" />
