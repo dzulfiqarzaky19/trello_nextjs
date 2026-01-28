@@ -6,20 +6,16 @@ import { createTaskSchema, updateTaskSchema } from '../schema';
 import { TaskService } from './services';
 
 const app = new Hono()
-  .get(
-    '/user-tasks',
-    sessionMiddleware,
-    async (c) => {
-      const user = c.get('user');
-      const result = await TaskService.getTasksByUser(user.id);
+  .get('/user-tasks', sessionMiddleware, async (c) => {
+    const user = c.get('user');
+    const result = await TaskService.getTasksByUser(user.id);
 
-      if (!result.ok) {
-        return c.json({ error: result.error }, result.status);
-      }
-
-      return c.json({ data: result.data });
+    if (!result.ok) {
+      return c.json({ error: result.error }, result.status);
     }
-  )
+
+    return c.json({ data: result.data });
+  })
   .post(
     '/',
     sessionMiddleware,

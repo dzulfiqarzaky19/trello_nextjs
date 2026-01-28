@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCalendarNavigation } from '../hooks/useCalendarNavigation';
 
 export const CalendarHeader = () => {
-  const { currentDate, handlePrevMonth, handleNextMonth } =
+  const { currentDate, handlePrevMonth, handleNextMonth, view, setView } =
     useCalendarNavigation();
 
   return (
@@ -35,21 +35,36 @@ export const CalendarHeader = () => {
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 px-3 bg-white text-foreground shadow-sm rounded-md"
+            onClick={() => setView('month')}
+            className={`h-7 px-3 shadow-none rounded-md ${
+              view === 'month'
+                ? 'bg-white text-foreground shadow-sm'
+                : 'hover:bg-white/50 text-muted-foreground'
+            }`}
           >
             Month
           </Button>
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 px-3 hover:bg-white/50 text-muted-foreground"
+            onClick={() => setView('week')}
+            className={`h-7 px-3 shadow-none rounded-md ${
+              view === 'week'
+                ? 'bg-white text-foreground shadow-sm'
+                : 'hover:bg-white/50 text-muted-foreground'
+            }`}
           >
             Week
           </Button>
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 px-3 hover:bg-white/50 text-muted-foreground"
+            onClick={() => setView('day')}
+            className={`h-7 px-3 shadow-none rounded-md ${
+              view === 'day'
+                ? 'bg-white text-foreground shadow-sm'
+                : 'hover:bg-white/50 text-muted-foreground'
+            }`}
           >
             Day
           </Button>
