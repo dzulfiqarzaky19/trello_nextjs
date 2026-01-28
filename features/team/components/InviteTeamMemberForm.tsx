@@ -9,7 +9,7 @@ import { IUserSearchResult } from '@/features/users/schema';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
-import { Copy, Mail, Check, ChevronsUpDown } from 'lucide-react';
+import { Copy, Mail } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -79,7 +79,7 @@ export const InviteTeamMemberForm = ({
     const body = encodeURIComponent(
       `Hi!\n\nI'd like to invite you to join our workspace "${selectedWorkspace.name}" on Trello.\n\nYou can join using the invite code: ${selectedWorkspace.invite_code}\n\nSee you there!`
     );
-    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
   };
 
   return (
