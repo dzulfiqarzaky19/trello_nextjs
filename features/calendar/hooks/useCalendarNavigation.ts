@@ -45,11 +45,19 @@ export const useCalendarNavigation = () => {
     router.push(`?${params.toString()}`);
   };
 
+  const goToDayView = (date: Date) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('view', 'day');
+    params.set('date', format(date, 'yyyy-MM-dd'));
+    router.push(`?${params.toString()}`);
+  };
+
   return {
     currentDate: format(currentDate, 'MMMM yyyy'),
     handlePrev,
     handleNext,
     view,
     setView,
+    goToDayView,
   };
 };

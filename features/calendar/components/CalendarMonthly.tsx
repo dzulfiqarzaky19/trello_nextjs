@@ -6,10 +6,12 @@ import { format, isSameMonth, isToday } from 'date-fns';
 
 import { useCalendarWeeks } from '../hooks/useCalendarWeeks';
 import { useCalendarEvents } from '../hooks/useCalendarEvents';
+import { useCalendarNavigation } from '../hooks/useCalendarNavigation';
 
 export const CalendarMonthly = () => {
   const { weeks, monthStart } = useCalendarWeeks();
   const { getEventsForDay } = useCalendarEvents();
+  const { goToDayView } = useCalendarNavigation();
 
   return (
     <div className="flex flex-col h-full space-y-4">
@@ -37,6 +39,7 @@ export const CalendarMonthly = () => {
                     isCurrentMonth={isSameMonth(day, monthStart)}
                     isToday={isToday(day)}
                     events={getEventsForDay(day)}
+                    onClick={() => goToDayView(day)}
                   />
                 ))}
               </tr>

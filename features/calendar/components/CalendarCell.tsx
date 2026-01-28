@@ -13,6 +13,7 @@ interface ICalendarCellProps {
   isCurrentMonth: boolean;
   isToday?: boolean;
   events: Event[];
+  onClick?: () => void;
 }
 
 export const CalendarCell = ({
@@ -20,11 +21,13 @@ export const CalendarCell = ({
   isCurrentMonth,
   isToday,
   events,
+  onClick,
 }: ICalendarCellProps) => {
   return (
     <td
+      onClick={onClick}
       className={cn(
-        'h-[120px] align-top p-2 border-b border-r border-secondary-foreground/20 bg-background transition-colors hover:bg-muted/30 last:border-r-0 w-[120px]',
+        'h-[120px] align-top p-2 border-b border-r border-secondary-foreground/20 bg-background transition-colors hover:bg-muted/30 last:border-r-0 w-[120px] cursor-pointer',
         !isCurrentMonth && 'bg-muted/20 text-muted-foreground'
       )}
     >

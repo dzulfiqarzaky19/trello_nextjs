@@ -2,6 +2,7 @@
 
 import { useCalendarEvents } from '../hooks/useCalendarEvents';
 import { useCalendarWeek } from '../hooks/useCalendarWeek';
+import { useCalendarNavigation } from '../hooks/useCalendarNavigation';
 import { format, isToday } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { WEEKDAYS } from '@/lib/const/calendarPage';
@@ -10,6 +11,7 @@ import { CalendarEvent } from './CalendarEvent';
 export const CalendarWeekly = () => {
   const { getEventsForDay } = useCalendarEvents();
   const { days } = useCalendarWeek();
+  const { goToDayView } = useCalendarNavigation();
 
   return (
     <div className="flex flex-col h-full space-y-4">
@@ -42,7 +44,8 @@ export const CalendarWeekly = () => {
             return (
               <div
                 key={day.toString()}
-                className="border-r last:border-r-0 border-secondary-foreground/20 p-2 relative h-full min-h-[500px]"
+                className="border-r last:border-r-0 border-secondary-foreground/20 p-2 relative h-full min-h-[500px] cursor-pointer hover:bg-muted/30 transition-colors"
+                onClick={() => goToDayView(day)}
               >
                 <div className="space-y-2">
                   {events.map((event) => (
