@@ -279,6 +279,7 @@ export class TaskService {
   ): Promise<ServiceResult<Tables<'tasks'>>> {
     try {
       const result = await this.validateTaskAccess(taskId, userId);
+
       if (!result.ok) return result;
 
       const currentTask = result.data;
@@ -324,9 +325,12 @@ export class TaskService {
   ): Promise<ServiceResult<Tables<'tasks'>>> {
     try {
       const result = await this.validateTaskAccess(taskId, userId);
+
       if (!result.ok) return result;
 
       const task = result.data;
+
+      const data = await this.deleteTask(taskId);
 
       const workspaceId = task.projects!.workspace_id;
       const projectName = task.projects!.name;
