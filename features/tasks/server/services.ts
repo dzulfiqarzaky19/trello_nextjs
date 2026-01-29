@@ -5,7 +5,6 @@ import { z } from 'zod';
 import { createTaskSchema, updateTaskSchema } from '../schema';
 import { MemberGuard } from '@/features/members/server/guard';
 import { logActivity } from '@/lib/audit-logs';
-import { hasProjectData } from '@/lib/supabase/types';
 import { ProjectService } from '@/features/projects/server/services';
 
 import { ServiceResult } from '@/lib/service-result';
@@ -21,6 +20,26 @@ export class TaskService {
 
     if (error) return null;
     return data;
+  }
+
+  private static async validateTaskAccess(
+    taskId: string,
+    userId: string
+  ): Promise<
+    ServiceResult<NonNullable<Awaited<ReturnType<typeof TaskService.getTask>>>>
+  > {
+    const task = await this.getTask(taskId);
+    if (!task) return { ok: false, error: 'Task not found', status: 404 };
+
+    const workspaceId = task.projects?.workspace_id;
+    if (!workspaceId) {
+      return { ok: false, error: 'Project data missing', status: 404 };
+    }
+
+    const member = await MemberGuard.validateMember(workspaceId, userId);
+    if (!member) return { ok: false, error: 'Unauthorized', status: 401 };
+
+    return { ok: true, data: task, };
   }
 
   static async getTasksByUser(
@@ -92,6 +111,35 @@ export class TaskService {
     return data;
   }
 
+  private static async getPositionUpdates(
+    currentTask: Tables<'tasks'>,
+    input: z.infer<typeof updateTaskSchema>
+  ): Promise<Partial<TablesUpdate<'tasks'>>> {
+    if (input.position !== undefined && input.columnId !== undefined) {
+      await this.updateTaskPosition(
+        currentTask.column_id,
+        currentTask.position,
+        input.columnId,
+        input.position
+      );
+      return { column_id: input.columnId, position: input.position };
+    }
+
+    if (
+      input.columnId !== undefined &&
+      input.columnId !== currentTask.column_id
+    ) {
+      const newPos = await this.moveTaskToColumnEnd(
+        currentTask.column_id,
+        currentTask.position,
+        input.columnId
+      );
+      return { column_id: input.columnId, position: newPos };
+    }
+
+    return {};
+  }
+
   static async updateTaskPosition(
     oldColumnId: string,
     oldPosition: number,
@@ -100,31 +148,11 @@ export class TaskService {
   ) {
     const supabase = await createSupabaseServer();
 
-    if (oldColumnId === newColumnId) {
-      if (oldPosition !== newPosition) {
-        if (newPosition > oldPosition) {
-          const { error: rpcError } = await supabase.rpc(
-            'decrement_task_positions',
-            {
-              p_column_id: oldColumnId,
-              p_start_pos: oldPosition + 1,
-              p_end_pos: newPosition,
-            }
-          );
-          if (rpcError) throw rpcError;
-        } else {
-          const { error: rpcError } = await supabase.rpc(
-            'increment_task_positions',
-            {
-              p_column_id: oldColumnId,
-              p_start_pos: newPosition,
-              p_end_pos: oldPosition - 1,
-            }
-          );
-          if (rpcError) throw rpcError;
-        }
-      }
-    } else {
+    if (oldColumnId === newColumnId && oldPosition === newPosition) {
+      return;
+    }
+
+    if (oldColumnId !== newColumnId) {
       const { error: rpcError1 } = await supabase.rpc(
         'decrement_task_positions_from',
         {
@@ -142,7 +170,33 @@ export class TaskService {
         }
       );
       if (rpcError2) throw rpcError2;
+
+      return
     }
+
+
+    if (newPosition > oldPosition) {
+      const { error: rpcError } = await supabase.rpc(
+        'decrement_task_positions',
+        {
+          p_column_id: oldColumnId,
+          p_start_pos: oldPosition + 1,
+          p_end_pos: newPosition,
+        }
+      );
+      if (rpcError) throw rpcError;
+      return
+    }
+
+    const { error: rpcError } = await supabase.rpc(
+      'increment_task_positions',
+      {
+        p_column_id: oldColumnId,
+        p_start_pos: newPosition,
+        p_end_pos: oldPosition - 1,
+      }
+    );
+    if (rpcError) throw rpcError;
   }
 
   static async moveTaskToColumnEnd(
@@ -156,7 +210,6 @@ export class TaskService {
       .from('tasks')
       .select('*', { count: 'exact', head: true })
       .eq('column_id', newColumnId);
-    const newPos = (count || 0) + 1;
 
     const { error: rpcError } = await supabase.rpc(
       'decrement_task_positions_from',
@@ -167,7 +220,7 @@ export class TaskService {
     );
     if (rpcError) throw rpcError;
 
-    return newPos;
+    return (count || 0) + 1;
   }
 
   static async getById(
@@ -175,20 +228,10 @@ export class TaskService {
     taskId: string
   ): Promise<ServiceResult<Tables<'tasks'>>> {
     try {
-      const task = await this.getTask(taskId);
-      if (!task) return { ok: false, error: 'Task not found', status: 404 };
+      const result = await this.validateTaskAccess(taskId, userId);
+      if (!result.ok) return result;
 
-      let workspaceId = '';
-      if (hasProjectData(task) && task.projects) {
-        workspaceId = task.projects.workspace_id;
-      }
-
-      if (!workspaceId) {
-        return { ok: false, error: 'Project data missing', status: 404 };
-      }
-
-      const member = await MemberGuard.validateMember(workspaceId, userId);
-      if (!member) return { ok: false, error: 'Unauthorized', status: 401 };
+      const task = result.data;
 
       return { ok: true, data: task };
     } catch (error) {
@@ -239,60 +282,27 @@ export class TaskService {
     input: z.infer<typeof updateTaskSchema>
   ): Promise<ServiceResult<Tables<'tasks'>>> {
     try {
-      const currentTask = await this.getTask(taskId);
-      if (!currentTask) {
-        return { ok: false, error: 'Task not found', status: 404 };
-      }
+      const result = await this.validateTaskAccess(taskId, userId);
+      if (!result.ok) return result;
 
-      let workspaceId = '';
-      let projectName = '';
-      if (hasProjectData(currentTask) && currentTask.projects) {
-        workspaceId = currentTask.projects.workspace_id;
-        projectName = currentTask.projects.name;
-      }
+      const currentTask = result.data;
 
-      if (!workspaceId) {
-        return { ok: false, error: 'Project data missing', status: 404 };
-      }
+      const workspaceId = currentTask.projects!.workspace_id;
+      const projectName = currentTask.projects!.name;
 
-      const member = await MemberGuard.validateMember(workspaceId, userId);
-
-      if (!member) {
-        return { ok: false, error: 'Unauthorized', status: 401 };
-      }
+      const positionUpdates = await this.getPositionUpdates(currentTask, input);
 
       const updates: TablesUpdate<'tasks'> = {
         updated_at: new Date().toISOString(),
         updated_by: userId,
+        ...(input.title && { title: input.title }),
+        ...(input.description && { description: input.description }),
+        ...(input.assignedTo !== undefined && {
+          assigned_to: input.assignedTo,
+        }),
+        ...(input.deadlines !== undefined && { deadlines: input.deadlines }),
+        ...positionUpdates,
       };
-
-      if (input.title) updates.title = input.title;
-      if (input.description) updates.description = input.description;
-      if (input.assignedTo !== undefined)
-        updates.assigned_to = input.assignedTo;
-      if (input.deadlines !== undefined) updates.deadlines = input.deadlines;
-
-      if (input.position !== undefined && input.columnId !== undefined) {
-        await this.updateTaskPosition(
-          currentTask.column_id,
-          currentTask.position,
-          input.columnId,
-          input.position
-        );
-        updates.column_id = input.columnId;
-        updates.position = input.position;
-      } else if (
-        input.columnId !== undefined &&
-        input.columnId !== currentTask.column_id
-      ) {
-        const newPos = await this.moveTaskToColumnEnd(
-          currentTask.column_id,
-          currentTask.position,
-          input.columnId
-        );
-        updates.column_id = input.columnId;
-        updates.position = newPos;
-      }
 
       const data = await this.updateTask(taskId, updates);
 
@@ -317,31 +327,13 @@ export class TaskService {
     taskId: string
   ): Promise<ServiceResult<Tables<'tasks'>>> {
     try {
-      const task = await this.getTask(taskId);
-      if (!task) {
-        return { ok: false, error: 'Task not found', status: 404 };
-      }
+      const result = await this.validateTaskAccess(taskId, userId);
+      if (!result.ok) return result;
 
-      let workspaceId = '';
-      if (hasProjectData(task) && task.projects) {
-        workspaceId = task.projects.workspace_id;
-      }
+      const task = result.data;
 
-      if (!workspaceId) {
-        return { ok: false, error: 'Project data missing', status: 404 };
-      }
-
-      const member = await MemberGuard.validateMember(workspaceId, userId);
-      if (!member) {
-        return { ok: false, error: 'Unauthorized', status: 401 };
-      }
-
-      const data = await this.deleteTask(taskId);
-
-      let projectName = '';
-      if (hasProjectData(task) && task.projects) {
-        projectName = task.projects.name;
-      }
+      const workspaceId = task.projects!.workspace_id;
+      const projectName = task.projects!.name;
 
       await logActivity({
         action: 'DELETE',
