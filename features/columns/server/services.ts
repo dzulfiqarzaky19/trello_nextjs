@@ -5,7 +5,6 @@ import { z } from 'zod';
 import { createColumnSchema, updateColumnSchema } from '../schema';
 import { MemberGuard } from '@/features/members/server/guard';
 import { logActivity } from '@/lib/audit-logs';
-import { hasProjectData } from '@/lib/supabase/types';
 import { ProjectService } from '@/features/projects/server/services';
 
 import { ServiceResult } from '@/lib/service-result';
@@ -23,6 +22,29 @@ export class ColumnService {
 
     if (error) return null;
     return data;
+  }
+
+  private static async validateColumnAccess(
+    columnId: string,
+    userId: string
+  ): Promise<
+    ServiceResult<
+      NonNullable<Awaited<ReturnType<typeof ColumnService.getColumn>>>
+    >
+  > {
+    const column = await this.getColumn(columnId);
+    if (!column) return { ok: false, error: 'Column not found', status: 404 };
+
+    const workspaceId = column.projects?.workspace_id;
+
+    if (!workspaceId) {
+      return { ok: false, error: 'Project data missing', status: 404 };
+    }
+
+    const member = await MemberGuard.validateMember(workspaceId, userId);
+    if (!member) return { ok: false, error: 'Unauthorized', status: 401 };
+
+    return { ok: true, data: column };
   }
 
   static async listColumns(projectId: string) {
@@ -165,21 +187,11 @@ export class ColumnService {
     columnId: string
   ): Promise<ServiceResult<Tables<'columns'>>> {
     try {
-      const column = await this.getColumn(columnId);
-      if (!column) return { ok: false, error: 'Column not found', status: 404 };
+      const result = await this.validateColumnAccess(columnId, userId);
 
-      let workspaceId = '';
-      if (hasProjectData(column) && column.projects) {
-        workspaceId = column.projects.workspace_id;
-      }
-      if (!workspaceId) {
-        return { ok: false, error: 'Project data missing', status: 404 };
-      }
+      if (!result.ok) return result;
 
-      const member = await MemberGuard.validateMember(workspaceId, userId);
-      if (!member) return { ok: false, error: 'Unauthorized', status: 401 };
-
-      return { ok: true, data: column };
+      return { ok: true, data: result.data };
     } catch (error) {
       return { ok: false, error: getErrorMessage(error), status: 500 };
     }
@@ -236,53 +248,35 @@ export class ColumnService {
     input: z.infer<typeof updateColumnSchema>
   ): Promise<ServiceResult<Tables<'columns'>>> {
     try {
-      const currentColumn = await this.getColumn(columnId);
-      if (!currentColumn) {
-        return { ok: false, error: 'Column not found', status: 404 };
-      }
+      const result = await this.validateColumnAccess(columnId, userId);
+      if (!result.ok) return result;
 
-      let workspaceId = '';
-      let projectName = '';
-      if (hasProjectData(currentColumn) && currentColumn.projects) {
-        workspaceId = currentColumn.projects.workspace_id;
-        projectName = currentColumn.projects.name;
-      }
-
-      if (!workspaceId) {
-        return { ok: false, error: 'Project data missing', status: 404 };
-      }
-
-      const member = await MemberGuard.validateMember(workspaceId, userId);
-
-      if (!member) {
-        return { ok: false, error: 'Unauthorized', status: 401 };
-      }
+      const currentColumn = result.data;
+      const workspaceId = currentColumn.projects!.workspace_id;
+      const projectName = currentColumn.projects!.name;
+      const isPositionChanged =
+        input.position !== undefined &&
+        input.position !== currentColumn.position;
+      const isTitleChanged = input.title && input.title !== currentColumn.name;
 
       const updates: TablesUpdate<'columns'> = {
         updated_at: new Date().toISOString(),
         updated_by: userId,
+        ...(input.title && { name: input.title }),
+        ...(isPositionChanged && { position: input.position }),
       };
 
-      if (input.title) updates.name = input.title;
-
-      if (
-        input.position !== undefined &&
-        input.position !== currentColumn.position
-      ) {
+      if (isPositionChanged) {
         await this.updateColumnPosition(
           currentColumn.project_id,
           currentColumn.position,
-          input.position
+          input.position || 0
         );
-        updates.position = input.position;
       }
 
       const data = await this.updateColumn(columnId, updates);
 
-      if (
-        input.position !== undefined &&
-        input.position !== currentColumn.position
-      ) {
+      if (isPositionChanged) {
         await logActivity({
           action: 'MOVE',
           entityType: 'COLUMN',
@@ -296,16 +290,22 @@ export class ColumnService {
             projectName,
           },
         });
-      } else if (input.title && input.title !== currentColumn.name) {
+
+        return { ok: true, data };
+      }
+
+      if (isTitleChanged) {
         await logActivity({
           action: 'UPDATE_NAME',
           entityType: 'COLUMN',
           entityId: columnId,
-          entityTitle: input.title,
+          entityTitle: input.title || '',
           workspaceId: workspaceId,
           userId: userId,
           metadata: { from: currentColumn.name, to: input.title, projectName },
         });
+
+        return { ok: true, data };
       }
 
       return { ok: true, data };
@@ -319,26 +319,12 @@ export class ColumnService {
     columnId: string
   ): Promise<ServiceResult<Tables<'columns'>>> {
     try {
-      const column = await this.getColumn(columnId);
-      if (!column) {
-        return { ok: false, error: 'Column not found', status: 404 };
-      }
+      const result = await this.validateColumnAccess(columnId, userId);
+      if (!result.ok) return result;
 
-      let workspaceId = '';
-      let projectName = '';
-      if (hasProjectData(column) && column.projects) {
-        workspaceId = column.projects.workspace_id;
-        projectName = column.projects.name;
-      }
-
-      if (!workspaceId) {
-        return { ok: false, error: 'Project data missing', status: 404 };
-      }
-
-      const member = await MemberGuard.validateMember(workspaceId, userId);
-      if (!member) {
-        return { ok: false, error: 'Unauthorized', status: 401 };
-      }
+      const column = result.data;
+      const workspaceId = column.projects!.workspace_id;
+      const projectName = column.projects!.name;
 
       const data = await this.deleteColumn(columnId);
 

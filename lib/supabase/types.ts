@@ -112,24 +112,6 @@ export type AuditLogMetadata =
 // ============================================
 
 /**
- * Type guard to check if a column query result has joined project data.
- */
-export function hasProjectData(
-  data: unknown
-): data is { projects: { workspace_id: string; name: string } | null } {
-  if (typeof data !== 'object' || data === null) return false;
-  if (!('projects' in data)) return false;
-  const projects = (data as { projects: unknown }).projects;
-  if (projects === null) return true; // null is valid
-  return (
-    typeof projects === 'object' &&
-    projects !== null &&
-    'workspace_id' in projects &&
-    'name' in projects
-  );
-}
-
-/**
  * Type guard to check if member data has workspace image.
  */
 export function hasWorkspaceImage(data: unknown): data is {
