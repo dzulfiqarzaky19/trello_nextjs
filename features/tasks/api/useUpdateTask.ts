@@ -6,7 +6,6 @@ import { useProjectId } from '@/features/projects/hooks/useProjectId';
 import { Column } from '@/features/columns/types';
 import { optimisticTask } from '@/lib/utils/optimisticTask';
 
-
 type ResponseType = InferResponseType<
   (typeof client.api.tasks)[':taskId']['$patch'],
   200
@@ -14,7 +13,6 @@ type ResponseType = InferResponseType<
 type RequestType = InferRequestType<
   (typeof client.api.tasks)[':taskId']['$patch']
 >;
-
 
 export const useUpdateTask = () => {
   const queryClient = useQueryClient();

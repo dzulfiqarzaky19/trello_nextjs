@@ -39,7 +39,7 @@ export class TaskService {
     const member = await MemberGuard.validateMember(workspaceId, userId);
     if (!member) return { ok: false, error: 'Unauthorized', status: 401 };
 
-    return { ok: true, data: task, };
+    return { ok: true, data: task };
   }
 
   static async getTasksByUser(
@@ -171,9 +171,8 @@ export class TaskService {
       );
       if (rpcError2) throw rpcError2;
 
-      return
+      return;
     }
-
 
     if (newPosition > oldPosition) {
       const { error: rpcError } = await supabase.rpc(
@@ -185,17 +184,14 @@ export class TaskService {
         }
       );
       if (rpcError) throw rpcError;
-      return
+      return;
     }
 
-    const { error: rpcError } = await supabase.rpc(
-      'increment_task_positions',
-      {
-        p_column_id: oldColumnId,
-        p_start_pos: newPosition,
-        p_end_pos: oldPosition - 1,
-      }
-    );
+    const { error: rpcError } = await supabase.rpc('increment_task_positions', {
+      p_column_id: oldColumnId,
+      p_start_pos: newPosition,
+      p_end_pos: oldPosition - 1,
+    });
     if (rpcError) throw rpcError;
   }
 

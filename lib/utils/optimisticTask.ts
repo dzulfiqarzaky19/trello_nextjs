@@ -1,11 +1,5 @@
 import { Column } from '@/features/columns/types';
 
-interface UpdateTaskFieldParams {
-    task: { title: string; description: string | null };
-    title?: string;
-    description?: string;
-}
-
 interface MoveTaskParams {
     newColumns: Column[];
     sourceColumn: Column;
@@ -28,18 +22,6 @@ interface OptimisticTaskParams {
     };
 }
 
-
-const updateTaskField = ({
-    task,
-    title,
-    description,
-}: UpdateTaskFieldParams) => {
-    if (title) task.title = title;
-    if (description) task.description = description;
-};
-
-
-
 const moveTasks = ({
     newColumns,
     sourceColumn,
@@ -56,6 +38,7 @@ const moveTasks = ({
         Math.max(0, position - 1),
         destColumn.tasks.length
     );
+
     destColumn.tasks.splice(insertIndex, 0, movedTask);
 
     destColumn.tasks.forEach((t, idx) => {
@@ -71,12 +54,7 @@ const moveTasks = ({
     return newColumns;
 };
 
-
-export const optimisticTask = ({
-    old,
-    param,
-    json,
-}: OptimisticTaskParams) => {
+export const optimisticTask = ({ old, param, json }: OptimisticTaskParams) => {
     if (!old) return old;
 
     const newColumns: Column[] = structuredClone(old);
@@ -89,9 +67,7 @@ export const optimisticTask = ({
 
     if (!sourceColumn || !sourceColumn.tasks) return newColumns;
 
-    const sourceTaskIndex = sourceColumn.tasks.findIndex(
-        (t) => t.id === taskId
-    );
+    const sourceTaskIndex = sourceColumn.tasks.findIndex((t) => t.id === taskId);
 
     if (sourceTaskIndex === -1) return newColumns;
 
@@ -99,7 +75,11 @@ export const optimisticTask = ({
 
     if (!movedTask) return newColumns;
 
-    updateTaskField({ task: movedTask, title, description });
+    const updatedMovedTask = {
+        ...movedTask,
+        ...(title && { title }),
+        ...(description && { description })
+    };
 
     if (!columnId || !position) return newColumns;
 
@@ -111,10 +91,10 @@ export const optimisticTask = ({
         newColumns,
         sourceColumn,
         destColumn,
-        movedTask,
+        movedTask: updatedMovedTask,
         sourceTaskIndex,
         position,
     });
 
     return newColumns;
-}
+};
