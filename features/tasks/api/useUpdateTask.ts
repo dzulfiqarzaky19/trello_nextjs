@@ -4,7 +4,8 @@ import { InferRequestType, InferResponseType } from 'hono';
 import { toast } from 'sonner';
 import { useProjectId } from '@/features/projects/hooks/useProjectId';
 import { Column } from '@/features/columns/types';
-import { Task } from '../types';
+import { optimisticTask } from '@/lib/utils/optimisticTask';
+
 
 type ResponseType = InferResponseType<
   (typeof client.api.tasks)[':taskId']['$patch'],
@@ -13,6 +14,7 @@ type ResponseType = InferResponseType<
 type RequestType = InferRequestType<
   (typeof client.api.tasks)[':taskId']['$patch']
 >;
+
 
 export const useUpdateTask = () => {
   const queryClient = useQueryClient();
@@ -47,65 +49,7 @@ export const useUpdateTask = () => {
 
       queryClient.setQueryData(
         ['columns', projectId],
-        (old: Column[] | undefined) => {
-          if (!old) return old;
-
-          const newColumns: Column[] = JSON.parse(JSON.stringify(old));
-          const { taskId } = param;
-          const { columnId, position, description, title } = json;
-
-          if (columnId && position) {
-            let sourceColumn: Column | undefined;
-            let sourceTaskIndex = -1;
-            let movedTask: Task | undefined;
-
-            for (const col of newColumns) {
-              const taskIndex = col.tasks?.findIndex((t) => t.id === taskId);
-              if (taskIndex !== -1 && taskIndex !== undefined) {
-                sourceColumn = col;
-                sourceTaskIndex = taskIndex;
-                movedTask = col.tasks[taskIndex];
-                break;
-              }
-            }
-
-            if (sourceColumn && movedTask) {
-              sourceColumn.tasks.splice(sourceTaskIndex, 1);
-
-              const destColumn = newColumns.find((c) => c.id === columnId);
-              if (destColumn) {
-                if (!destColumn.tasks) destColumn.tasks = [];
-                const insertIndex = Math.min(
-                  Math.max(0, position - 1),
-                  destColumn.tasks.length
-                );
-                destColumn.tasks.splice(insertIndex, 0, movedTask);
-
-                destColumn.tasks.forEach((t, idx) => {
-                  t.position = idx + 1;
-                });
-                if (sourceColumn && sourceColumn !== destColumn) {
-                  sourceColumn.tasks.forEach((t, idx) => {
-                    t.position = idx + 1;
-                  });
-                }
-              }
-            }
-          }
-
-          if (title || description) {
-            for (const col of newColumns) {
-              const task = col.tasks?.find((t) => t.id === taskId);
-              if (task) {
-                if (title) task.title = title;
-                if (description) task.description = description;
-                break;
-              }
-            }
-          }
-
-          return newColumns;
-        }
+        (old: Column[] | undefined) => optimisticTask({ old, param, json })
       );
 
       return { previousColumns };
