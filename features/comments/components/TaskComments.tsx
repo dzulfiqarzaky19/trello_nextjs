@@ -23,9 +23,9 @@ export const TaskComments = ({ taskId, className }: TaskCommentsProps) => {
     if (!comments) return { topLevelComments: [], repliesByParent: {} };
 
     const top = comments.filter((c) => !c.parent_id);
-    
+
     const replyMap: Record<string, Comment[]> = {};
-    
+
     comments.forEach((comment) => {
       if (comment.parent_id) {
         if (!replyMap[comment.parent_id]) replyMap[comment.parent_id] = [];

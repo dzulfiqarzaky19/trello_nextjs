@@ -1,10 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import {
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
+import { DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
 import { Card as CardType } from '../../projects/types';
 import { AlignLeft, Laptop, Trash2, Loader2, Calendar } from 'lucide-react';
@@ -124,9 +121,10 @@ export const TaskForm = ({
   const isLoading = isUpdating || isDeleting || isCreating;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex-1 min-h-0 flex flex-col">
-
-
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex-1 min-h-0 flex flex-col"
+    >
       <div className="flex-1 min-h-0 overflow-y-auto md:overflow-hidden">
         <div className="grid grid-cols-1 md:grid-cols-2 min-h-full">
           {/* Left Column: Details */}
@@ -146,7 +144,9 @@ export const TaskForm = ({
                 </DialogTitle>
                 <div className="text-sm text-muted-foreground">
                   in list{' '}
-                  <span className="font-medium text-foreground">{listTitle}</span>
+                  <span className="font-medium text-foreground">
+                    {listTitle}
+                  </span>
                 </div>
               </div>
             </div>

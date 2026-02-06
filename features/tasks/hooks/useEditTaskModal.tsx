@@ -16,7 +16,7 @@ export const useEditTaskModal = () => {
         />
       ),
       config: {
-        className: 'sm:max-w-6xl ',
+        className: 'sm:max-w-6xl',
         contentClassName: 'p-0 space-y-0',
         showFooter: false,
       },

@@ -128,48 +128,49 @@ export const CommentItem = ({
         )}
 
         {replies.length > 0 && (
-        <div className="mt-2 text-sm">
-          {!showReplies ? (
-            <button
-              onClick={() => setShowReplies(true)}
-              className="text-muted-foreground hover:text-foreground font-medium flex items-center gap-2"
-            >
-              <div className="w-8 h-px bg-border" />
-              View {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
-            </button>
-          ) : (
-             <div className="space-y-3">
-               {replies.map((reply) => (
-                 <div key={reply.id} className="relative pl-6">
-                   {/* Connector line */}
-                   <div className="absolute left-0 top-0 bottom-0 w-px bg-border/40" />
-                   <div className="absolute left-0 top-4 w-4 h-px bg-border/40" />
-   
-                   <CommentItem
-                     comment={reply}
-                     taskId={taskId}
+          <div className="mt-2 text-sm">
+            {!showReplies ? (
+              <button
+                onClick={() => setShowReplies(true)}
+                className="text-muted-foreground hover:text-foreground font-medium flex items-center gap-2"
+              >
+                <div className="w-8 h-px bg-border" />
+                View {replies.length}{' '}
+                {replies.length === 1 ? 'reply' : 'replies'}
+              </button>
+            ) : (
+              <div className="space-y-3">
+                {replies.map((reply) => (
+                  <div key={reply.id} className="relative pl-6">
+                    {/* Connector line */}
+                    <div className="absolute left-0 top-0 bottom-0 w-px bg-border/40" />
+                    <div className="absolute left-0 top-4 w-4 h-px bg-border/40" />
+
+                    <CommentItem
+                      comment={reply}
+                      taskId={taskId}
                       replies={repliesByParent[reply.id]}
-                       onReply={onReply}
-                     replyingToId={replyingToId}
+                      onReply={onReply}
+                      replyingToId={replyingToId}
                       rootCommentId={comment.id}
                       depth={depth + 1}
-                       // Supports up to 3 levels: depth 0 (top) -> 1 (reply) -> 2 (reply-to-reply)
+                      // Supports up to 3 levels: depth 0 (top) -> 1 (reply) -> 2 (reply-to-reply)
                       repliesByParent={repliesByParent}
-                     onCancelReply={onCancelReply}
+                      onCancelReply={onCancelReply}
                     />
-                 </div>
-               ))}
-               <button
+                  </div>
+                ))}
+                <button
                   onClick={() => setShowReplies(false)}
                   className="text-muted-foreground hover:text-foreground font-medium text-xs ml-6 mt-2"
                 >
                   Hide replies
                 </button>
-             </div>
-          )}
-        </div>
-      )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
-  </div>
   );
 };
