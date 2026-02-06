@@ -389,6 +389,7 @@ trello_nextjs/
 > This project uses **domain-driven feature modules** instead of traditional layer-based structure (controllers/, services/, models/).
 >
 > Features are bundled by **domain ownership**:
+>
 > - **Workspaces** own **Members** (members don't exist without a workspace)
 > - **Projects** own **Columns** and **Tasks** (the Kanban board)
 
@@ -1197,3 +1198,33 @@ This Trello clone demonstrates modern full-stack TypeScript development with:
 - **Maintainability**: Clear separation of concerns via service layer
 
 The architecture is **production-ready** with clear paths for scaling (real-time features, mobile apps, advanced analytics).
+
+### Phase 2: Enterprise Hardening (Post-MVP)
+
+#### 1. Advanced Security & Governance
+
+- **Role-Based Access Control (RBAC)**:
+  - Move beyond simple Member checks.
+  - Implement granular permissions: `Project Viewer`, `Project Editor`, `Workspace Admin`.
+  - *Tech*: Custom Hono Middleware + RLS Policies.
+- **Audit Logs**:
+  - Track *who* did *what* and *when* (e.g., "User A deleted Task B").
+  - *Tech*: Async insert into `audit_logs` table via Service Layer.
+
+#### 2. Infrastructure & Operations
+
+- **Strict Database Migrations**:
+  - Move away from Supabase Dashboard UI changes.
+  - Enforce CI/CD pipeline for schema changes (`supabase db push`).
+- **Observability**:
+  - Integrate **OpenTelemetry** or **Sentry** to trace slow requests.
+  - Structured logging (JSON format) for easier debugging in production.
+
+#### 3. API Governance
+
+- **Public API Documentation**:
+  - Auto-generate Swagger/OpenAPI specs from Zod schemas (`@hono/zod-openapi`).
+  - Allow third-party integrations (e.g., "Create Trello Task from Slack").
+- **Rate Limiting**:
+  - Protect `create` and `auth` endpoints from abuse.
+  - *Tech*: Redis-based sliding window limiter (`upstash/ratelimit`).
