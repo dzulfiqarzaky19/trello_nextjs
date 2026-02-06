@@ -103,15 +103,15 @@ export const CommentItem = ({
         </div>
 
         {replyingToId === comment.id && (
-            <div className="mt-2 pl-4 border-l-2 border-border/50">
-                 <CommentInput 
-                    taskId={taskId} 
-                    parentId={comment.id} 
-                    autoFocus 
-                    onCancel={onCancelReply}
-                    onSuccess={onCancelReply}
-                 />
-            </div>
+          <div className="mt-2 pl-4 border-l-2 border-border/50">
+            <CommentInput
+              taskId={taskId}
+              parentId={comment.id}
+              autoFocus
+              onCancel={onCancelReply}
+              onSuccess={onCancelReply}
+            />
+          </div>
         )}
 
         {replies.length > 0 && (
@@ -121,7 +121,7 @@ export const CommentItem = ({
                 {/* Connector line */}
                 <div className="absolute left-0 top-0 bottom-0 w-px bg-border/40" />
                 <div className="absolute left-0 top-4 w-4 h-px bg-border/40" />
-                
+
                 <CommentItem
                   comment={reply}
                   taskId={taskId}

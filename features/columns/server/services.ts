@@ -51,9 +51,7 @@ export class ColumnService {
     const supabase = await createSupabaseServer();
     const { data, error } = await supabase
       .from('columns')
-      .select(
-        '*, tasks(*, comments:task_comments(count))'
-      )
+      .select('*, tasks(*, comments:task_comments(count))')
       .eq('project_id', projectId)
       .order('position', { ascending: true });
 

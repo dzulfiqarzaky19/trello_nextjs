@@ -51,7 +51,7 @@ export const ProjectTask = ({ task, index, columnName }: ProjectTaskProps) => {
                   <Avatar className="w-6 h-6 border-2 border-background">
                     <AvatarImage src={task.assigned_to_user.avatar_url || ''} />
                     <AvatarFallback className="text-[10px]">
-                       {task.assigned_to_user.full_name?.charAt(0) || 'U'}
+                      {task.assigned_to_user.full_name?.charAt(0) || 'U'}
                     </AvatarFallback>
                   </Avatar>
                 )}

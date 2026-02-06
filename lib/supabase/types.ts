@@ -61,9 +61,9 @@ export interface AuditLogWithProfile extends Tables<'audit_logs'> {
 export interface MemberPartial {
   role: string | null;
   workspaces:
-  | { image_url: string | null }
-  | { image_url: string | null }[]
-  | null;
+    | { image_url: string | null }
+    | { image_url: string | null }[]
+    | null;
 }
 
 // ============================================
@@ -134,9 +134,9 @@ export function hasProjectData(
  */
 export function hasWorkspaceImage(data: unknown): data is {
   workspaces:
-  | { image_url: string | null }
-  | { image_url: string | null }[]
-  | null;
+    | { image_url: string | null }
+    | { image_url: string | null }[]
+    | null;
 } {
   if (typeof data !== 'object' || data === null) return false;
   if (!('workspaces' in data)) return false;

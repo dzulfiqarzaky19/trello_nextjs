@@ -8,7 +8,12 @@ interface ICardProps {
   children?: React.ReactNode;
 }
 
-export const CardDemo = ({ title, description, className, children }: ICardProps) => {
+export const CardDemo = ({
+  title,
+  description,
+  className,
+  children,
+}: ICardProps) => {
   return (
     <Card
       className={cn(

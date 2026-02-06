@@ -191,9 +191,9 @@ export const TaskForm = ({
         </div>
 
         {isEditing && card && (
-            <div className="pt-4 border-t">
-                <TaskComments taskId={card.id} />
-            </div>
+          <div className="pt-4 border-t">
+            <TaskComments taskId={card.id} />
+          </div>
         )}
       </div>
 
