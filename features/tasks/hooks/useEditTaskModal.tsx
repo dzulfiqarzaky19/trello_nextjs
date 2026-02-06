@@ -7,7 +7,7 @@ export const useEditTaskModal = () => {
 
   const openEditTaskModal = (task: Task, listTitle: string) => {
     openModal({
-      title: 'Edit Task',
+      title: '', // Handled inside TaskForm
       children: (
         <TaskForm
           card={task}
@@ -15,6 +15,11 @@ export const useEditTaskModal = () => {
           closeModal={closeWithBack}
         />
       ),
+      config: {
+        className: 'sm:max-w-6xl ',
+        contentClassName: 'p-0 space-y-0',
+        showFooter: false,
+      },
     });
   };
 

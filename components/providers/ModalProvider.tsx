@@ -15,6 +15,8 @@ interface ModalConfig {
   confirmVariant?: 'default' | 'destructive';
   onConfirm?: () => void;
   isConfirming?: boolean;
+  className?: string; // override default max-w-md
+  contentClassName?: string; // override default inner padding/spacing
 }
 
 interface ModalState {

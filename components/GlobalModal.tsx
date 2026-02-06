@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useGlobalModal } from './providers/ModalProvider';
+import { cn } from '@/lib/utils';
 
 export const GlobalModal = () => {
   const { modalState, currentModalKey, closeWithBack } = useGlobalModal();
@@ -20,23 +21,37 @@ export const GlobalModal = () => {
 
   return (
     <Dialog open={true} onOpenChange={(open) => !open && closeWithBack()}>
-      <DialogContent className="max-w-md p-0 overflow-hidden border-none shadow-2xl">
-        <div className="p-6 space-y-6">
-          <DialogHeader className="space-y-2">
-            <DialogTitle className="text-2xl font-bold tracking-tight">
-              {title}
-            </DialogTitle>
-            {description && (
-              <DialogDescription className="text-muted-foreground">
-                {description}
-              </DialogDescription>
-            )}
-          </DialogHeader>
+      <DialogContent
+        className={cn(
+          'p-0 overflow-hidden border-none shadow-2xl',
+          config?.className
+        )}
+      >
+        <div
+          className={cn(
+            'h-full flex flex-col p-6 space-y-6',
+            config?.contentClassName
+          )}
+        >
+          {(title || description) && (
+            <DialogHeader className="space-y-2 shrink-0">
+              {title && (
+                <DialogTitle className="text-2xl font-bold tracking-tight">
+                  {title}
+                </DialogTitle>
+              )}
+              {description && (
+                <DialogDescription className="text-muted-foreground">
+                  {description}
+                </DialogDescription>
+              )}
+            </DialogHeader>
+          )}
 
-          <div className="grow">{children}</div>
+          <div className="flex-1 min-h-0">{children}</div>
 
           {config?.showFooter && (
-            <DialogFooter className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
+            <DialogFooter className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800 shrink-0">
               <Button
                 variant="outline"
                 onClick={closeWithBack}

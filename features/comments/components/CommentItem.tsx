@@ -1,5 +1,6 @@
 import { formatDistanceToNow } from 'date-fns';
 import { MoreHorizontal, Reply, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +21,9 @@ interface CommentItemProps {
   onReply: (commentId: string) => void;
   replyingToId?: string | null;
   onCancelReply: () => void;
+  rootCommentId?: string; // ID of the top-level comment for nested replies
+  depth?: number; // Nesting level: 0=top-level, 1=reply, 2=reply-to-reply
+  repliesByParent?: Record<string, Comment[]>; // Map of all replies for recursive rendering
 }
 
 export const CommentItem = ({
@@ -29,10 +33,14 @@ export const CommentItem = ({
   onReply,
   replyingToId,
   onCancelReply,
+  rootCommentId,
+  depth = 0,
+  repliesByParent = {},
 }: CommentItemProps) => {
   const { data } = useMe();
   const deleteMutation = useDeleteComment();
   const isAuthor = data?.user?.id === comment.user_id;
+  const [showReplies, setShowReplies] = useState(false);
 
   const handleDelete = () => {
     deleteMutation.mutate({ commentId: comment.id, taskId });
@@ -90,23 +98,28 @@ export const CommentItem = ({
         </p>
 
         <div className="flex items-center gap-4 pt-1">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="h-auto p-0 text-muted-foreground hover:text-foreground"
-            onClick={() => onReply(comment.id)}
-          >
-            <Reply className="mr-1.5 h-3 w-3" />
-            <span className="text-xs">Reply</span>
-          </Button>
+          {replyingToId !== comment.id && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-auto p-0 text-muted-foreground hover:text-foreground"
+              onClick={() => {
+                onReply(comment.id);
+                setShowReplies(true);
+              }}
+            >
+              <Reply className="mr-1.5 h-3 w-3" />
+              <span className="text-xs">Reply</span>
+            </Button>
+          )}
         </div>
 
         {replyingToId === comment.id && (
           <div className="mt-2 pl-4 border-l-2 border-border/50">
             <CommentInput
               taskId={taskId}
-              parentId={comment.id}
+              parentId={depth === 2 ? rootCommentId || comment.id : comment.id}
               autoFocus
               onCancel={onCancelReply}
               onSuccess={onCancelReply}
@@ -115,26 +128,48 @@ export const CommentItem = ({
         )}
 
         {replies.length > 0 && (
-          <div className="mt-2 space-y-3">
-            {replies.map((reply) => (
-              <div key={reply.id} className="relative pl-6">
-                {/* Connector line */}
-                <div className="absolute left-0 top-0 bottom-0 w-px bg-border/40" />
-                <div className="absolute left-0 top-4 w-4 h-px bg-border/40" />
-
-                <CommentItem
-                  comment={reply}
-                  taskId={taskId}
-                  onReply={() => onReply(comment.id)} // Reply to reply -> reply to parent
-                  replyingToId={replyingToId}
-                  onCancelReply={onCancelReply}
-                  // Nested replies not passed, as we flatten to 2 levels
-                />
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+        <div className="mt-2 text-sm">
+          {!showReplies ? (
+            <button
+              onClick={() => setShowReplies(true)}
+              className="text-muted-foreground hover:text-foreground font-medium flex items-center gap-2"
+            >
+              <div className="w-8 h-px bg-border" />
+              View {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
+            </button>
+          ) : (
+             <div className="space-y-3">
+               {replies.map((reply) => (
+                 <div key={reply.id} className="relative pl-6">
+                   {/* Connector line */}
+                   <div className="absolute left-0 top-0 bottom-0 w-px bg-border/40" />
+                   <div className="absolute left-0 top-4 w-4 h-px bg-border/40" />
+   
+                   <CommentItem
+                     comment={reply}
+                     taskId={taskId}
+                      replies={repliesByParent[reply.id]}
+                       onReply={onReply}
+                     replyingToId={replyingToId}
+                      rootCommentId={comment.id}
+                      depth={depth + 1}
+                       // Supports up to 3 levels: depth 0 (top) -> 1 (reply) -> 2 (reply-to-reply)
+                      repliesByParent={repliesByParent}
+                     onCancelReply={onCancelReply}
+                    />
+                 </div>
+               ))}
+               <button
+                  onClick={() => setShowReplies(false)}
+                  className="text-muted-foreground hover:text-foreground font-medium text-xs ml-6 mt-2"
+                >
+                  Hide replies
+                </button>
+             </div>
+          )}
+        </div>
+      )}
     </div>
+  </div>
   );
 };

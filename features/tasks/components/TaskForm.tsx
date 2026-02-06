@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/ui/button';
 import {
-  DialogHeader,
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
@@ -125,87 +124,98 @@ export const TaskForm = ({
   const isLoading = isUpdating || isDeleting || isCreating;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="h-full flex flex-col">
-      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
-        <DialogHeader>
-          <div className="flex items-start gap-4">
-            <Laptop className="mt-1 size-5 text-muted-foreground" />
-            <div className="flex-1 space-y-1">
-              <DialogTitle className="flex items-center gap-2">
-                <FormInput
-                  {...register('title')}
-                  placeholder="Task Title"
-                  className="font-semibold text-xl border-none shadow-none focus-visible:ring-0 px-0 h-auto p-0 bg-transparent placeholder:text-muted-foreground/50"
+    <form onSubmit={handleSubmit(onSubmit)} className="flex-1 min-h-0 flex flex-col">
+
+
+      <div className="flex-1 min-h-0 overflow-y-auto md:overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-2 min-h-full">
+          {/* Left Column: Details */}
+          <div className="space-y-8 p-6 scroll-smooth h-full md:overflow-y-auto md:min-h-0">
+            {/* Title Section */}
+            <div className="flex items-start gap-4">
+              <Laptop className="mt-1 size-5 text-muted-foreground" />
+              <div className="flex-1 space-y-1">
+                <DialogTitle className="flex items-center gap-2">
+                  <FormInput
+                    {...register('title')}
+                    placeholder="Task Title"
+                    className="font-semibold text-xl border-none shadow-none focus-visible:ring-0 px-0 h-auto p-0 bg-transparent placeholder:text-muted-foreground/50 w-full"
+                    disabled={isLoading}
+                    error={errors.title?.message}
+                  />
+                </DialogTitle>
+                <div className="text-sm text-muted-foreground">
+                  in list{' '}
+                  <span className="font-medium text-foreground">{listTitle}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-[24px_1fr] gap-4">
+              <Calendar className="mt-1 size-5 text-muted-foreground" />
+              <div className="space-y-2">
+                <FormDatePicker
+                  control={control}
+                  name="deadlines"
+                  label="Deadlines"
+                  className="w-full"
                   disabled={isLoading}
-                  error={errors.title?.message}
                 />
-              </DialogTitle>
-              <div className="text-sm text-muted-foreground">
-                in list{' '}
-                <span className="font-medium text-foreground">{listTitle}</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-[24px_1fr] gap-4">
+              <div className="mt-1 size-5 bg-transparent" />
+              <div className="space-y-2">
+                <FormSelect
+                  control={control}
+                  name="assignedTo"
+                  label="Assign To"
+                  placeholder="Select assignee..."
+                  options={memberOptions}
+                  className="w-full"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-[24px_1fr] gap-4">
+              <AlignLeft className="mt-1 size-5 text-muted-foreground" />
+              <div className="space-y-2">
+                <h3 className="font-semibold text-base">Description</h3>
+                <FormTextarea
+                  label=""
+                  {...register('description')}
+                  placeholder="Add a more detailed description..."
+                  className="resize-none min-h-[120px]"
+                  disabled={isLoading}
+                  error={errors.description?.message}
+                />
               </div>
             </div>
           </div>
-        </DialogHeader>
 
-        <div className="grid grid-cols-[24px_1fr] gap-4">
-          <AlignLeft className="mt-1 size-5 text-muted-foreground" />
-          <div className="space-y-2">
-            <h3 className="font-semibold text-base">Description</h3>
-            <FormTextarea
-              label="Description"
-              {...register('description')}
-              placeholder="Add a more detailed description..."
-              className="resize-none"
-              disabled={isLoading}
-              error={errors.description?.message}
-            />
+          {/* Right Column: Activity */}
+          <div className="flex flex-col border-l bg-gray-50/50 p-6 h-full md:min-h-0">
+            {isEditing && card ? (
+              <TaskComments taskId={card.id} />
+            ) : (
+              <div className="flex items-center justify-center h-full text-muted-foreground bg-muted/10 rounded-lg border border-dashed">
+                <p>Save task to add comments</p>
+              </div>
+            )}
           </div>
         </div>
-
-        <div className="grid grid-cols-[24px_1fr] gap-4">
-          <Calendar className="mt-1 size-5 text-muted-foreground" />
-          <div className="space-y-2">
-            <FormDatePicker
-              control={control}
-              name="deadlines"
-              label="Deadlines"
-              className="w-full"
-              disabled={isLoading}
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-[24px_1fr] gap-4">
-          <div className="mt-1 size-5" />
-          <div className="space-y-2">
-            <FormSelect
-              control={control}
-              name="assignedTo"
-              label="Assign To"
-              placeholder="Select assignee..."
-              options={memberOptions}
-              className="w-full"
-            />
-          </div>
-        </div>
-
-        {isEditing && card && (
-          <div className="pt-4 border-t">
-            <TaskComments taskId={card.id} />
-          </div>
-        )}
       </div>
 
-      <DialogFooter className="px-6 py-4 border-t flex justify-between items-center bg-muted/20">
+      <DialogFooter className="px-6 py-4 border-t flex justify-between items-center sm:justify-between bg-background shrink-0 z-10">
         {isEditing ? (
           <Button
             type="button"
-            variant="destructive"
+            variant="ghost"
             size="sm"
             onClick={onDelete}
             disabled={isLoading}
-            className="gap-2"
+            className="gap-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 pl-2"
           >
             {isDeleting ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -217,6 +227,7 @@ export const TaskForm = ({
         ) : (
           <div />
         )}
+
         <div className="flex gap-2">
           <Button
             type="button"
