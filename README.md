@@ -318,18 +318,39 @@ trello_nextjs/
 │   ├── globals.css               # Global styles
 │   └── layout.tsx                # Root layout
 │
-├── features/                     # Feature-based modules
+├── features/                     # Feature-based modules (domain-driven)
 │   ├── auth/                     # Authentication
 │   │   ├── api/                  # Client-side query hooks
 │   │   ├── components/           # Login/Signup forms
 │   │   ├── server/               # API routes & services
 │   │   └── schema.ts             # Zod validation schemas
-│   ├── workspaces/               # Workspace management
-│   ├── projects/                 # Project boards
-│   ├── tasks/                    # Task CRUD
-│   ├── columns/                  # Kanban columns
+│   │
+│   ├── workspaces/               # Workspace + Member management
+│   │   ├── api/
+│   │   ├── components/
+│   │   ├── server/
+│   │   └── members/              # ← Member features bundled here
+│   │       ├── api/
+│   │       ├── components/
+│   │       ├── hooks/
+│   │       └── server/
+│   │
+│   ├── projects/                 # Project boards + Columns + Tasks
+│   │   ├── api/
+│   │   ├── components/
+│   │   ├── server/
+│   │   ├── columns/              # ← Column features bundled here
+│   │   │   ├── api/
+│   │   │   ├── components/
+│   │   │   ├── hooks/
+│   │   │   └── server/
+│   │   └── tasks/                # ← Task features bundled here
+│   │       ├── api/
+│   │       ├── components/
+│   │       ├── hooks/
+│   │       └── server/
+│   │
 │   ├── comments/                 # Task comments (3-level nesting)
-│   ├── members/                  # Team member management
 │   ├── calendar/                 # Calendar views
 │   ├── dashboard/                # Dashboard stats
 │   ├── team/                     # Team invitation
@@ -363,17 +384,22 @@ trello_nextjs/
 ### Rationale for Feature-Based Structure
 
 > [!IMPORTANT]
-> **Feature-Based > Layer-Based**
+> **Domain-Driven Feature Organization**
 >
-> This project uses **feature-based modules** instead of traditional layer-based structure (controllers/, services/, models/).
+> This project uses **domain-driven feature modules** instead of traditional layer-based structure (controllers/, services/, models/).
+>
+> Features are bundled by **domain ownership**:
+> - **Workspaces** own **Members** (members don't exist without a workspace)
+> - **Projects** own **Columns** and **Tasks** (the Kanban board)
 
 **Benefits:**
 
-1. **Co-location**: All code for a feature lives together (API, UI, types, tests)
+1. **Co-location**: All code for a domain lives together (API, UI, types, tests)
 2. **Scalability**: Easy to add/remove features without touching unrelated code
 3. **Team Parallelization**: Multiple developers can work on different features simultaneously
 4. **Clear Boundaries**: Each feature owns its domain logic
 5. **Easier Refactoring**: Changes are localized to feature directories
+6. **Mental Model Alignment**: Structure matches user's understanding (Workspace → Project → Board → Tasks)
 
 **Each Feature Module Contains:**
 
