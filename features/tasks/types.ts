@@ -1,3 +1,5 @@
+import { Tables } from '@/lib/supabase/database.types';
+
 export interface Task {
   id: string;
   title: string;
@@ -12,11 +14,12 @@ export interface Task {
   card_members?: unknown[];
   card_labels?: unknown[];
   checklists?: unknown[];
-  comments?: unknown[];
+  comments?: { count: number }[];
   attachments?: unknown[];
   due_date?: string | null;
   deadlines: string;
   assigned_to: string | null;
+  assigned_to_user?: Tables<'profiles'> | null;
   priority?: 'low' | 'medium' | 'high' | null;
 }
 

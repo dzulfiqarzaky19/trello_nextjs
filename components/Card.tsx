@@ -5,9 +5,10 @@ interface ICardProps {
   title: string;
   description?: string | null;
   className?: string;
+  children?: React.ReactNode;
 }
 
-export const CardDemo = ({ title, description, className }: ICardProps) => {
+export const CardDemo = ({ title, description, className, children }: ICardProps) => {
   return (
     <Card
       className={cn(
@@ -27,6 +28,7 @@ export const CardDemo = ({ title, description, className }: ICardProps) => {
             {description}
           </div>
         )}
+        {children}
       </CardContent>
     </Card>
   );

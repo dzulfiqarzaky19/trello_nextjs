@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { InferResponseType } from 'hono';
 
-type ResponseType = InferResponseType<typeof client.api.auth.me.$get>;
+type ResponseType = InferResponseType<typeof client.api.auth.me.$get, 200>;
 
 export const useMe = () => {
   const query = useQuery<ResponseType, Error>({
@@ -17,7 +17,9 @@ export const useMe = () => {
         throw new Error('Failed to fetch user');
       }
 
-      return await response.json();
+      const { user, profile } = await response.json();
+
+      return { user, profile };
     },
   });
 

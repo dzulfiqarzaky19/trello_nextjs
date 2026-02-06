@@ -16,14 +16,14 @@ const app = new Hono()
       });
 
       if (error) {
-        return c.json({ error: error.message });
+        return c.json({ error: error.message }, 401);
       }
 
       return c.json({ response: data });
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'My Internal Server Error';
-      return c.json({ error: errorMessage });
+      return c.json({ error: errorMessage }, 500);
     }
   })
   .post('/register', zValidator('json', signUpSchema), async (c) => {
@@ -43,7 +43,7 @@ const app = new Hono()
       });
 
       if (error) {
-        return c.json({ error: error.message });
+        return c.json({ error: error.message }, 400);
       }
 
       const {
@@ -58,7 +58,7 @@ const app = new Hono()
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Internal Server Error';
-      return c.json({ error: errorMessage });
+      return c.json({ error: errorMessage }, 500);
     }
   })
   .post('/logout', async (c) => {
@@ -75,7 +75,7 @@ const app = new Hono()
       } = await supabase.auth.getUser();
 
       if (!user) {
-        return c.json({ error: 'User not found' });
+        return c.json({ error: 'User not found' }, 401);
       }
 
       const { data: profile } = await supabase
@@ -85,14 +85,14 @@ const app = new Hono()
         .single();
 
       if (!profile) {
-        return c.json({ error: 'Profile not found' });
+        return c.json({ error: 'Profile not found' }, 404);
       }
 
       return c.json({ user, profile });
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Internal Server Error';
-      return c.json({ error: errorMessage });
+      return c.json({ error: errorMessage }, 500);
     }
   })
   .get('/:id', zValidator('param', z.object({ id: z.string() })), async (c) => {
@@ -107,14 +107,14 @@ const app = new Hono()
         .single();
 
       if (error) {
-        return c.json({ error: error.message });
+        return c.json({ error: error.message }, 400);
       }
 
       return c.json({ profile });
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Internal Server Error';
-      return c.json({ error: errorMessage });
+      return c.json({ error: errorMessage }, 500);
     }
   });
 

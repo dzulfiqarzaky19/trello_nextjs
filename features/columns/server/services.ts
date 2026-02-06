@@ -51,7 +51,9 @@ export class ColumnService {
     const supabase = await createSupabaseServer();
     const { data, error } = await supabase
       .from('columns')
-      .select('*, tasks(*)')
+      .select(
+        '*, tasks(*, comments:task_comments(count))'
+      )
       .eq('project_id', projectId)
       .order('position', { ascending: true });
 
@@ -166,13 +168,39 @@ export class ColumnService {
 
       const data = await this.listColumns(projectId);
 
+      // Collect all user IDs from tasks to fetch profiles manually
+      // because there is no foreign key relationship in the database schema
+      const userIds = new Set<string>();
+      data?.forEach((col) => {
+        col.tasks.forEach((task) => {
+          if (task.assigned_to) {
+            userIds.add(task.assigned_to);
+          }
+        });
+      });
+
+      const supabase = await createSupabaseServer();
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('*')
+        .in('id', Array.from(userIds));
+
+      const profileMap = new Map(profiles?.map((p) => [p.id, p]) || []);
+
       const columnsWithSortedTasks: ColumnWithTasks[] =
         data?.map((column) => {
           const tasks = Array.isArray(column.tasks) ? column.tasks : [];
 
+          const tasksWithProfiles = tasks.map((task) => ({
+            ...task,
+            assigned_to_user: task.assigned_to
+              ? profileMap.get(task.assigned_to)
+              : null,
+          }));
+
           return {
             ...column,
-            tasks: tasks.sort((a, b) => a.position - b.position),
+            tasks: tasksWithProfiles.sort((a, b) => a.position - b.position),
           } as ColumnWithTasks;
         }) || [];
 

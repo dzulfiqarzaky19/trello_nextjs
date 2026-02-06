@@ -24,6 +24,7 @@ import { useCreateTask } from '@/features/tasks/api/useCreateTask';
 import { useProjectId } from '../../projects/hooks/useProjectId';
 import { useDeleteTaskModal } from '@/features/tasks/hooks/useDeleteTaskModal';
 import { useGetProject } from '@/features/projects/api/useGetProject';
+import { TaskComments } from '@/features/comments/components/TaskComments';
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -188,6 +189,12 @@ export const TaskForm = ({
             />
           </div>
         </div>
+
+        {isEditing && card && (
+            <div className="pt-4 border-t">
+                <TaskComments taskId={card.id} />
+            </div>
+        )}
       </div>
 
       <DialogFooter className="px-6 py-4 border-t flex justify-between items-center bg-muted/20">

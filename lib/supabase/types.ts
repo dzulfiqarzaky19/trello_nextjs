@@ -61,9 +61,9 @@ export interface AuditLogWithProfile extends Tables<'audit_logs'> {
 export interface MemberPartial {
   role: string | null;
   workspaces:
-    | { image_url: string | null }
-    | { image_url: string | null }[]
-    | null;
+  | { image_url: string | null }
+  | { image_url: string | null }[]
+  | null;
 }
 
 // ============================================
@@ -112,13 +112,31 @@ export type AuditLogMetadata =
 // ============================================
 
 /**
+ * Type guard to check if a column query result has joined project data.
+ */
+export function hasProjectData(
+  data: unknown
+): data is { projects: { workspace_id: string; name: string } | null } {
+  if (typeof data !== 'object' || data === null) return false;
+  if (!('projects' in data)) return false;
+  const projects = (data as { projects: unknown }).projects;
+  if (projects === null) return true;
+  return (
+    typeof projects === 'object' &&
+    projects !== null &&
+    'workspace_id' in projects &&
+    'name' in projects
+  );
+}
+
+/**
  * Type guard to check if member data has workspace image.
  */
 export function hasWorkspaceImage(data: unknown): data is {
   workspaces:
-    | { image_url: string | null }
-    | { image_url: string | null }[]
-    | null;
+  | { image_url: string | null }
+  | { image_url: string | null }[]
+  | null;
 } {
   if (typeof data !== 'object' || data === null) return false;
   if (!('workspaces' in data)) return false;
