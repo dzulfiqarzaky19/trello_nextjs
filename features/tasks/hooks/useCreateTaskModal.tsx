@@ -14,6 +14,9 @@ export const useCreateTaskModal = () => {
           closeModal={closeWithBack}
         />
       ),
+      config: {
+        className: 'sm:max-w-5xl',
+      },
     });
   };
 
