@@ -1,7 +1,7 @@
 'use client';
 
 import { useGetWorkspaces } from '@/features/workspaces/api/useGetWorkspaces';
-import { useGetMembers } from '@/features/members/api/useGetMembers';
+import { useGetMembers } from '@/features/workspaces/members/api/useGetMembers';
 import { useForm, useWatch } from 'react-hook-form';
 import { FormSelect } from '@/components/form/FormSelect';
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useAddMember } from '@/features/members/api/useAddMember';
+import { useAddMember } from '@/features/workspaces/members/api/useAddMember';
 import { UserSearchInput } from '@/features/users/components/UserSearchInput';
 import { IUserSearchResult } from '@/features/users/schema';
 import { Button } from '@/components/ui/button';

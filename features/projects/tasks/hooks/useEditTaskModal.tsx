@@ -1,6 +1,6 @@
 import { useModal } from '@/components/providers/ModalProvider';
 import { TaskForm } from '../components/TaskForm';
-import { Task } from '@/features/tasks/types';
+import { Task } from '@/features/projects/tasks/types';
 
 export const useEditTaskModal = () => {
   const { openModal, closeWithBack } = useModal('view-task');

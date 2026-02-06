@@ -3,7 +3,7 @@ import { client } from '@/lib/rpc';
 import { InferRequestType, InferResponseType } from 'hono';
 import { toast } from 'sonner';
 import { useProjectId } from '@/features/projects/hooks/useProjectId';
-import { Column } from '@/features/columns/types';
+import { Column } from '@/features/projects/columns/types';
 import { optimisticTask } from '@/lib/utils/optimisticTask';
 
 type ResponseType = InferResponseType<

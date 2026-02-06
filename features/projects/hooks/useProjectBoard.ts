@@ -2,9 +2,9 @@ import { useCallback, useMemo } from 'react';
 import { DropResult } from '@hello-pangea/dnd';
 import { Column } from '../types';
 import { useGetProject } from '../api/useGetProject';
-import { useGetColumns } from '@/features/columns/api/useGetColumns';
-import { useUpdateTask } from '@/features/tasks/api/useUpdateTask';
-import { useUpdateColumn } from '@/features/columns/api/useUpdateColumn';
+import { useGetColumns } from '@/features/projects/columns/api/useGetColumns';
+import { useUpdateTask } from '@/features/projects/tasks/api/useUpdateTask';
+import { useUpdateColumn } from '@/features/projects/columns/api/useUpdateColumn';
 
 export const useProjectBoard = () => {
   const {

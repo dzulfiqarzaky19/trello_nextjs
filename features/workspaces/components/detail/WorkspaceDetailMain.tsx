@@ -1,6 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Overview } from './Overview';
-import { MembersList } from '@/features/members/components/MembersList';
+import { MembersList } from '@/features/workspaces/members/components/MembersList';
 import { ProjectsGrid } from '@/features/projects/components/ProjectsGrid';
 import { WorkspaceDetailHeader } from './WorkspaceDetailHeader';
 

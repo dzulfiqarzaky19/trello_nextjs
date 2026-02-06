@@ -10,7 +10,7 @@ import { FormRadio } from '@/components/form/FormRadio';
 import { cn } from '@/lib/utils';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useCreateColumn } from '@/features/columns/api/useCreateColumn';
+import { useCreateColumn } from '@/features/projects/columns/api/useCreateColumn';
 import { useForm } from 'react-hook-form';
 import { useProjectId } from '@/features/projects/hooks/useProjectId';
 

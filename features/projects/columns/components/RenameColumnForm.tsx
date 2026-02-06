@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { DialogFooter } from '@/components/ui/dialog';
-import { useUpdateColumn } from '@/features/columns/api/useUpdateColumn';
+import { useUpdateColumn } from '@/features/projects/columns/api/useUpdateColumn';
 
 import { FormInput } from '@/components/form/FormInput';
 import { FormSubmit } from '@/components/form/FormSubmit';

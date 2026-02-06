@@ -1,4 +1,4 @@
-import { useGetMyTasks } from '@/features/tasks/api/useGetMyTasks';
+import { useGetMyTasks } from '@/features/projects/tasks/api/useGetMyTasks';
 import { format, isSameDay, isValid } from 'date-fns';
 
 export const useCalendarEvents = () => {

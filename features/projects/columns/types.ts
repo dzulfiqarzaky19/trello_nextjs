@@ -1,4 +1,4 @@
-import { Task } from '@/features/tasks/types';
+import { Task } from '@/features/projects/tasks/types';
 
 export interface Column {
   id: string;

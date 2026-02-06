@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
-import { Card as CardType } from '../../projects/types';
+import { Card as CardType } from '@/features/projects/types';
 import { AlignLeft, Laptop, Trash2, Loader2, Calendar } from 'lucide-react';
 import { FormInput } from '@/components/form/FormInput';
 import { FormTextarea } from '@/components/form/FormTextarea';
@@ -12,13 +12,13 @@ import { FormDatePicker } from '@/components/form/FormDatePicker';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useUpdateTask } from '@/features/tasks/api/useUpdateTask';
+import { useUpdateTask } from '@/features/projects/tasks/api/useUpdateTask';
 import { FormSelect } from '@/components/form/FormSelect';
-import { useGetMembers } from '@/features/members/api/useGetMembers';
+import { useGetMembers } from '@/features/workspaces/members/api/useGetMembers';
 
-import { useCreateTask } from '@/features/tasks/api/useCreateTask';
-import { useProjectId } from '../../projects/hooks/useProjectId';
-import { useDeleteTaskModal } from '@/features/tasks/hooks/useDeleteTaskModal';
+import { useCreateTask } from '@/features/projects/tasks/api/useCreateTask';
+import { useProjectId } from '@/features/projects/hooks/useProjectId';
+import { useDeleteTaskModal } from '@/features/projects/tasks/hooks/useDeleteTaskModal';
 import { useGetProject } from '@/features/projects/api/useGetProject';
 import { TaskComments } from '@/features/comments/components/TaskComments';
 

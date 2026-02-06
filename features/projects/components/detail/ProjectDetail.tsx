@@ -1,11 +1,11 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { Plus, Loader2 } from 'lucide-react';
-import { ProjectColumn } from '../../../columns/components/ProjectColumn';
+import { ProjectColumn } from '@/features/projects/columns/components/ProjectColumn';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import { useProjectBoard } from '../../hooks/useProjectBoard';
 import { useProjectRealtime } from '../../hooks/useProjectRealtime';
-import { useCreateColumnModal } from '@/features/columns/hooks/useCreateColumnModal';
+import { useCreateColumnModal } from '@/features/projects/columns/hooks/useCreateColumnModal';
 
 export const ProjectDetail = () => {
   const { orderedData, isLoading, error, onDragEnd } = useProjectBoard();

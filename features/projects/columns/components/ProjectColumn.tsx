@@ -15,11 +15,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { Ellipsis, Plus } from 'lucide-react';
-import { ProjectTask } from '../../tasks/components/ProjectTask';
-import { Column } from '../../projects/types';
-import { useDeleteColumnModal } from '../../columns/hooks/useDeleteColumnModal';
-import { useRenameColumnModal } from '../../columns/hooks/useRenameColumnModal';
-import { useCreateTaskModal } from '@/features/tasks/hooks/useCreateTaskModal';
+import { ProjectTask } from '@/features/projects/tasks/components/ProjectTask';
+import { Column } from '@/features/projects/types';
+import { useDeleteColumnModal } from '@/features/projects/columns/hooks/useDeleteColumnModal';
+import { useRenameColumnModal } from '@/features/projects/columns/hooks/useRenameColumnModal';
+import { useCreateTaskModal } from '@/features/projects/tasks/hooks/useCreateTaskModal';
 
 interface ProjectColumnProps {
   column: Column;

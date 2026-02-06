@@ -3,7 +3,7 @@ import { Tables, TablesUpdate } from '@/lib/supabase/database.types';
 import { getErrorMessage } from '@/lib/supabase/types';
 import { z } from 'zod';
 import { createTaskSchema, updateTaskSchema } from '../schema';
-import { MemberGuard } from '@/features/members/server/guard';
+import { MemberGuard } from '@/features/workspaces/members/server/guard';
 import { logActivity } from '@/lib/audit-logs';
 import { ProjectService } from '@/features/projects/server/services';
 

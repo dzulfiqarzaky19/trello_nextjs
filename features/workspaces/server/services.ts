@@ -5,10 +5,10 @@ import { getErrorMessage, isAppError } from '@/lib/supabase/types';
 import { workspaceSchema, workspacesListSchema } from '../schema';
 import { z } from 'zod';
 import { isUuid } from '@/lib/utils/checkUuid';
-import { MemberGuard } from '@/features/members/server/guard';
+import { MemberGuard } from '@/features/workspaces/members/server/guard';
 import { StorageService } from '@/lib/storage-service';
 
-import { MemberService } from '@/features/members/server/services';
+import { MemberService } from '@/features/workspaces/members/server/services';
 
 import { ServiceResult } from '@/lib/service-result';
 

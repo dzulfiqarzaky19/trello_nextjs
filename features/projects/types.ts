@@ -13,12 +13,12 @@ export interface Member {
   profiles: Profile;
 }
 
-import { Task } from '@/features/tasks/types';
+import { Task } from '@/features/projects/tasks/types';
 
 export type { Task };
-export type { Card } from '@/features/tasks/types';
+export type { Card } from '@/features/projects/tasks/types';
 
-import { Column } from '@/features/columns/types';
+import { Column } from '@/features/projects/columns/types';
 
 export type { Column };
 

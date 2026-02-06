@@ -1,6 +1,6 @@
 import { CardDemo } from '@/components/Card';
-import { Task } from '@/features/tasks/types';
-import { useEditTaskModal } from '@/features/tasks/hooks/useEditTaskModal';
+import { Task } from '@/features/projects/tasks/types';
+import { useEditTaskModal } from '@/features/projects/tasks/hooks/useEditTaskModal';
 import { Draggable } from '@hello-pangea/dnd';
 
 interface ProjectTaskProps {

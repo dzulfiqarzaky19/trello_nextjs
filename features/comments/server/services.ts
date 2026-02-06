@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { createCommentSchema, updateCommentSchema } from '../schema';
 import { ServiceResult } from '@/lib/service-result';
 import { Comment } from '../types';
-import { TaskService } from '@/features/tasks/server/services';
+import { TaskService } from '@/features/projects/tasks/server/services';
 
 export class CommentService {
   static async getComments(

@@ -4,7 +4,7 @@ import { WORKSPACE_STORAGE_BUCKET } from '@/features/workspaces/constants';
 import { getErrorMessage } from '@/lib/supabase/types';
 import { z } from 'zod';
 import { createProjectSchema, updateProjectSchema } from '../schema';
-import { MemberGuard } from '@/features/members/server/guard';
+import { MemberGuard } from '@/features/workspaces/members/server/guard';
 import { WorkspaceService } from '@/features/workspaces/server/services';
 import { StorageService } from '@/lib/storage-service';
 import { logActivity } from '@/lib/audit-logs';

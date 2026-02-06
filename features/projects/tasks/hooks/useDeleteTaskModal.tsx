@@ -1,6 +1,6 @@
 import { useModal } from '@/components/providers/ModalProvider';
 import { useDeleteTask } from '../api/useDeleteTask';
-import { Task } from '@/features/tasks/types';
+import { Task } from '@/features/projects/tasks/types';
 
 export const useDeleteTaskModal = () => {
   const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask();

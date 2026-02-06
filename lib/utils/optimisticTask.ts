@@ -1,4 +1,4 @@
-import { Column } from '@/features/columns/types';
+import { Column } from '@/features/projects/columns/types';
 
 interface MoveTaskParams {
   newColumns: Column[];
